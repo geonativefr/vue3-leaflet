@@ -6,7 +6,7 @@
 import L, { LatLng, Marker, Icon } from 'leaflet';
 import 'leaflet.smooth_marker_bouncing';
 import { whenever } from '@vueuse/core';
-import { computed, inject, onUnmounted, provide, reactive, ref, toRefs, watch } from 'vue';
+import { computed, inject, onUnmounted, provide, reactive, ref, toRefs, unref, watch } from 'vue';
 import { clean } from '../../utils/utils.js';
 
 // @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
@@ -112,7 +112,7 @@ const icon = computed(() => {
       iconAnchor: [22, 50], // half width, full height
       popupAnchor: [0, -50],
     };
-    return {iconUrl: props.icon, ...defaults};
+    return L.icon({iconUrl: props.icon, ...defaults});
   }
 });
 
@@ -127,6 +127,7 @@ const bouncingOptions = reactive({
 });
 const map = ref(inject('map'));
 const marker = L.marker(props.position, clean(options));
+provide('layer', marker);
 marker.on('click', () => emit('click', marker));
 marker.on('bounceend', () => emit('bounceend'));
 
@@ -139,7 +140,6 @@ function doBounce(marker, value) {
   marker.bounce(value);
 }
 
-provide('layer', marker);
 
 function updateOptions(marker) {
   L.setOptions(marker, clean(options));
@@ -152,7 +152,7 @@ whenever(map, (map) => map.addLayer(marker), {immediate: true});
 whenever(position, position => marker.setLatLng(position));
 whenever(icon, icon => marker.setIcon(icon), {deep: true, immediate: true});
 whenever(options, () => updateOptions(marker), {deep: true, immediate: true});
-whenever(bouncingOptions, options => marker.setBouncingOptions(clean(options)), {deep: true, immediate: true});
+whenever(bouncingOptions, bouncingOptions => marker.setBouncingOptions(clean(bouncingOptions)), {deep: true, immediate: true});
 watch(bounce, value => doBounce(marker, value), {immediate: true});
 onUnmounted(() => marker.remove());
 </script>

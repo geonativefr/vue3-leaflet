@@ -368,7 +368,7 @@ const _sfc_main$1 = {
           iconAnchor: [22, 50],
           popupAnchor: [0, -50]
         };
-        return __spreadValues({ iconUrl: props.icon }, defaults);
+        return L$1.icon(__spreadValues({ iconUrl: props.icon }, defaults));
       }
     });
     const bouncingOptions = reactive({
@@ -382,6 +382,7 @@ const _sfc_main$1 = {
     });
     const map = ref(inject("map"));
     const marker = L$1.marker(props.position, clean(options));
+    provide("layer", marker);
     marker.on("click", () => emit("click", marker));
     marker.on("bounceend", () => emit("bounceend"));
     function doBounce(marker2, value) {
@@ -391,7 +392,6 @@ const _sfc_main$1 = {
       }
       marker2.bounce(value);
     }
-    provide("layer", marker);
     function updateOptions(marker2) {
       L$1.setOptions(marker2, clean(options));
       marker2._removeIcon();
@@ -402,7 +402,7 @@ const _sfc_main$1 = {
     whenever(position, (position2) => marker.setLatLng(position2));
     whenever(icon, (icon2) => marker.setIcon(icon2), { deep: true, immediate: true });
     whenever(options, () => updateOptions(marker), { deep: true, immediate: true });
-    whenever(bouncingOptions, (options2) => marker.setBouncingOptions(clean(options2)), { deep: true, immediate: true });
+    whenever(bouncingOptions, (bouncingOptions2) => marker.setBouncingOptions(clean(bouncingOptions2)), { deep: true, immediate: true });
     watch(bounce, (value) => doBounce(marker, value), { immediate: true });
     onUnmounted(() => marker.remove());
     return (_ctx, _cache) => {
