@@ -10,3 +10,4 @@ export { default as Polygon } from './layers/vector/Polygon.js';
 export { default as ZoomControl } from './controls/ZoomControl.js';
 export { default as ScaleControl } from './controls/ScaleControl.js';
 export { default as LocateControl } from './controls/LocateControl.js';
+export { default as PegmanControl } from './controls/PegmanControl.js';

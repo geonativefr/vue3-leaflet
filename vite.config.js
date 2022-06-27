@@ -20,6 +20,7 @@ export default defineConfig({
         'leaflet',
         'leaflet.smooth_marker_bouncing',
         'leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js',
+        'leaflet-pegman',
         //'leaflet.locatecontrol',
         //'leaflet-arrowheads',
       ],

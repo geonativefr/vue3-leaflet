@@ -92,6 +92,30 @@ const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
 </style>
 ```
 
+#### Pegman (Google Street View)
+
+```vue
+<template>
+  <MapContainer :center="center">
+    <GoogleMaps :api-key="apiKey" type="satellite" />
+    <PegmanControl :api-key="apiKey" />
+  </MapContainer>
+</template>
+
+<script setup>
+import { MapContainer, GoogleMaps, PegmanControl } from 'vue3-leaflet';
+import { ref } from 'vue';
+
+const center = ref([48.3151, 3.68461]);
+const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
+</script>
+
+<style lang="scss">
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet-pegman/leaflet-pegman.css';
+</style>
+```
+
 ### Vectors
 
 Add vectors on map (Circle, Polygon, Polyline)

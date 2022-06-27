@@ -34,6 +34,7 @@ import L$1, { LatLng, Map, Icon, Marker, Popup, Control } from "leaflet";
 import { templateRef, get, whenever, set, useMounted } from "@vueuse/core";
 import "leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js";
 import "leaflet.smooth_marker_bouncing";
+import "leaflet-pegman";
 const _sfc_main$5 = {
   __name: "MapContainer",
   props: {
@@ -173,74 +174,6 @@ const _sfc_main$3 = {
     };
   }
 };
-const _sfc_main$2 = {
-  __name: "GoogleMaps",
-  props: {
-    url: {
-      type: String,
-      default: "https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-    },
-    apiKey: {
-      type: String,
-      required: true
-    },
-    type: {
-      type: String,
-      default: "roadmap",
-      validator: (type) => ["roadmap", "satellite", "terrain", "hybrid"].includes(type)
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    const { type } = toRefs(props);
-    const defaultOptions = reactive({ type });
-    const useGoogleMaps = (GOOGLE_MAPS_API_KEY) => {
-      var _a;
-      window.gmapsApiLoaded = (_a = window.gmapsApiLoaded) != null ? _a : false;
-      const mount = (map2, options2) => L$1.gridLayer.googleMutant(options2).addTo(map2);
-      const load = async (map2, options2 = defaultOptions) => {
-        return new Promise((resolve, reject) => {
-          if (window.gmapsApiLoaded === true) {
-            return resolve(mount(map2, options2));
-          }
-          const el = document.createElement("script");
-          el.type = "text/javascript";
-          el.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY;
-          el.async = true;
-          el.addEventListener("error", (event) => reject(event));
-          el.addEventListener("abort", (event) => reject(event));
-          el.addEventListener("load", () => {
-            window.L = L$1;
-            window.gmapsApiLoaded = true;
-            resolve(mount(map2, options2));
-          });
-          document.head.appendChild(el);
-        });
-      };
-      return { load };
-    };
-    const map = ref(inject("map"));
-    const options = reactive({
-      apiKey: props.apiKey,
-      attribution: props.attribution,
-      tileSize: props.tileSize,
-      zoomOffset: props.zoomOffset
-    });
-    const layer = L$1.tileLayer(props.url, options);
-    const gmaps = useGoogleMaps(props.apiKey);
-    const mutant = ref();
-    whenever(mutant, (mutant2, oldMutant) => oldMutant == null ? void 0 : oldMutant.remove());
-    watch(type, () => setMutant(unref(map)));
-    async function setMutant(map2) {
-      set(mutant, await gmaps.load(map2, defaultOptions));
-    }
-    provide("layer", layer);
-    whenever(map, (map2) => setMutant(map2), { immediate: true });
-    return (_ctx, _cache) => {
-      return renderSlot(_ctx.$slots, "default");
-    };
-  }
-};
 function renderless(component) {
   return Object.assign(component, { render: () => void 0 });
 }
@@ -266,6 +199,74 @@ function clean(object) {
   });
   return object;
 }
+async function loadGmapsApi(GOOGLE_MAPS_API_KEY) {
+  var _a;
+  window.gmapsApi = (_a = window.gmapsApi) != null ? _a : new Promise((resolve, reject) => {
+    const el = document.createElement("script");
+    el.type = "text/javascript";
+    el.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY;
+    el.async = true;
+    el.addEventListener("error", (event) => reject(event));
+    el.addEventListener("abort", (event) => reject(event));
+    el.addEventListener("load", () => {
+      window.L = L$1;
+      resolve(true);
+    });
+    document.head.appendChild(el);
+  });
+  return window.gmapsApi;
+}
+const _sfc_main$2 = {
+  __name: "GoogleMaps",
+  props: {
+    url: {
+      type: String,
+      default: "https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+    },
+    apiKey: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      default: "roadmap",
+      validator: (type) => ["roadmap", "satellite", "terrain", "hybrid"].includes(type)
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const { type } = toRefs(props);
+    const defaultOptions = reactive({ type });
+    const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
+      const mount = (map2, options2) => L$1.gridLayer.googleMutant(options2).addTo(map2);
+      const load = async (map2, options2 = defaultOptions) => {
+        await loadGmapsApi(GOOGLE_MAPS_API_KEY);
+        mount(map2, options2);
+      };
+      return { load };
+    };
+    const map = ref(inject("map"));
+    const options = reactive({
+      apiKey: props.apiKey,
+      attribution: props.attribution,
+      tileSize: props.tileSize,
+      zoomOffset: props.zoomOffset
+    });
+    const layer = L$1.tileLayer(props.url, options);
+    const gmaps = useGoogleMutant(props.apiKey);
+    const mutant = ref();
+    whenever(mutant, (mutant2, oldMutant) => oldMutant == null ? void 0 : oldMutant.remove());
+    watch(type, () => setMutant(unref(map)));
+    async function setMutant(map2) {
+      set(mutant, await gmaps.load(map2, defaultOptions));
+    }
+    provide("layer", layer);
+    whenever(map, (map2) => setMutant(map2), { immediate: true });
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
+  }
+};
 const _sfc_main$1 = {
   __name: "Marker",
   props: {
@@ -2076,4 +2077,34 @@ var LocateControl = renderless({
     whenever(map, (map2) => map2.addControl(control), { immediate: true });
   }
 });
-export { Circle, _sfc_main$2 as GoogleMaps, LocateControl, _sfc_main$5 as MapContainer, _sfc_main$3 as Mapbox, _sfc_main$1 as Marker, _sfc_main$4 as OpenStreetMap, Polygon, Polyline, _sfc_main as Popup, ScaleControl, ZoomControl };
+var PegmanControl = renderless({
+  props: {
+    apiKey: {
+      type: String,
+      default: void 0
+    },
+    position: {
+      type: String,
+      default: "bottomright"
+    },
+    theme: {
+      type: String,
+      default: "leaflet-pegman-v3-small"
+    }
+  },
+  setup(props) {
+    const map = ref(inject("map"));
+    const mount = async (map2) => {
+      if (props.apiKey) {
+        await loadGmapsApi(props.apiKey);
+      }
+      const control = new L$1.Control.Pegman({
+        position: props.position,
+        theme: props.theme
+      });
+      control.addTo(map2);
+    };
+    whenever(map, mount, { immediate: true });
+  }
+});
+export { Circle, _sfc_main$2 as GoogleMaps, LocateControl, _sfc_main$5 as MapContainer, _sfc_main$3 as Mapbox, _sfc_main$1 as Marker, _sfc_main$4 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, ZoomControl };

@@ -303,6 +303,11 @@ leaflet-geometryutil@^0.10.0:
   dependencies:
     leaflet "^1.6.0"
 
+leaflet-pegman@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/leaflet-pegman/-/leaflet-pegman-0.1.6.tgz#184ed969d48ad1bf54e87dd25b220dd8f4fe45af"
+  integrity sha512-hNXa1bYomWdXtaYtpDTXrfEbRBLBhRL8aO8HQTpTqYeYLUSX+wnEX0yQePK7Q+U+IBgyWiNZ7UhsBsFGdH1G2w==
+
 leaflet.gridlayer.googlemutant@^0.13.5:
   version "0.13.5"
   resolved "https://registry.yarnpkg.com/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.13.5.tgz#7182c26f479e726bff8b85a7ebf9d3f44dd3ea57"
