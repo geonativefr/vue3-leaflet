@@ -2078,6 +2078,7 @@ var LocateControl = renderless({
   }
 });
 var PegmanControl = renderless({
+  emits: ["openstreetview", "closestreetview"],
   props: {
     apiKey: {
       type: String,
@@ -2092,7 +2093,7 @@ var PegmanControl = renderless({
       default: "leaflet-pegman-v3-small"
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     const map = ref(inject("map"));
     const mount = async (map2) => {
       if (props.apiKey) {
@@ -2103,6 +2104,24 @@ var PegmanControl = renderless({
         theme: props.theme
       });
       control.addTo(map2);
+      const observer = new MutationObserver((mutationList) => {
+        var _a, _b;
+        for (const mutation of mutationList) {
+          if (mutation.type === "childList") {
+            for (const node of mutation.addedNodes) {
+              if ((_a = node.classList) == null ? void 0 : _a.contains("pegman-marker")) {
+                emit("openstreetview");
+              }
+            }
+            for (const node of mutation.removedNodes) {
+              if ((_b = node.classList) == null ? void 0 : _b.contains("pegman-marker")) {
+                emit("closestreetview");
+              }
+            }
+          }
+        }
+      });
+      observer.observe(map2._container, { childList: true, subtree: true });
     };
     whenever(map, mount, { immediate: true });
   }
