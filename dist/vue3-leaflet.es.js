@@ -103,7 +103,7 @@ const _sfc_main$4 = {
   props: {
     url: {
       type: String,
-      default: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      default: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
     },
     attribution: {
       type: String,

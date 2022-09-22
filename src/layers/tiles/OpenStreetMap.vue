@@ -10,7 +10,7 @@ import { whenever } from '@vueuse/core';
 const props = defineProps({
   url: {
     type: String,
-    default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    default: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   },
   attribution: {
     type: String,
