@@ -4,6 +4,7 @@ export { default as Mapbox} from './layers/tiles/Mapbox.vue';
 export { default as GoogleMaps} from './layers/tiles/GoogleMaps.vue';
 export { default as Marker } from './layers/markers/Marker.vue';
 export { default as Popup } from './layers/Popup.vue';
+export { default as Tooltip } from './layers/Tooltip.js';
 export { default as Circle } from './layers/vector/Circle.js';
 export { default as Polyline } from './layers/vector/Polyline.js';
 export { default as Polygon } from './layers/vector/Polygon.js';

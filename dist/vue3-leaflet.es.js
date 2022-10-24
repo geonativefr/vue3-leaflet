@@ -30,7 +30,7 @@ var __objRest = (source, exclude) => {
   return target;
 };
 import { toRefs, reactive, ref, onMounted, provide, watch, openBlock, createElementBlock, renderSlot, createCommentVNode, inject, unref, computed, onUnmounted, createElementVNode } from "vue";
-import L$1, { LatLng, Map, Icon, Marker, Popup, Control } from "leaflet";
+import L$1, { LatLng, Map, Icon, Marker, Popup, Tooltip as Tooltip$1, Control } from "leaflet";
 import { templateRef, get, whenever, set, useMounted } from "@vueuse/core";
 import "leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js";
 import "leaflet.smooth_marker_bouncing";
@@ -482,6 +482,177 @@ const _sfc_main = {
     };
   }
 };
+function formatNum(num, precision) {
+  if (precision === false) {
+    return num;
+  }
+  var pow = Math.pow(10, precision === void 0 ? 6 : precision);
+  return Math.round(num * pow) / pow;
+}
+var isArray = Array.isArray || function(obj) {
+  return Object.prototype.toString.call(obj) === "[object Array]";
+};
+function Point(x, y, round) {
+  this.x = round ? Math.round(x) : x;
+  this.y = round ? Math.round(y) : y;
+}
+var trunc = Math.trunc || function(v) {
+  return v > 0 ? Math.floor(v) : Math.ceil(v);
+};
+Point.prototype = {
+  clone: function() {
+    return new Point(this.x, this.y);
+  },
+  add: function(point) {
+    return this.clone()._add(toPoint(point));
+  },
+  _add: function(point) {
+    this.x += point.x;
+    this.y += point.y;
+    return this;
+  },
+  subtract: function(point) {
+    return this.clone()._subtract(toPoint(point));
+  },
+  _subtract: function(point) {
+    this.x -= point.x;
+    this.y -= point.y;
+    return this;
+  },
+  divideBy: function(num) {
+    return this.clone()._divideBy(num);
+  },
+  _divideBy: function(num) {
+    this.x /= num;
+    this.y /= num;
+    return this;
+  },
+  multiplyBy: function(num) {
+    return this.clone()._multiplyBy(num);
+  },
+  _multiplyBy: function(num) {
+    this.x *= num;
+    this.y *= num;
+    return this;
+  },
+  scaleBy: function(point) {
+    return new Point(this.x * point.x, this.y * point.y);
+  },
+  unscaleBy: function(point) {
+    return new Point(this.x / point.x, this.y / point.y);
+  },
+  round: function() {
+    return this.clone()._round();
+  },
+  _round: function() {
+    this.x = Math.round(this.x);
+    this.y = Math.round(this.y);
+    return this;
+  },
+  floor: function() {
+    return this.clone()._floor();
+  },
+  _floor: function() {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+    return this;
+  },
+  ceil: function() {
+    return this.clone()._ceil();
+  },
+  _ceil: function() {
+    this.x = Math.ceil(this.x);
+    this.y = Math.ceil(this.y);
+    return this;
+  },
+  trunc: function() {
+    return this.clone()._trunc();
+  },
+  _trunc: function() {
+    this.x = trunc(this.x);
+    this.y = trunc(this.y);
+    return this;
+  },
+  distanceTo: function(point) {
+    point = toPoint(point);
+    var x = point.x - this.x, y = point.y - this.y;
+    return Math.sqrt(x * x + y * y);
+  },
+  equals: function(point) {
+    point = toPoint(point);
+    return point.x === this.x && point.y === this.y;
+  },
+  contains: function(point) {
+    point = toPoint(point);
+    return Math.abs(point.x) <= Math.abs(this.x) && Math.abs(point.y) <= Math.abs(this.y);
+  },
+  toString: function() {
+    return "Point(" + formatNum(this.x) + ", " + formatNum(this.y) + ")";
+  }
+};
+function toPoint(x, y, round) {
+  if (x instanceof Point) {
+    return x;
+  }
+  if (isArray(x)) {
+    return new Point(x[0], x[1]);
+  }
+  if (x === void 0 || x === null) {
+    return x;
+  }
+  if (typeof x === "object" && "x" in x && "y" in x) {
+    return new Point(x.x, x.y);
+  }
+  return new Point(x, y, round);
+}
+var Tooltip = renderless({
+  props: {
+    position: {
+      type: LatLng,
+      required: true
+    },
+    text: {
+      type: String,
+      required: true
+    },
+    direction: {
+      type: String,
+      default: "auto"
+    },
+    offset: {
+      type: Point,
+      default: () => new Point(0, 0)
+    },
+    permanent: {
+      type: Boolean,
+      default: false
+    },
+    sticky: {
+      type: Boolean,
+      default: false
+    },
+    opacity: {
+      type: Number,
+      default: 0.9
+    }
+  },
+  setup(props) {
+    const { position, text } = toRefs(props);
+    const options = reactive({
+      direction: props.direction,
+      offset: props.offset,
+      permanent: props.permanent,
+      sticky: props.sticky,
+      opacity: props.opacity
+    });
+    const map = inject("map");
+    const tooltip = new Tooltip$1();
+    tooltip.setLatLng(props.position).addTo(map);
+    watch(position, (position2) => tooltip.setLatLng(position2));
+    watch(text, (text2) => tooltip.setContent(text2), { immediate: true });
+    watch(options, (options2) => L$1.setOptions(tooltip, options2), { immediate: true });
+  }
+});
 var PathProps = {
   color: {
     type: String
@@ -2126,4 +2297,4 @@ var PegmanControl = renderless({
     whenever(map, mount, { immediate: true });
   }
 });
-export { Circle, _sfc_main$2 as GoogleMaps, LocateControl, _sfc_main$5 as MapContainer, _sfc_main$3 as Mapbox, _sfc_main$1 as Marker, _sfc_main$4 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, ZoomControl };
+export { Circle, _sfc_main$2 as GoogleMaps, LocateControl, _sfc_main$5 as MapContainer, _sfc_main$3 as Mapbox, _sfc_main$1 as Marker, _sfc_main$4 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, Tooltip, ZoomControl };
