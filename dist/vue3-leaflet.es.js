@@ -75,14 +75,15 @@ const _sfc_main$5 = {
     }
     onMounted(() => {
       const map = new Map(get(container), options);
+      map.setView(props.center, props.zoom);
       provide("map", map);
-      watch(center, (center2) => map.setView(center2, props.zoom), { immediate: true });
+      watch(center, (center2) => map.setView(center2));
       watch(zoom, (zoom2) => map.setView(props.center, zoom2), { immediate: true });
       watch(zoomControl, (zoomControl2) => zoomControl2 ? map.zoomControl.addTo(map) : map.zoomControl.remove(), { immediate: true });
       whenever(bounds, (bounds2) => fitBounds(map, bounds2), { immediate: true });
       set(mapRef, map);
-      map.on("move", (event) => emit("move", { event, center: map.getCenter() }));
-      map.on("zoomend", () => emit("zoomend", map.getZoom()));
+      map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
+      map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
       emit("ready", map);
     });
     return (_ctx, _cache) => {

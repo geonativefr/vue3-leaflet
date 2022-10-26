@@ -50,14 +50,15 @@ function fitBounds(map, bounds) {
 
 onMounted(() => {
   const map = new Map(get(container), options);
+  map.setView(props.center, props.zoom);
   provide('map', map);
-  watch(center, center => map.setView(center, props.zoom), {immediate: true});
+  watch(center, center => map.setView(center));
   watch(zoom, zoom => map.setView(props.center, zoom), {immediate: true});
   watch(zoomControl, zoomControl => zoomControl ? map.zoomControl.addTo(map) : map.zoomControl.remove(), {immediate: true});
   whenever(bounds, bounds => fitBounds(map, bounds), {immediate: true});
   set(mapRef, map);
-  map.on('move', (event) => emit('move', {event, center: map.getCenter()}));
-  map.on('zoomend', () => emit('zoomend', map.getZoom()));
+  map.on('move', (event) => emit('move', {event, center: map.getCenter(), map}));
+  map.on('zoomend', () => emit('zoomend', {zoom: map.getZoom(), bounds: map.getBounds(), map}));
   emit('ready', map);
 });
 </script>
