@@ -3,9 +3,8 @@
 </template>
 
 <script setup>
-import L from 'leaflet';
-import { inject, provide, ref } from 'vue';
 import { whenever } from '@vueuse/core';
+import { inject, provide } from 'vue';
 
 const props = defineProps({
   url: {
@@ -23,7 +22,7 @@ const props = defineProps({
   },
 });
 
-const map = ref(inject('map'));
+const map = inject('map');
 const layer = L.tileLayer(props.url, {
   attribution: props.attribution,
 });

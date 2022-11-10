@@ -1,4 +1,3 @@
-import L, { LatLng } from 'leaflet';
 import { computed, inject, onUnmounted, provide, reactive, ref, toRefs } from 'vue';
 import { whenever } from '@vueuse/core';
 import { clean, renderless } from '../../utils/utils.js';
@@ -7,7 +6,7 @@ import PathProps from '../PathProps.js';
 export default renderless({
   props: {
     center: {
-      type: [LatLng, Array, Object],
+      type: [Array, Object],
       required: true,
     },
     radius: {
@@ -39,7 +38,7 @@ export default renderless({
       fillColor,
     });
 
-    const map = ref(inject('map'));
+    const map = inject('map');
     const circle = L.circle(props.center, clean(options));
     provide('layer', circle);
 

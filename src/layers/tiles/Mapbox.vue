@@ -3,9 +3,9 @@
 </template>
 
 <script setup>
-import L from 'leaflet';
-import { inject, provide, reactive, ref } from 'vue';
 import { whenever } from '@vueuse/core';
+import { inject, provide, reactive } from 'vue';
+import { importLeaflet } from '../../utils/leaflet-loader.js';
 
 const props = defineProps({
   url: {
@@ -35,7 +35,8 @@ const props = defineProps({
   },
 });
 
-const map = ref(inject('map'));
+await importLeaflet(inject('leaflet.version'));
+const map = inject('map');
 const options = reactive({
   apiKey: props.apiKey,
   attribution: props.attribution,

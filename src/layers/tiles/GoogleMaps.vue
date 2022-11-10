@@ -1,13 +1,13 @@
 <template>
-  <slot />
+  <slot v-if="mutant" />
 </template>
 
 <script setup>
-import L from 'leaflet';
-import 'leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js';
-import { inject, onMounted, provide, reactive, ref, toRefs, unref, watch } from 'vue';
-import { get, set, whenever } from '@vueuse/core';
-import { loadGmapsApi } from '../../utils/utils.js';
+import { set, whenever } from '@vueuse/core';
+import { inject, provide, reactive, ref, toRefs, unref, watch } from 'vue';
+import { importLeaflet } from '../../utils/leaflet-loader.js';
+import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
+import { importGoogleMapsApi }from '../../utils/gmaps-api-loader.js';
 
 const props = defineProps({
   url: {
@@ -23,7 +23,14 @@ const props = defineProps({
     default: 'roadmap',
     validator: (type) => ['roadmap', 'satellite', 'terrain', 'hybrid'].includes(type),
   },
+  version: {
+    type: String,
+    default: undefined,
+  },
 });
+
+await importLeaflet(inject('leaflet.version'));
+await importLeafletGoogleMutant(props.version);
 
 const {type} = toRefs(props);
 const defaultOptions = reactive({type});
@@ -31,14 +38,15 @@ const defaultOptions = reactive({type});
 const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
   const mount = (map, options) => L.gridLayer.googleMutant(options).addTo(map);
   const load = async (map, options = defaultOptions) => {
-    await loadGmapsApi(GOOGLE_MAPS_API_KEY);
+    await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
     mount(map, options);
+    return {};
   };
 
   return {load};
 };
 
-const map = ref(inject('map'));
+const map = inject('map');
 const options = reactive({
   apiKey: props.apiKey,
   attribution: props.attribution,

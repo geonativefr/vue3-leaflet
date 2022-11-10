@@ -7,12 +7,21 @@
 </template>
 
 <script setup>
-import { LatLng, Popup } from 'leaflet';
 import { get, set, templateRef, useMounted, whenever } from '@vueuse/core';
 import { inject, provide, ref, toRefs, watch } from 'vue';
+import { importLeaflet } from '../utils/leaflet-loader.js';
+
+const props = defineProps({
+  position: {
+    type: [Object, Array],
+    default: undefined,
+  },
+});
+
+await importLeaflet(inject('leaflet.version'));
 
 // @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
-Popup.prototype._animateZoom = function (e) {
+L.Popup.prototype._animateZoom = function (e) {
   if (!this._map) {
     return;
   }
@@ -36,16 +45,9 @@ if (!window.fixPopupCloseEvent) {
   window.fixPopupCloseEvent = true; // Prevent declaring same listener twice
 }
 
-const props = defineProps({
-  position: {
-    type: LatLng,
-    default: undefined,
-  },
-});
-
 const {position} = toRefs(props);
 const popupContent = templateRef('popup-content');
-const popup = new Popup();
+const popup = new L.Popup();
 const layer = inject('layer');
 const isMounted = useMounted();
 const isBound = ref(false);

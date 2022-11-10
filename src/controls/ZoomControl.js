@@ -1,6 +1,5 @@
-import { Control } from 'leaflet';
 import { whenever } from '@vueuse/core';
-import { inject, ref } from 'vue';
+import { inject } from 'vue';
 import { clean, renderless } from '../utils/utils.js';
 
 export default renderless({
@@ -19,8 +18,8 @@ export default renderless({
     },
   },
   setup(props) {
-    const map = ref(inject('map'));
-    const control = new Control.Zoom(clean({...props}));
+    const map = inject('map');
+    const control = new L.Control.Zoom(clean({...props}));
 
     const mount = map => {
       map?.zoomControl?.remove();

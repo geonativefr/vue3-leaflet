@@ -1,4 +1,3 @@
-import L from 'leaflet';
 import { computed, inject, onUnmounted, provide, reactive, ref, toRefs } from 'vue';
 import { whenever } from '@vueuse/core';
 import { clean, renderless } from '../../utils/utils.js';
@@ -33,7 +32,7 @@ export default renderless({
       fillColor,
     });
 
-    const map = ref(inject('map'));
+    const map = inject('map');
     const polygon = L.polygon(props.positions, clean(options));
     provide('layer', polygon);
 

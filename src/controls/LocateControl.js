@@ -1,10 +1,8 @@
-import L from 'leaflet';
-import 'leaflet.locatecontrol';
-import { inject, ref } from 'vue';
 import { whenever } from '@vueuse/core';
+import { inject } from 'vue';
+import { importLeaflet } from '../utils/leaflet-loader.js';
+import { importLeafletLocateControl } from '../utils/leaflet-locatecontrol-loader.js';
 import { clean, renderless } from '../utils/utils.js';
-
-import.meta.env.PROD || import('leaflet.locatecontrol/dist/L.Control.Locate.min.css');
 
 export default renderless({
   props: {
@@ -16,9 +14,16 @@ export default renderless({
       type: Object,
       default: undefined,
     },
+    version: {
+      type: String,
+      default: undefined,
+    },
   },
-  setup(props) {
-    const map = ref(inject('map'));
+  async setup(props) {
+    const map = inject('map');
+
+    await importLeaflet(inject('leaflet.version'));
+    await importLeafletLocateControl(props.version);
     const control = L.control.locate(clean({...props}));
 
     whenever(map, (map) => map.addControl(control), {immediate: true});
