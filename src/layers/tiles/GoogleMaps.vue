@@ -56,7 +56,6 @@ const options = reactive({
 const layer = L.tileLayer(props.url, options);
 const gmaps = useGoogleMutant(props.apiKey);
 const mutant = ref();
-whenever(mutant, (mutant, oldMutant) => oldMutant?.remove());
 watch(type, () => setMutant(unref(map)));
 
 async function setMutant(map) {

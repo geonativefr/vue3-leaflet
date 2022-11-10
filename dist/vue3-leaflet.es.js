@@ -327,7 +327,6 @@ const _sfc_main$2 = {
     const layer = L.tileLayer(props.url, options);
     const gmaps = useGoogleMutant(props.apiKey);
     const mutant = ref();
-    whenever(mutant, (mutant2, oldMutant) => oldMutant == null ? void 0 : oldMutant.remove());
     watch(type, () => setMutant(unref(map)));
     async function setMutant(map2) {
       set(mutant, await gmaps.load(map2, defaultOptions));
