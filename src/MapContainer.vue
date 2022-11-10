@@ -1,9 +1,11 @@
 <template>
-  <Suspense>
-    <div ref="container" v-bind="$attrs">
-      <slot v-if="mapRef" :map="mapRef" />
-    </div>
-  </Suspense>
+  <div>
+    <Suspense>
+      <div ref="container" v-bind="$attrs">
+        <slot v-if="mapRef" :map="mapRef" />
+      </div>
+    </Suspense>
+  </div>
 </template>
 
 <script setup>
