@@ -1,3 +1,4 @@
+import { whenever } from '@vueuse/core';
 import { inject, reactive, toRefs, watch } from 'vue';
 import { renderless } from '../utils/utils.js';
 
@@ -42,10 +43,13 @@ export default renderless({
       opacity: props.opacity,
     });
     const map = inject('map');
-    const tooltip = new L.Tooltip();
-    tooltip.setLatLng(props.position).addTo(map);
-    watch(position, position => tooltip.setLatLng(position));
-    watch(text, text => tooltip.setContent(text), {immediate: true});
-    watch(options, options => L.setOptions(tooltip, options), {immediate: true});
+    const mount = (map) => {
+      const tooltip = new L.Tooltip();
+      tooltip.setLatLng(props.position).addTo(map);
+      watch(position, position => tooltip.setLatLng(position));
+      watch(text, text => tooltip.setContent(text), {immediate: true});
+      watch(options, options => L.setOptions(tooltip, options), {immediate: true});
+    }
+    whenever(map, mount, {immediate: true});
   },
 });

@@ -14,7 +14,7 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, createElementBlock, toRaw, nextTick } from "vue";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, toRaw, nextTick } from "vue";
 import { templateRef, get, whenever, set, useMounted } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
@@ -174,20 +174,22 @@ const _sfc_main$5 = {
       emit("ready", map);
     });
     return (_ctx, _cache) => {
-      return openBlock(), createBlock(Suspense, null, {
-        default: withCtx(() => [
-          createElementVNode("div", mergeProps({
-            ref_key: "container",
-            ref: container
-          }, _ctx.$attrs), [
-            mapRef.value ? renderSlot(_ctx.$slots, "default", {
-              key: 0,
-              map: mapRef.value
-            }) : createCommentVNode("", true)
-          ], 16)
-        ]),
-        _: 3
-      });
+      return openBlock(), createElementBlock("div", null, [
+        (openBlock(), createBlock(Suspense, null, {
+          default: withCtx(() => [
+            createElementVNode("div", mergeProps({
+              ref_key: "container",
+              ref: container
+            }, _ctx.$attrs), [
+              mapRef.value ? renderSlot(_ctx.$slots, "default", {
+                key: 0,
+                map: mapRef.value
+              }) : createCommentVNode("", true)
+            ], 16)
+          ]),
+          _: 3
+        }))
+      ]);
     };
   }
 };
@@ -580,11 +582,14 @@ var Tooltip = renderless({
       opacity: props.opacity
     });
     const map = inject("map");
-    const tooltip = new L.Tooltip();
-    tooltip.setLatLng(props.position).addTo(map);
-    watch(position, (position2) => tooltip.setLatLng(position2));
-    watch(text, (text2) => tooltip.setContent(text2), { immediate: true });
-    watch(options, (options2) => L.setOptions(tooltip, options2), { immediate: true });
+    const mount = (map2) => {
+      const tooltip = new L.Tooltip();
+      tooltip.setLatLng(props.position).addTo(map2);
+      watch(position, (position2) => tooltip.setLatLng(position2));
+      watch(text, (text2) => tooltip.setContent(text2), { immediate: true });
+      watch(options, (options2) => L.setOptions(tooltip, options2), { immediate: true });
+    };
+    whenever(map, mount, { immediate: true });
   }
 });
 var PathProps = {
