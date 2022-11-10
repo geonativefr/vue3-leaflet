@@ -410,6 +410,7 @@ const _sfc_main$1 = {
     const $map = inject("map");
     const $marker = ref();
     provide("layer", $marker);
+    provide("marker", $marker);
     function updateOptions(marker) {
       L.setOptions(marker, clean(options));
       marker._removeIcon();

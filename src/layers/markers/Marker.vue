@@ -82,6 +82,7 @@ const icon = computed(() => {
 const $map = inject('map');
 const $marker = ref();
 provide('layer', $marker);
+provide('marker', $marker);
 
 function updateOptions(marker) {
   L.setOptions(marker, clean(options));
