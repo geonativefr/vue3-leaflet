@@ -15,7 +15,7 @@ var __spreadValues = (a, b) => {
   return a;
 };
 import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, toRaw, nextTick } from "vue";
-import { templateRef, get, whenever, set, useMounted } from "@vueuse/core";
+import { templateRef, get, whenever, set, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
 const LEAFLET_GOOGLE_MUTANT_VERSION = "0.13.5";
@@ -468,10 +468,7 @@ var Bounceable = {
   }
 };
 const _hoisted_1 = { style: { "opacity": "0" } };
-const _hoisted_2 = {
-  ref: "popup-content",
-  id: "popup-container"
-};
+const _hoisted_2 = { ref: "popup-content" };
 const _sfc_main = {
   __name: "Popup",
   props: {
@@ -512,14 +509,22 @@ const _sfc_main = {
     const isMounted = useMounted();
     const isBound = ref(false);
     provide("layer", popup);
+    function redraw() {
+      if (popup.isOpen()) {
+        popup.toggle();
+        popup.toggle();
+      }
+    }
     function bindPopup() {
       if (get(isBound) === true) {
         return;
       }
       get(layer).bindPopup(popup);
       set(isBound, true);
+      redraw();
     }
     function hydrateContent(content) {
+      var _a;
       if (get(isMounted) === false) {
         return;
       }
@@ -528,6 +533,7 @@ const _sfc_main = {
         popup.setContent(isStructured ? content.firstElementChild : content);
         bindPopup();
       }
+      useMutationObserver((_a = content.firstElementChild) != null ? _a : content, () => redraw(), { subtree: true, childList: true, characterData: true });
     }
     whenever(position, (position2) => popup.setLatLng(position2), { immediate: true });
     watch(popupContent, hydrateContent, { immediate: true });
