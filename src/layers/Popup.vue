@@ -1,15 +1,16 @@
 <template>
-  <div style="opacity: 0">
+  <Void>
     <div ref="popup-content">
       <slot/>
     </div>
-  </div>
+  </Void>
 </template>
 
 <script setup>
 import { get, set, templateRef, useMounted, useMutationObserver, whenever } from '@vueuse/core';
 import { inject, provide, ref, toRefs, watch } from 'vue';
 import { importLeaflet } from '../utils/leaflet-loader.js';
+import Void from '../Void.vue';
 
 const props = defineProps({
   position: {
