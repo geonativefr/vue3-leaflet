@@ -17,12 +17,6 @@ export default defineConfig({
       external: [
         '@vueuse/core',
         'vue',
-        'leaflet',
-        'leaflet.smooth_marker_bouncing',
-        'leaflet.gridlayer.googlemutant/dist/Leaflet.GoogleMutant.js',
-        'leaflet-pegman',
-        //'leaflet.locatecontrol',
-        //'leaflet-arrowheads',
       ],
       output: {
         // Provide global variables to use in the UMD build

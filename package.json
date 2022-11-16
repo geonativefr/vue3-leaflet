@@ -21,16 +21,10 @@
   },
   "dependencies": {
     "@vueuse/core": "^8.6.0",
-    "leaflet": "^1.8.0",
-    "leaflet-arrowheads": "^1.4.0",
-    "leaflet-pegman": "^0.1.6",
-    "leaflet.locatecontrol": "^0.76.1",
-    "leaflet.smooth_marker_bouncing": "^2.0.1",
     "vue": "^3.2.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
-    "leaflet.gridlayer.googlemutant": "^0.13.5",
     "path": "^0.12.7",
     "vite": "^2.9.9"
   }

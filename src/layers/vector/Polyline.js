@@ -1,7 +1,6 @@
-import L from 'leaflet';
-import 'leaflet-arrowheads';
 import { computed, inject, onUnmounted, provide, reactive, ref, toRefs } from 'vue';
 import { whenever } from '@vueuse/core';
+import { importLeafletArrowHeads } from '../../utils/leaflet-leaflet-arrowheads.js';
 import { clean, renderless } from '../../utils/utils.js';
 import PathProps from '../PathProps.js';
 
@@ -17,7 +16,7 @@ export default renderless({
     },
     ...PathProps,
   },
-  setup(props) {
+  async setup(props) {
     const {
       positions,
       color,
@@ -38,18 +37,19 @@ export default renderless({
       fillColor,
     });
 
-    const map = ref(inject('map'));
+    const map = inject('map');
     const polyline = L.polyline(props.positions, clean(options));
+    provide('layer', polyline);
+    onUnmounted(() => polyline.remove());
+
     if (props.arrows) {
+      await importLeafletArrowHeads();
       polyline.arrowheads(props.arrows);
     }
-    provide('layer', polyline);
 
     whenever(map, (map) => map.addLayer(polyline), {immediate: true});
     whenever(options, (options) => L.setOptions(polyline, clean(options), {deep: true, immediate: true}));
     whenever(positions, positions => polyline.setLatLngs(positions));
-
-    onUnmounted(() => polyline.remove());
   },
 });
 

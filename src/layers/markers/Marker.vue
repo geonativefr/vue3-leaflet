@@ -1,31 +1,23 @@
 <template>
-  <slot :marker="marker"/>
+  <span v-if="$marker" :data-marker="$marker">
+    <slot :marker="$marker"/>
+  </span>
 </template>
 
 <script setup>
-import L, { LatLng, Marker, Icon } from 'leaflet';
-import 'leaflet.smooth_marker_bouncing';
-import { whenever } from '@vueuse/core';
-import { computed, inject, onUnmounted, provide, reactive, ref, toRefs, unref, watch } from 'vue';
+import { get, set, whenever } from '@vueuse/core';
+import { computed, inject, onMounted, onUnmounted, provide, reactive, ref, toRefs } from 'vue';
+import { importLeaflet } from '../../utils/leaflet-loader.js';
 import { clean } from '../../utils/utils.js';
 
-// @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
-Marker.prototype._animateZoom = function (opt) {
-  if (!this._map) {
-    return;
-  }
-  const pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
-  this._setPos(pos);
-};
-
-const emit = defineEmits(['click', 'bounceend']);
+const emit = defineEmits(['click', 'load']);
 const props = defineProps({
   position: {
-    type: [LatLng, Array, Object],
+    type: [Array, Object],
     required: true,
   },
   icon: {
-    type: [String, Object, Icon],
+    type: [String, Object],
     default: undefined,
   },
   title: {
@@ -44,53 +36,24 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
-  bounce: {
-    type: [Boolean, Number],
-    default: false,
-  },
-  bounceHeight: {
-    type: Number,
-    default: undefined,
-  },
-  contractHeight: {
-    type: Number,
-    default: undefined,
-  },
-  bounceSpeed: {
-    type: Number,
-    default: undefined,
-  },
-  contractSpeed: {
-    type: Number,
-    default: undefined,
-  },
-  shadowAngle: {
-    type: Number,
-    default: undefined,
-  },
-  elastic: {
-    type: Boolean,
-    default: undefined,
-  },
-  exclusive: {
-    type: Boolean,
-    default: undefined,
-  },
 });
+
+await importLeaflet(inject('leaflet.version'));
+
+// @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
+L.Marker.prototype._animateZoom = function (opt) {
+  if (!this._map) {
+    return;
+  }
+  const pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
+  this._setPos(pos);
+};
 
 const {
   position,
   title,
   alt,
   opacity,
-  bounce,
-  bounceHeight,
-  contractHeight,
-  bounceSpeed,
-  contractSpeed,
-  shadowAngle,
-  elastic,
-  exclusive,
 } = toRefs(props);
 
 const options = reactive({
@@ -100,7 +63,7 @@ const options = reactive({
 });
 
 const icon = computed(() => {
-  if (props.icon instanceof Icon) {
+  if (props.icon instanceof L.Icon) {
     return props.icon;
   }
   if (props.icon instanceof Object) {
@@ -116,30 +79,10 @@ const icon = computed(() => {
   }
 });
 
-const bouncingOptions = reactive({
-  bounceHeight,
-  contractHeight,
-  bounceSpeed,
-  contractSpeed,
-  shadowAngle,
-  elastic,
-  exclusive,
-});
-const map = ref(inject('map'));
-const marker = L.marker(props.position, clean(options));
-provide('layer', marker);
-marker.on('click', () => emit('click', marker));
-marker.on('bounceend', () => emit('bounceend'));
-
-function doBounce(marker, value) {
-  if ('boolean' === typeof value) {
-    value ? marker.bounce() : marker.stopBouncing();
-    return;
-  }
-
-  marker.bounce(value);
-}
-
+const $map = inject('map');
+const $marker = ref();
+provide('layer', $marker);
+provide('marker', $marker);
 
 function updateOptions(marker) {
   L.setOptions(marker, clean(options));
@@ -148,11 +91,23 @@ function updateOptions(marker) {
   marker.update();
 }
 
-whenever(map, (map) => map.addLayer(marker), {immediate: true});
-whenever(position, position => marker.setLatLng(position));
-whenever(icon, icon => marker.setIcon(icon), {deep: true, immediate: true});
-whenever(options, () => updateOptions(marker), {deep: true, immediate: true});
-whenever(bouncingOptions, bouncingOptions => marker.setBouncingOptions(clean(bouncingOptions)), {deep: true, immediate: true});
-watch(bounce, value => doBounce(marker, value), {immediate: true});
-onUnmounted(() => marker.remove());
+onMounted(() => {
+  whenever($map, (map) => {
+    const marker = L.marker(props.position, clean(options));
+    marker.on('click', () => emit('click', marker));
+    set($marker, marker);
+    map.addLayer(get($marker));
+    emit('load', get($marker));
+
+    whenever(position, position => get($marker).setLatLng(position));
+    whenever(icon, icon => get($marker).setIcon(icon), {deep: true, immediate: true});
+    whenever(options, () => updateOptions(get($marker)), {deep: true, immediate: true});
+
+  }, {immediate: true});
+});
+
+
+
+
+onUnmounted(() => get($marker).remove());
 </script>

@@ -1,12 +1,11 @@
-import L, { LatLng, Tooltip } from 'leaflet';
-import { Point } from 'leaflet/src/geometry/index.js';
+import { whenever } from '@vueuse/core';
 import { inject, reactive, toRefs, watch } from 'vue';
 import { renderless } from '../utils/utils.js';
 
 export default renderless({
   props: {
     position: {
-      type: LatLng,
+      type: [Array, Object],
       required: true,
     },
     text: {
@@ -18,8 +17,8 @@ export default renderless({
       default: 'auto',
     },
     offset: {
-      type: Point,
-      default: () => new Point(0, 0),
+      type: Object,
+      default: undefined,
     },
     permanent: {
       type: Boolean,
@@ -38,16 +37,19 @@ export default renderless({
     const {position, text} = toRefs(props);
     const options = reactive({
       direction: props.direction,
-      offset: props.offset,
+      offset: props.offset ?? new L.Point(0, 0),
       permanent: props.permanent,
       sticky: props.sticky,
       opacity: props.opacity,
     });
     const map = inject('map');
-    const tooltip = new Tooltip();
-    tooltip.setLatLng(props.position).addTo(map);
-    watch(position, position => tooltip.setLatLng(position));
-    watch(text, text => tooltip.setContent(text), {immediate: true});
-    watch(options, options => L.setOptions(tooltip, options), {immediate: true});
+    const mount = (map) => {
+      const tooltip = new L.Tooltip();
+      tooltip.setLatLng(props.position).addTo(map);
+      watch(position, position => tooltip.setLatLng(position));
+      watch(text, text => tooltip.setContent(text), {immediate: true});
+      watch(options, options => L.setOptions(tooltip, options), {immediate: true});
+    }
+    whenever(map, mount, {immediate: true});
   },
 });

@@ -1,21 +1,23 @@
 <template>
-  <div ref="container">
-    <slot v-if="mapRef" :map="mapRef" />
+  <div>
+    <Suspense>
+      <div ref="container" v-bind="$attrs">
+        <slot v-if="mapRef" :map="mapRef" />
+      </div>
+    </Suspense>
   </div>
 </template>
 
 <script setup>
-import { LatLng, Map } from 'leaflet';
 import { get, set, templateRef, whenever } from '@vueuse/core';
 import { onMounted, provide, reactive, ref, toRefs, watch } from 'vue';
-
-import.meta.env.PROD || import('leaflet/dist/leaflet.css');
+import { importLeaflet } from './utils/leaflet-loader.js';
 
 const emit = defineEmits(['ready', 'move', 'zoomend']);
 const props = defineProps({
   center: {
-    type: [LatLng, Array, Object],
-    default: () => new LatLng(0, 0),
+    type: [Array, Object],
+    default: () => undefined,
   },
   zoom: {
     type: Number,
@@ -33,11 +35,16 @@ const props = defineProps({
     type: Array,
     default: undefined,
   },
+  version: {
+    type: String,
+    default: undefined,
+  },
 });
 
 const {center, zoom, zoomControl, bounds, scrollWheelZoom} = toRefs(props);
 const options = reactive({
   scrollWheelZoom,
+  maxZoom: 18,
 });
 const container = templateRef('container');
 const mapRef = ref();
@@ -48,10 +55,13 @@ function fitBounds(map, bounds) {
   }
 }
 
-onMounted(() => {
-  const map = new Map(get(container), options);
+provide('map', mapRef);
+provide('leaflet.version', props.version);
+
+onMounted(async () => {
+  await importLeaflet(props.version);
+  const map = L.map(get(container), options);
   map.setView(props.center, props.zoom);
-  provide('map', map);
   watch(center, center => map.setView(center));
   watch(zoom, zoom => map.setView(props.center, zoom), {immediate: true});
   watch(zoomControl, zoomControl => zoomControl ? map.zoomControl.addTo(map) : map.zoomControl.remove(), {immediate: true});
