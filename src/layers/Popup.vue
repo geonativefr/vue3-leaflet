@@ -1,15 +1,16 @@
 <template>
-  <div style="opacity: 0">
-    <div ref="popup-content" id="popup-container">
+  <Void>
+    <div ref="popup-content">
       <slot/>
     </div>
-  </div>
+  </Void>
 </template>
 
 <script setup>
-import { get, set, templateRef, useMounted, whenever } from '@vueuse/core';
+import { get, set, templateRef, useMounted, useMutationObserver, whenever } from '@vueuse/core';
 import { inject, provide, ref, toRefs, watch } from 'vue';
 import { importLeaflet } from '../utils/leaflet-loader.js';
+import Void from '../Void.vue';
 
 const props = defineProps({
   position: {
@@ -53,12 +54,20 @@ const isMounted = useMounted();
 const isBound = ref(false);
 provide('layer', popup);
 
+function redraw() {
+  if (popup.isOpen()) {
+    popup.toggle();
+    popup.toggle();
+  }
+}
+
 function bindPopup() {
   if (true === get(isBound)) {
     return;
   }
   get(layer).bindPopup(popup);
   set(isBound, true);
+  redraw();
 }
 
 function hydrateContent(content) {
@@ -70,6 +79,11 @@ function hydrateContent(content) {
     popup.setContent(isStructured ? content.firstElementChild : content);
     bindPopup();
   }
+  useMutationObserver(
+      content.firstElementChild ?? content,
+      () => redraw(),
+      {subtree: true, childList: true, characterData: true},
+  );
 }
 
 whenever(position, position => popup.setLatLng(position), {immediate: true});

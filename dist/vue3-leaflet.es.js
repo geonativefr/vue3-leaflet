@@ -14,8 +14,8 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, toRaw, nextTick } from "vue";
-import { templateRef, get, whenever, set, useMounted } from "@vueuse/core";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, toRaw, Teleport, nextTick } from "vue";
+import { templateRef, get, whenever, set, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
 const LEAFLET_GOOGLE_MUTANT_VERSION = "0.13.5";
@@ -115,7 +115,7 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     importLeafletGeoman()
   ]);
 }
-const _sfc_main$5 = {
+const _sfc_main$6 = {
   __name: "MapContainer",
   props: {
     center: {
@@ -193,7 +193,7 @@ const _sfc_main$5 = {
     };
   }
 };
-const _sfc_main$4 = {
+const _sfc_main$5 = {
   __name: "OpenStreetMap",
   props: {
     url: {
@@ -223,7 +223,7 @@ const _sfc_main$4 = {
     };
   }
 };
-const _sfc_main$3 = {
+const _sfc_main$4 = {
   __name: "Mapbox",
   props: {
     url: {
@@ -280,7 +280,7 @@ async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
   }
   return loadJSFromCDN(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`);
 }
-const _sfc_main$2 = {
+const _sfc_main$3 = {
   __name: "GoogleMaps",
   props: {
     url: {
@@ -339,7 +339,7 @@ const _sfc_main$2 = {
   }
 };
 const _hoisted_1$1 = ["data-marker"];
-const _sfc_main$1 = {
+const _sfc_main$2 = {
   __name: "Marker",
   props: {
     position: {
@@ -467,11 +467,30 @@ var Bounceable = {
     setBouncingState(marker, binding.value);
   }
 };
-const _hoisted_1 = { style: { "opacity": "0" } };
-const _hoisted_2 = {
-  ref: "popup-content",
-  id: "popup-container"
+var _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
 };
+if (document && !document.getElementById("void")) {
+  const voidElement = document.createElement("div");
+  voidElement.id = "void";
+  voidElement.style.width = 0;
+  voidElement.style.height = 0;
+  voidElement.style.opacity = 0;
+  voidElement.style.display = "none";
+  document.body.appendChild(voidElement);
+}
+const _sfc_main$1 = {};
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createBlock(Teleport, { to: "#void" }, [
+    renderSlot(_ctx.$slots, "default")
+  ]);
+}
+var Void = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render]]);
+const _hoisted_1 = { ref: "popup-content" };
 const _sfc_main = {
   __name: "Popup",
   props: {
@@ -512,14 +531,22 @@ const _sfc_main = {
     const isMounted = useMounted();
     const isBound = ref(false);
     provide("layer", popup);
+    function redraw() {
+      if (popup.isOpen()) {
+        popup.toggle();
+        popup.toggle();
+      }
+    }
     function bindPopup() {
       if (get(isBound) === true) {
         return;
       }
       get(layer).bindPopup(popup);
       set(isBound, true);
+      redraw();
     }
     function hydrateContent(content) {
+      var _a;
       if (get(isMounted) === false) {
         return;
       }
@@ -528,15 +555,19 @@ const _sfc_main = {
         popup.setContent(isStructured ? content.firstElementChild : content);
         bindPopup();
       }
+      useMutationObserver((_a = content.firstElementChild) != null ? _a : content, () => redraw(), { subtree: true, childList: true, characterData: true });
     }
     whenever(position, (position2) => popup.setLatLng(position2), { immediate: true });
     watch(popupContent, hydrateContent, { immediate: true });
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1, [
-        createElementVNode("div", _hoisted_2, [
-          renderSlot(_ctx.$slots, "default")
-        ], 512)
-      ]);
+      return openBlock(), createBlock(Void, null, {
+        default: withCtx(() => [
+          createElementVNode("div", _hoisted_1, [
+            renderSlot(_ctx.$slots, "default")
+          ], 512)
+        ]),
+        _: 3
+      });
     };
   }
 };
@@ -970,4 +1001,4 @@ var DrawControl = renderless({
     whenever(map, init, { immediate: true });
   }
 });
-export { Circle, DrawControl, _sfc_main$2 as GoogleMaps, LocateControl, _sfc_main$5 as MapContainer, _sfc_main$3 as Mapbox, _sfc_main$1 as Marker, _sfc_main$4 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
+export { Circle, DrawControl, _sfc_main$3 as GoogleMaps, LocateControl, _sfc_main$6 as MapContainer, _sfc_main$4 as Mapbox, _sfc_main$2 as Marker, _sfc_main$5 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
