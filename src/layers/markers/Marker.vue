@@ -33,7 +33,7 @@ const props = defineProps({
     default: undefined,
   },
   tooltip: {
-    type: String,
+    type: [String, Node],
     default: undefined,
   },
 });
@@ -54,6 +54,7 @@ const {
   title,
   alt,
   opacity,
+  tooltip,
 } = toRefs(props);
 
 const options = reactive({
@@ -102,6 +103,7 @@ onMounted(() => {
     whenever(position, position => get($marker).setLatLng(position));
     whenever(icon, icon => get($marker).setIcon(icon), {deep: true, immediate: true});
     whenever(options, () => updateOptions(get($marker)), {deep: true, immediate: true});
+    whenever(tooltip, (tooltip) => get(marker).bindTooltip(tooltip), {deep: true, immediate: true});
 
   }, {immediate: true});
 });
