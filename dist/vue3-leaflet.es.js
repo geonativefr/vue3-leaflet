@@ -115,7 +115,7 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     importLeafletGeoman()
   ]);
 }
-const _sfc_main$6 = {
+const _sfc_main$9 = {
   __name: "MapContainer",
   props: {
     center: {
@@ -193,7 +193,7 @@ const _sfc_main$6 = {
     };
   }
 };
-const _sfc_main$5 = {
+const _sfc_main$8 = {
   __name: "OpenStreetMap",
   props: {
     url: {
@@ -223,7 +223,7 @@ const _sfc_main$5 = {
     };
   }
 };
-const _sfc_main$4 = {
+const _sfc_main$7 = {
   __name: "Mapbox",
   props: {
     url: {
@@ -280,7 +280,7 @@ async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
   }
   return loadJSFromCDN(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`);
 }
-const _sfc_main$3 = {
+const _sfc_main$6 = {
   __name: "GoogleMaps",
   props: {
     url: {
@@ -339,7 +339,7 @@ const _sfc_main$3 = {
   }
 };
 const _hoisted_1$1 = ["data-marker"];
-const _sfc_main$2 = {
+const _sfc_main$5 = {
   __name: "Marker",
   props: {
     position: {
@@ -483,15 +483,15 @@ if (document && !document.getElementById("void")) {
   voidElement.style.display = "none";
   document.body.appendChild(voidElement);
 }
-const _sfc_main$1 = {};
+const _sfc_main$4 = {};
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createBlock(Teleport, { to: "#void" }, [
     renderSlot(_ctx.$slots, "default")
   ]);
 }
-var Void = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render]]);
+var Void = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render]]);
 const _hoisted_1 = { ref: "popup-content" };
-const _sfc_main = {
+const _sfc_main$3 = {
   __name: "Popup",
   props: {
     position: {
@@ -637,7 +637,8 @@ var PathProps = {
     type: String
   }
 };
-var Circle = renderless({
+const _sfc_main$2 = {
+  __name: "Circle",
   props: __spreadValues({
     center: {
       type: [Array, Object],
@@ -648,7 +649,8 @@ var Circle = renderless({
       required: true
     }
   }, PathProps),
-  setup(props) {
+  setup(__props) {
+    const props = __props;
     const {
       center,
       radius,
@@ -675,8 +677,11 @@ var Circle = renderless({
     whenever(options, (options2) => L.setOptions(circle, clean(options2), { deep: true, immediate: true }));
     whenever(center, (position) => circle.setLatLng(position));
     onUnmounted(() => circle.remove());
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
   }
-});
+};
 async function importLeafletGeometryUtil(version = LEAFLET_GEOMETRYUTIL_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet-geometryutil@${version}/src/leaflet.geometryutil.js`);
 }
@@ -684,7 +689,8 @@ async function importLeafletArrowHeads(version = LEAFLET_ARROWHEADS_VERSION) {
   await importLeafletGeometryUtil();
   return loadJSFromCDN(`https://unpkg.com/leaflet-arrowheads@${version}/src/leaflet-arrowheads.js`);
 }
-var Polyline = renderless({
+const _sfc_main$1 = {
+  __name: "Polyline",
   props: __spreadValues({
     positions: {
       type: Array,
@@ -695,7 +701,9 @@ var Polyline = renderless({
       default: void 0
     }
   }, PathProps),
-  async setup(props) {
+  async setup(__props) {
+    let __temp, __restore;
+    const props = __props;
     const {
       positions,
       color,
@@ -718,22 +726,27 @@ var Polyline = renderless({
     provide("layer", polyline);
     onUnmounted(() => polyline.remove());
     if (props.arrows) {
-      await importLeafletArrowHeads();
+      [__temp, __restore] = withAsyncContext(() => importLeafletArrowHeads()), await __temp, __restore();
       polyline.arrowheads(props.arrows);
     }
     whenever(map, (map2) => map2.addLayer(polyline), { immediate: true });
     whenever(options, (options2) => L.setOptions(polyline, clean(options2), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polyline.setLatLngs(positions2));
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
   }
-});
-var Polygon = renderless({
+};
+const _sfc_main = {
+  __name: "Polygon",
   props: __spreadValues({
     positions: {
       type: Array,
       required: true
     }
   }, PathProps),
-  setup(props) {
+  setup(__props) {
+    const props = __props;
     const {
       positions,
       color,
@@ -758,8 +771,11 @@ var Polygon = renderless({
     whenever(options, (options2) => L.setOptions(polygon, clean(options2), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polygon.setLatLngs(positions2));
     onUnmounted(() => polygon.remove());
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
   }
-});
+};
 var ZoomControl = renderless({
   props: {
     position: {
@@ -1001,4 +1017,4 @@ var DrawControl = renderless({
     whenever(map, init, { immediate: true });
   }
 });
-export { Circle, DrawControl, _sfc_main$3 as GoogleMaps, LocateControl, _sfc_main$6 as MapContainer, _sfc_main$4 as Mapbox, _sfc_main$2 as Marker, _sfc_main$5 as OpenStreetMap, PegmanControl, Polygon, Polyline, _sfc_main as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, DrawControl, _sfc_main$6 as GoogleMaps, LocateControl, _sfc_main$9 as MapContainer, _sfc_main$7 as Mapbox, _sfc_main$5 as Marker, _sfc_main$8 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
