@@ -6,8 +6,9 @@
 
 <script setup>
 import { get, set, whenever } from '@vueuse/core';
-import { computed, inject, onMounted, onUnmounted, provide, reactive, ref, toRefs } from 'vue';
+import { computed, inject, onUnmounted, provide, reactive, ref, toRaw, toRefs } from 'vue';
 import { importLeaflet } from '../../utils/leaflet-loader.js';
+import { MUTE_ERRORS, silently } from '../../utils/silently.js';
 import { clean } from '../../utils/utils.js';
 
 const emit = defineEmits(['click', 'load']);
@@ -80,36 +81,35 @@ const icon = computed(() => {
   }
 });
 
-const $map = inject('map');
-const $marker = ref();
-provide('layer', $marker);
-provide('marker', $marker);
-
 function updateOptions(marker) {
   L.setOptions(marker, clean(options));
-  marker._removeIcon();
-  marker._initIcon();
+  silently(() => {
+    marker._removeIcon();
+    marker._initIcon();
+  }, MUTE_ERRORS);
   marker.update();
 }
 
-onMounted(() => {
-  whenever($map, (map) => {
-    const marker = L.marker(props.position, clean(options));
-    marker.on('click', () => emit('click', marker));
-    set($marker, marker);
-    map.addLayer(get($marker));
-    emit('load', get($marker));
+const $layer = inject('layer');
+const $marker = ref();
+provide('marker', $marker);
+provide('layer', $marker);
 
-    whenever(position, position => get($marker).setLatLng(position));
-    whenever(icon, icon => get($marker).setIcon(icon), {deep: true, immediate: true});
-    whenever(options, () => updateOptions(get($marker)), {deep: true, immediate: true});
-    whenever(tooltip, (tooltip) => get(marker).bindTooltip(tooltip), {deep: true, immediate: true});
+const layer = toRaw(get($layer));
+set($marker, L.marker(props.position, clean(options)));
+get($marker).on('click', () => emit('click', get($marker)));
+layer.addLayer(get($marker));
+emit('load', get($marker));
 
-  }, {immediate: true});
+whenever(position, position => get($marker).setLatLng(position));
+whenever(icon, icon => silently(() => get($marker).setIcon(icon), MUTE_ERRORS));
+whenever(options, () => updateOptions(get($marker)), {deep: true, immediate: true});
+whenever(tooltip, (tooltip) => get(marker).bindTooltip(tooltip), {deep: true, immediate: true});
+
+onUnmounted(() => {
+  silently(() => {
+    get($layer).removeLayer(get($marker));
+    get($marker).remove();
+  });
 });
-
-
-
-
-onUnmounted(() => get($marker).remove());
 </script>

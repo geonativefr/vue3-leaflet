@@ -14,7 +14,7 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, computed, onUnmounted, toRaw, Teleport, nextTick } from "vue";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, onUnmounted, computed, toRaw, Teleport, nextTick } from "vue";
 import { templateRef, get, whenever, set, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
@@ -24,6 +24,7 @@ const LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION = "2.0.1";
 const LEAFLET_ARROWHEADS_VERSION = "1.4.0";
 const LEAFLET_GEOMETRYUTIL_VERSION = "0.10.1";
 const LEAFLET_GEOMAN_VERSION = "2.13.0";
+const LEAFLET_MARKERCLUSTER_VERSION = "1.4.1";
 function renderless(component) {
   return Object.assign(component, { render: () => void 0 });
 }
@@ -115,7 +116,7 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     importLeafletGeoman()
   ]);
 }
-const _sfc_main$9 = {
+const _sfc_main$a = {
   __name: "MapContainer",
   props: {
     center: {
@@ -159,6 +160,7 @@ const _sfc_main$9 = {
       }
     }
     provide("map", mapRef);
+    provide("layer", mapRef);
     provide("leaflet.version", props.version);
     onMounted(async () => {
       await importLeaflet(props.version);
@@ -193,7 +195,7 @@ const _sfc_main$9 = {
     };
   }
 };
-const _sfc_main$8 = {
+const _sfc_main$9 = {
   __name: "OpenStreetMap",
   props: {
     url: {
@@ -223,7 +225,7 @@ const _sfc_main$8 = {
     };
   }
 };
-const _sfc_main$7 = {
+const _sfc_main$8 = {
   __name: "Mapbox",
   props: {
     url: {
@@ -280,7 +282,7 @@ async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
   }
   return loadJSFromCDN(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`);
 }
-const _sfc_main$6 = {
+const _sfc_main$7 = {
   __name: "GoogleMaps",
   props: {
     url: {
@@ -338,6 +340,38 @@ const _sfc_main$6 = {
     };
   }
 };
+async function importLeafletMarkerCluster(version = LEAFLET_MARKERCLUSTER_VERSION) {
+  return Promise.all([
+    loadJSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js`),
+    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css`),
+    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css`)
+  ]);
+}
+const _sfc_main$6 = {
+  __name: "Cluster",
+  async setup(__props) {
+    let __temp, __restore;
+    const map = inject("map");
+    [__temp, __restore] = withAsyncContext(() => importLeafletMarkerCluster()), await __temp, __restore();
+    const cluster = L.markerClusterGroup();
+    const $cluster = ref(cluster);
+    provide("layer", $cluster);
+    get(map).addLayer(cluster);
+    onUnmounted(() => get(map).removeLayer(cluster));
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
+  }
+};
+const MUTE_ERRORS = () => ({});
+const LOG_ERRORS = (e) => console.debug(e);
+async function silently(callback, onFailure = LOG_ERRORS) {
+  try {
+    await callback();
+  } catch (e) {
+    onFailure(e);
+  }
+}
 const _hoisted_1$1 = ["data-marker"];
 const _sfc_main$5 = {
   __name: "Marker",
@@ -407,30 +441,33 @@ const _sfc_main$5 = {
         return L.icon(__spreadValues({ iconUrl: props.icon }, defaults));
       }
     });
-    const $map = inject("map");
-    const $marker = ref();
-    provide("layer", $marker);
-    provide("marker", $marker);
-    function updateOptions(marker) {
-      L.setOptions(marker, clean(options));
-      marker._removeIcon();
-      marker._initIcon();
-      marker.update();
+    function updateOptions(marker2) {
+      L.setOptions(marker2, clean(options));
+      silently(() => {
+        marker2._removeIcon();
+        marker2._initIcon();
+      }, MUTE_ERRORS);
+      marker2.update();
     }
-    onMounted(() => {
-      whenever($map, (map) => {
-        const marker = L.marker(props.position, clean(options));
-        marker.on("click", () => emit("click", marker));
-        set($marker, marker);
-        map.addLayer(get($marker));
-        emit("load", get($marker));
-        whenever(position, (position2) => get($marker).setLatLng(position2));
-        whenever(icon, (icon2) => get($marker).setIcon(icon2), { deep: true, immediate: true });
-        whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
-        whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
-      }, { immediate: true });
+    const $layer = inject("layer");
+    const $marker = ref();
+    provide("marker", $marker);
+    provide("layer", $marker);
+    const layer = toRaw(get($layer));
+    set($marker, L.marker(props.position, clean(options)));
+    get($marker).on("click", () => emit("click", get($marker)));
+    layer.addLayer(get($marker));
+    emit("load", get($marker));
+    whenever(position, (position2) => get($marker).setLatLng(position2));
+    whenever(icon, (icon2) => silently(() => get($marker).setIcon(icon2), MUTE_ERRORS));
+    whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
+    whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
+    onUnmounted(() => {
+      silently(() => {
+        get($layer).removeLayer(get($marker));
+        get($marker).remove();
+      });
     });
-    onUnmounted(() => get($marker).remove());
     return (_ctx, _cache) => {
       return $marker.value ? (openBlock(), createElementBlock("span", {
         key: 0,
@@ -441,32 +478,32 @@ const _sfc_main$5 = {
     };
   }
 };
-function setBouncingState(marker, value) {
+function setBouncingState(marker2, value) {
   if (value) {
-    marker.bounce();
+    marker2.bounce();
   } else {
-    marker.stopBouncing();
+    marker2.stopBouncing();
   }
 }
 var Bounceable = {
   async mounted(el, binding, vnode) {
-    const marker = toRaw(vnode.props["data-marker"]);
-    if (!(marker instanceof L.Marker)) {
+    const marker2 = toRaw(vnode.props["data-marker"]);
+    if (!(marker2 instanceof L.Marker)) {
       throw Error("This directive can only be used on markers.");
     }
     if (binding.arg === "options") {
-      marker.setBouncingOptions(binding.value);
+      marker2.setBouncingOptions(binding.value);
       return;
     }
-    setBouncingState(marker, binding.value);
+    setBouncingState(marker2, binding.value);
   },
   async updated(el, binding, vnode) {
-    const marker = toRaw(vnode.props["data-marker"]);
+    const marker2 = toRaw(vnode.props["data-marker"]);
     if (binding.arg === "options") {
-      marker.setBouncingOptions(binding.value);
+      marker2.setBouncingOptions(binding.value);
       return;
     }
-    setBouncingState(marker, binding.value);
+    setBouncingState(marker2, binding.value);
   }
 };
 var _export_sfc = (sfc, props) => {
@@ -1019,4 +1056,4 @@ var DrawControl = renderless({
     whenever(map, init, { immediate: true });
   }
 });
-export { _sfc_main$2 as Circle, DrawControl, _sfc_main$6 as GoogleMaps, LocateControl, _sfc_main$9 as MapContainer, _sfc_main$7 as Mapbox, _sfc_main$5 as Marker, _sfc_main$8 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
