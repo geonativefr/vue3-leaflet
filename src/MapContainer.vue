@@ -2,7 +2,7 @@
   <div>
     <Suspense>
       <div ref="container" v-bind="$attrs">
-        <slot v-if="mapRef" :map="mapRef" />
+        <slot v-if="$map" :map="$map" />
       </div>
     </Suspense>
   </div>
@@ -47,7 +47,8 @@ const options = reactive({
   maxZoom: 18,
 });
 const container = templateRef('container');
-const mapRef = ref();
+const $map = ref();
+const $layerGroup = ref();
 
 function fitBounds(map, bounds) {
   if (bounds.length > 0) {
@@ -55,21 +56,29 @@ function fitBounds(map, bounds) {
   }
 }
 
-provide('map', mapRef);
-provide('layer', mapRef);
+provide('map', $map);
+provide('layerGroup', $layerGroup);
 provide('leaflet.version', props.version);
 
 onMounted(async () => {
   await importLeaflet(props.version);
+
+
   const map = L.map(get(container), options);
   map.setView(props.center, props.zoom);
+  map.on('move', (event) => emit('move', {event, center: map.getCenter(), map}));
+  map.on('zoomend', () => emit('zoomend', {zoom: map.getZoom(), bounds: map.getBounds(), map}));
+
+  const layerGroup = L.layerGroup();
+  layerGroup.addTo(map);
+
+  set($map, map);
+  set($layerGroup, layerGroup);
+
   watch(center, center => map.setView(center));
   watch(zoom, zoom => map.setView(props.center, zoom), {immediate: true});
   watch(zoomControl, zoomControl => zoomControl ? map.zoomControl.addTo(map) : map.zoomControl.remove(), {immediate: true});
   whenever(bounds, bounds => fitBounds(map, bounds), {immediate: true});
-  set(mapRef, map);
-  map.on('move', (event) => emit('move', {event, center: map.getCenter(), map}));
-  map.on('zoomend', () => emit('zoomend', {zoom: map.getZoom(), bounds: map.getBounds(), map}));
   emit('ready', map);
 });
 </script>

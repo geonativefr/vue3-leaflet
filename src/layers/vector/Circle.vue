@@ -42,11 +42,11 @@ const options = reactive({
   fillColor,
 });
 
-const map = inject('map');
+const $layerGroup = inject('layerGroup');
 const circle = L.circle(props.center, clean(options));
 provide('layer', circle);
 
-whenever(map, (map) => map.addLayer(circle), {immediate: true});
+whenever($layerGroup, (layerGroup) => layerGroup.addLayer(circle), {immediate: true});
 whenever(options, (options) => L.setOptions(circle, clean(options), {deep: true, immediate: true}));
 whenever(center, position => circle.setLatLng(position));
 

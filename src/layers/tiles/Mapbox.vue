@@ -4,7 +4,7 @@
 
 <script setup>
 import { whenever } from '@vueuse/core';
-import { inject, provide, reactive } from 'vue';
+import { inject, provide, reactive, ref } from 'vue';
 import { importLeaflet } from '../../utils/leaflet-loader.js';
 
 const props = defineProps({
@@ -36,7 +36,7 @@ const props = defineProps({
 });
 
 await importLeaflet(inject('leaflet.version'));
-const map = inject('map');
+const $layerGroup = inject('layerGroup');
 const options = reactive({
   apiKey: props.apiKey,
   attribution: props.attribution,
@@ -45,6 +45,6 @@ const options = reactive({
 })
 const layer = L.tileLayer(props.url, options);
 
-provide('layer', layer);
-whenever(map, map => map.addLayer(layer), {immediate: true});
+provide('layer', ref(layer));
+whenever($layerGroup, map => map.addLayer(layer), {immediate: true});
 </script>

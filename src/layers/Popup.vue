@@ -49,7 +49,7 @@ if (!window.fixPopupCloseEvent) {
 const {position} = toRefs(props);
 const popupContent = templateRef('popup-content');
 const popup = new L.Popup();
-const layer = inject('layer');
+const $layer = inject('layer');
 const isMounted = useMounted();
 const isBound = ref(false);
 provide('layer', popup);
@@ -65,7 +65,7 @@ function bindPopup() {
   if (true === get(isBound)) {
     return;
   }
-  get(layer).bindPopup(popup);
+  get($layer).bindPopup(popup);
   set(isBound, true);
   redraw();
 }

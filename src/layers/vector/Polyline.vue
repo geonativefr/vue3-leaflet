@@ -41,7 +41,7 @@ const options = reactive({
   fillColor,
 });
 
-const map = inject('map');
+const $layerGroup = inject('layerGroup');
 const polyline = L.polyline(props.positions, clean(options));
 provide('layer', polyline);
 onUnmounted(() => polyline.remove());
@@ -51,7 +51,7 @@ if (props.arrows) {
   polyline.arrowheads(props.arrows);
 }
 
-whenever(map, (map) => map.addLayer(polyline), {immediate: true});
+whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polyline), {immediate: true});
 whenever(options, (options) => L.setOptions(polyline, clean(options), {deep: true, immediate: true}));
 whenever(positions, positions => polyline.setLatLngs(positions));
 </script>

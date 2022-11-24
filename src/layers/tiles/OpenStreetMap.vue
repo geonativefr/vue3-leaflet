@@ -4,7 +4,7 @@
 
 <script setup>
 import { whenever } from '@vueuse/core';
-import { inject, provide } from 'vue';
+import { inject, provide, ref } from 'vue';
 
 const props = defineProps({
   url: {
@@ -22,11 +22,11 @@ const props = defineProps({
   },
 });
 
-const map = inject('map');
+const $layerGroup = inject('layerGroup');
 const layer = L.tileLayer(props.url, {
   attribution: props.attribution,
 });
 
-provide('layer', layer);
-whenever(map, map => map.addLayer(layer), {immediate: true});
+provide('layer', ref(layer));
+whenever($layerGroup, layerGroup => layerGroup.addLayer(layer), {immediate: true});
 </script>

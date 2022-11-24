@@ -90,25 +90,26 @@ function updateOptions(marker) {
   marker.update();
 }
 
-const $layer = inject('layer');
+const $layerGroup = inject('layerGroup');
 const $marker = ref();
 provide('marker', $marker);
 provide('layer', $marker);
 
-const layer = toRaw(get($layer));
-set($marker, L.marker(props.position, clean(options)));
-get($marker).on('click', () => emit('click', get($marker)));
-layer.addLayer(get($marker));
+const layerGroup = toRaw(get($layerGroup));
+const marker = L.marker(props.position, clean(options));
+marker.on('click', () => emit('click', get($marker)));
+layerGroup.addLayer(marker);
+set($marker, marker);
 emit('load', get($marker));
 
 whenever(position, position => get($marker).setLatLng(position));
-whenever(icon, icon => silently(() => get($marker).setIcon(icon), MUTE_ERRORS));
+whenever(icon, icon => silently(() => toRaw(get($marker)).setIcon(icon), MUTE_ERRORS), {immediate: true});
 whenever(options, () => updateOptions(get($marker)), {deep: true, immediate: true});
 whenever(tooltip, (tooltip) => get(marker).bindTooltip(tooltip), {deep: true, immediate: true});
 
 onUnmounted(() => {
   silently(() => {
-    get($layer).removeLayer(get($marker));
+    get($layerGroup).removeLayer(get($marker));
     get($marker).remove();
   });
 });

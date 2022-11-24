@@ -15,7 +15,7 @@ var __spreadValues = (a, b) => {
   return a;
 };
 import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, onUnmounted, computed, toRaw, Teleport, nextTick } from "vue";
-import { templateRef, get, whenever, set, useMounted, useMutationObserver } from "@vueuse/core";
+import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
 const LEAFLET_GOOGLE_MUTANT_VERSION = "0.13.5";
@@ -153,26 +153,30 @@ const _sfc_main$a = {
       maxZoom: 18
     });
     const container = templateRef("container");
-    const mapRef = ref();
+    const $map = ref();
+    const $layerGroup = ref();
     function fitBounds(map, bounds2) {
       if (bounds2.length > 0) {
         map.fitBounds(bounds2);
       }
     }
-    provide("map", mapRef);
-    provide("layer", mapRef);
+    provide("map", $map);
+    provide("layerGroup", $layerGroup);
     provide("leaflet.version", props.version);
     onMounted(async () => {
       await importLeaflet(props.version);
       const map = L.map(get(container), options);
       map.setView(props.center, props.zoom);
+      map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
+      map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
+      const layerGroup = L.layerGroup();
+      layerGroup.addTo(map);
+      set($map, map);
+      set($layerGroup, layerGroup);
       watch(center, (center2) => map.setView(center2));
       watch(zoom, (zoom2) => map.setView(props.center, zoom2), { immediate: true });
       watch(zoomControl, (zoomControl2) => zoomControl2 ? map.zoomControl.addTo(map) : map.zoomControl.remove(), { immediate: true });
       whenever(bounds, (bounds2) => fitBounds(map, bounds2), { immediate: true });
-      set(mapRef, map);
-      map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
-      map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
       emit("ready", map);
     });
     return (_ctx, _cache) => {
@@ -183,9 +187,9 @@ const _sfc_main$a = {
               ref_key: "container",
               ref: container
             }, _ctx.$attrs), [
-              mapRef.value ? renderSlot(_ctx.$slots, "default", {
+              $map.value ? renderSlot(_ctx.$slots, "default", {
                 key: 0,
-                map: mapRef.value
+                map: $map.value
               }) : createCommentVNode("", true)
             ], 16)
           ]),
@@ -214,12 +218,12 @@ const _sfc_main$9 = {
   },
   setup(__props) {
     const props = __props;
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     const layer = L.tileLayer(props.url, {
       attribution: props.attribution
     });
-    provide("layer", layer);
-    whenever(map, (map2) => map2.addLayer(layer), { immediate: true });
+    provide("layer", ref(layer));
+    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(layer), { immediate: true });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -258,7 +262,7 @@ const _sfc_main$8 = {
     let __temp, __restore;
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     const options = reactive({
       apiKey: props.apiKey,
       attribution: props.attribution,
@@ -266,8 +270,8 @@ const _sfc_main$8 = {
       zoomOffset: props.zoomOffset
     });
     const layer = L.tileLayer(props.url, options);
-    provide("layer", layer);
-    whenever(map, (map2) => map2.addLayer(layer), { immediate: true });
+    provide("layer", ref(layer));
+    whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -311,15 +315,15 @@ const _sfc_main$7 = {
     const { type } = toRefs(props);
     const defaultOptions = reactive({ type });
     const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-      const mount = (map2, options2) => L.gridLayer.googleMutant(options2).addTo(map2);
-      const load = async (map2, options2 = defaultOptions) => {
+      const mount = (map, options2) => L.gridLayer.googleMutant(options2).addTo(map);
+      const load = async (map, options2 = defaultOptions) => {
         await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-        mount(map2, options2);
+        mount(map, options2);
         return {};
       };
       return { load };
     };
-    const map = inject("map");
+    const $map = inject("map");
     const options = reactive({
       apiKey: props.apiKey,
       attribution: props.attribution,
@@ -329,12 +333,12 @@ const _sfc_main$7 = {
     const layer = L.tileLayer(props.url, options);
     const gmaps = useGoogleMutant(props.apiKey);
     const mutant = ref();
-    watch(type, () => setMutant(unref(map)));
-    async function setMutant(map2) {
-      set(mutant, await gmaps.load(map2, defaultOptions));
+    watch(type, () => setMutant(unref($map)));
+    async function setMutant(map) {
+      set(mutant, await gmaps.load(map, defaultOptions));
     }
-    provide("layer", layer);
-    whenever(map, (map2) => setMutant(map2), { immediate: true });
+    provide("layer", ref(layer));
+    whenever($map, (map) => setMutant(map), { immediate: true });
     return (_ctx, _cache) => {
       return mutant.value ? renderSlot(_ctx.$slots, "default", { key: 0 }) : createCommentVNode("", true);
     };
@@ -351,13 +355,14 @@ const _sfc_main$6 = {
   __name: "Cluster",
   async setup(__props) {
     let __temp, __restore;
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     [__temp, __restore] = withAsyncContext(() => importLeafletMarkerCluster()), await __temp, __restore();
     const cluster = L.markerClusterGroup();
     const $cluster = ref(cluster);
     provide("layer", $cluster);
-    get(map).addLayer(cluster);
-    onUnmounted(() => get(map).removeLayer(cluster));
+    provide("layerGroup", $cluster);
+    get($layerGroup).addLayer(cluster);
+    onUnmounted(() => get($layerGroup).removeLayer(cluster));
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -449,22 +454,23 @@ const _sfc_main$5 = {
       }, MUTE_ERRORS);
       marker2.update();
     }
-    const $layer = inject("layer");
+    const $layerGroup = inject("layerGroup");
     const $marker = ref();
     provide("marker", $marker);
     provide("layer", $marker);
-    const layer = toRaw(get($layer));
-    set($marker, L.marker(props.position, clean(options)));
-    get($marker).on("click", () => emit("click", get($marker)));
-    layer.addLayer(get($marker));
+    const layerGroup = toRaw(get($layerGroup));
+    const marker = L.marker(props.position, clean(options));
+    marker.on("click", () => emit("click", get($marker)));
+    layerGroup.addLayer(marker);
+    set($marker, marker);
     emit("load", get($marker));
     whenever(position, (position2) => get($marker).setLatLng(position2));
-    whenever(icon, (icon2) => silently(() => get($marker).setIcon(icon2), MUTE_ERRORS));
+    whenever(icon, (icon2) => silently(() => toRaw(get($marker)).setIcon(icon2), MUTE_ERRORS), { immediate: true });
     whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
     whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
     onUnmounted(() => {
       silently(() => {
-        get($layer).removeLayer(get($marker));
+        get($layerGroup).removeLayer(get($marker));
         get($marker).remove();
       });
     });
@@ -478,32 +484,32 @@ const _sfc_main$5 = {
     };
   }
 };
-function setBouncingState(marker2, value) {
+function setBouncingState(marker, value) {
   if (value) {
-    marker2.bounce();
+    marker.bounce();
   } else {
-    marker2.stopBouncing();
+    marker.stopBouncing();
   }
 }
 var Bounceable = {
   async mounted(el, binding, vnode) {
-    const marker2 = toRaw(vnode.props["data-marker"]);
-    if (!(marker2 instanceof L.Marker)) {
+    const marker = toRaw(get(vnode.props["data-marker"]));
+    if (!(marker instanceof L.Marker)) {
       throw Error("This directive can only be used on markers.");
     }
     if (binding.arg === "options") {
-      marker2.setBouncingOptions(binding.value);
+      marker.setBouncingOptions(binding.value);
       return;
     }
-    setBouncingState(marker2, binding.value);
+    setBouncingState(marker, binding.value);
   },
   async updated(el, binding, vnode) {
-    const marker2 = toRaw(vnode.props["data-marker"]);
+    const marker = toRaw(get(vnode.props["data-marker"]));
     if (binding.arg === "options") {
-      marker2.setBouncingOptions(binding.value);
+      marker.setBouncingOptions(binding.value);
       return;
     }
-    setBouncingState(marker2, binding.value);
+    setBouncingState(marker, binding.value);
   }
 };
 var _export_sfc = (sfc, props) => {
@@ -566,7 +572,7 @@ const _sfc_main$3 = {
     const { position } = toRefs(props);
     const popupContent = templateRef("popup-content");
     const popup = new L.Popup();
-    const layer = inject("layer");
+    const $layer = inject("layer");
     const isMounted = useMounted();
     const isBound = ref(false);
     provide("layer", popup);
@@ -580,7 +586,7 @@ const _sfc_main$3 = {
       if (get(isBound) === true) {
         return;
       }
-      get(layer).bindPopup(popup);
+      get($layer).bindPopup(popup);
       set(isBound, true);
       redraw();
     }
@@ -709,10 +715,10 @@ const _sfc_main$2 = {
       fill,
       fillColor
     });
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     const circle = L.circle(props.center, clean(options));
     provide("layer", circle);
-    whenever(map, (map2) => map2.addLayer(circle), { immediate: true });
+    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(circle), { immediate: true });
     whenever(options, (options2) => L.setOptions(circle, clean(options2), { deep: true, immediate: true }));
     whenever(center, (position) => circle.setLatLng(position));
     onUnmounted(() => circle.remove());
@@ -760,7 +766,7 @@ const _sfc_main$1 = {
       fill,
       fillColor
     });
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     const polyline = L.polyline(props.positions, clean(options));
     provide("layer", polyline);
     onUnmounted(() => polyline.remove());
@@ -768,7 +774,7 @@ const _sfc_main$1 = {
       [__temp, __restore] = withAsyncContext(() => importLeafletArrowHeads()), await __temp, __restore();
       polyline.arrowheads(props.arrows);
     }
-    whenever(map, (map2) => map2.addLayer(polyline), { immediate: true });
+    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polyline), { immediate: true });
     whenever(options, (options2) => L.setOptions(polyline, clean(options2), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polyline.setLatLngs(positions2));
     return (_ctx, _cache) => {
@@ -803,10 +809,10 @@ const _sfc_main = {
       fill,
       fillColor
     });
-    const map = inject("map");
+    const $layerGroup = inject("layerGroup");
     const polygon = L.polygon(props.positions, clean(options));
     provide("layer", polygon);
-    whenever(map, (map2) => map2.addLayer(polygon), { immediate: true });
+    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polygon), { immediate: true });
     whenever(options, (options2) => L.setOptions(polygon, clean(options2), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polygon.setLatLngs(positions2));
     onUnmounted(() => polygon.remove());
@@ -1056,4 +1062,4 @@ var DrawControl = renderless({
     whenever(map, init, { immediate: true });
   }
 });
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
