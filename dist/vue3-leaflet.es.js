@@ -363,7 +363,7 @@ const _sfc_main$5 = {
       default: void 0
     },
     tooltip: {
-      type: String,
+      type: [String, Node],
       default: void 0
     }
   },
@@ -383,7 +383,8 @@ const _sfc_main$5 = {
       position,
       title,
       alt,
-      opacity
+      opacity,
+      tooltip
     } = toRefs(props);
     const options = reactive({
       title,
@@ -426,6 +427,7 @@ const _sfc_main$5 = {
         whenever(position, (position2) => get($marker).setLatLng(position2));
         whenever(icon, (icon2) => get($marker).setIcon(icon2), { deep: true, immediate: true });
         whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
+        whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
       }, { immediate: true });
     });
     onUnmounted(() => get($marker).remove());
