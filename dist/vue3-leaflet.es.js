@@ -342,9 +342,9 @@ const _sfc_main$7 = {
 };
 async function importLeafletMarkerCluster(version = LEAFLET_MARKERCLUSTER_VERSION) {
   return Promise.all([
-    loadJSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js`),
-    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css`),
-    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css`)
+    loadJSFromCDN(`https://unpkg.com/leaflet.markercluster@${version}/dist/leaflet.markercluster.js`),
+    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@${version}/dist/MarkerCluster.css`),
+    loadCSSFromCDN(`https://unpkg.com/leaflet.markercluster@${version}/dist/MarkerCluster.Default.css`)
   ]);
 }
 const _sfc_main$6 = {
