@@ -34,6 +34,15 @@ export default renderless({
     },
   },
   setup(props) {
+    // @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
+    L.Tooltip.prototype._animateZoom = function (e) {
+      if (!this._map) {
+        return;
+      }
+      const pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
+      const anchor = this._getAnchor();
+      L.DomUtil.setPosition(this._container, pos.add(anchor));
+    };
     const {position, text} = toRefs(props);
     const options = reactive({
       direction: props.direction,
