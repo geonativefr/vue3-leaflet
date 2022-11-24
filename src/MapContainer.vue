@@ -56,6 +56,7 @@ function fitBounds(map, bounds) {
 }
 
 provide('map', mapRef);
+provide('layer', mapRef);
 provide('leaflet.version', props.version);
 
 onMounted(async () => {
