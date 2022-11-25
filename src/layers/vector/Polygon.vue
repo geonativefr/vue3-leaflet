@@ -36,11 +36,11 @@ const options = reactive({
   fillColor,
 });
 
-const map = inject('map');
+const $layerGroup = inject('layerGroup');
 const polygon = L.polygon(props.positions, clean(options));
 provide('layer', polygon);
 
-whenever(map, (map) => map.addLayer(polygon), {immediate: true});
+whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polygon), {immediate: true});
 whenever(options, (options) => L.setOptions(polygon, clean(options), {deep: true, immediate: true}));
 whenever(positions, positions => polygon.setLatLngs(positions));
 onUnmounted(() => polygon.remove());

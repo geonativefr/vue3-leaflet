@@ -46,7 +46,7 @@ const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
   return {load};
 };
 
-const map = inject('map');
+const $map = inject('map');
 const options = reactive({
   apiKey: props.apiKey,
   attribution: props.attribution,
@@ -56,12 +56,12 @@ const options = reactive({
 const layer = L.tileLayer(props.url, options);
 const gmaps = useGoogleMutant(props.apiKey);
 const mutant = ref();
-watch(type, () => setMutant(unref(map)));
+watch(type, () => setMutant(unref($map)));
 
 async function setMutant(map) {
   set(mutant, await gmaps.load(map, defaultOptions));
 }
 
-provide('layer', layer);
-whenever(map, map => setMutant(map), {immediate: true});
+provide('layer', ref(layer));
+whenever($map, map => setMutant(map), {immediate: true});
 </script>

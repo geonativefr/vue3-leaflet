@@ -1,3 +1,4 @@
+import { get } from '@vueuse/core';
 import { toRaw } from 'vue';
 
 function setBouncingState(marker, value) {
@@ -10,7 +11,7 @@ function setBouncingState(marker, value) {
 
 export default {
   async mounted(el, binding, vnode) {
-    const marker = toRaw(vnode.props['data-marker']);
+    const marker = toRaw(get(vnode.props['data-marker']));
     if (!(marker instanceof L.Marker)) {
       throw Error('This directive can only be used on markers.');
     }
@@ -25,7 +26,7 @@ export default {
     setBouncingState(marker, binding.value);
   },
   async updated(el, binding, vnode) {
-    const marker = toRaw(vnode.props['data-marker']);
+    const marker = toRaw(get(vnode.props['data-marker']));
 
     // v-bounce:options="{}"
     if ('options' === binding.arg) {
