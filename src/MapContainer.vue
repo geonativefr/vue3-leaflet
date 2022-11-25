@@ -63,7 +63,6 @@ provide('leaflet.version', props.version);
 onMounted(async () => {
   await importLeaflet(props.version);
 
-
   const map = L.map(get(container), options);
   map.setView(props.center, props.zoom);
   map.on('move', (event) => emit('move', {event, center: map.getCenter(), map}));
