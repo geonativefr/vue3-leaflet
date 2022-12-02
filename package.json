@@ -20,11 +20,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vueuse/core": "^8.6.0",
+    "@vueuse/core": "^9.6.0",
     "vue": "^3.2.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
+    "leaflet": "^1.9.3",
     "path": "^0.12.7",
     "vite": "^2.9.9"
   }
