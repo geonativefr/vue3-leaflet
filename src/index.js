@@ -10,12 +10,14 @@ export { default as Tooltip } from './layers/Tooltip.js';
 export { default as Circle } from './layers/vector/Circle.vue';
 export { default as Polyline } from './layers/vector/Polyline.vue';
 export { default as Polygon } from './layers/vector/Polygon.vue';
-export { default as ZoomControl } from './controls/ZoomControl.js';
-export { default as ScaleControl } from './controls/ScaleControl.js';
+export { default as DrawControl } from './controls/DrawControl.js';
+export { default as FullScreenControl } from './controls/FullScreenControl.js';
 export { default as LocateControl } from './controls/LocateControl.js';
 export { default as PegmanControl } from './controls/PegmanControl.js';
-export { default as DrawControl } from './controls/DrawControl.js';
+export { default as ScaleControl } from './controls/ScaleControl.js';
+export { default as ZoomControl } from './controls/ZoomControl.js';
 export * from './utils/gmaps-api-loader.js'
+export * from './utils/leaflet-fullscreen-loader.js'
 export * from './utils/leaflet-geoman-loader.js'
 export * from './utils/leaflet-geometryutil-loader.js'
 export * from './utils/leaflet-google-mutant-loader.js'

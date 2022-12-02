@@ -25,6 +25,7 @@ const LEAFLET_ARROWHEADS_VERSION = "1.4.0";
 const LEAFLET_GEOMETRYUTIL_VERSION = "0.10.1";
 const LEAFLET_GEOMAN_VERSION = "2.13.0";
 const LEAFLET_MARKERCLUSTER_VERSION = "1.4.1";
+const LEAFLET_FULLSCREEN_VERSION = "1.0.5";
 function renderless(component) {
   return Object.assign(component, { render: () => void 0 });
 }
@@ -97,23 +98,10 @@ async function loadCSSFromCDN(url) {
     document.head.appendChild(el);
   });
 }
-async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
-  return Promise.all([
-    loadJSFromCDN(`https://unpkg.com/@geoman-io/leaflet-geoman-free@${version}/dist/leaflet-geoman.min.js`),
-    loadCSSFromCDN(`https://unpkg.com/@geoman-io/leaflet-geoman-free@${version}/dist/leaflet-geoman.css`)
-  ]);
-}
-async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
-  return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
-}
 async function importLeaflet(version = LEAFLET_VERSION) {
   await Promise.all([
     loadJSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.js`),
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
-  ]);
-  await Promise.all([
-    importLeafletSmoothMarkerBouncing(),
-    importLeafletGeoman()
   ]);
 }
 const _sfc_main$a = {
@@ -829,148 +817,6 @@ const _sfc_main = {
     };
   }
 };
-var ZoomControl = renderless({
-  props: {
-    position: {
-      type: String,
-      default: void 0
-    },
-    zoomInTitle: {
-      type: String,
-      default: void 0
-    },
-    zoomOutTitle: {
-      type: String,
-      default: void 0
-    }
-  },
-  setup(props) {
-    const map = inject("map");
-    const control = new L.Control.Zoom(clean(__spreadValues({}, props)));
-    const mount = (map2) => {
-      var _a;
-      (_a = map2 == null ? void 0 : map2.zoomControl) == null ? void 0 : _a.remove();
-      map2.addControl(control);
-    };
-    whenever(map, mount, { immediate: true });
-  }
-});
-var ScaleControl = renderless({
-  props: {
-    position: {
-      type: String,
-      default: void 0
-    },
-    maxWidth: {
-      type: Number,
-      default: void 0
-    },
-    imperial: {
-      type: Boolean,
-      default: void 0
-    },
-    metric: {
-      type: Boolean,
-      default: void 0
-    }
-  },
-  async setup(props) {
-    const map = inject("map");
-    await importLeaflet(inject("leaflet.version"));
-    const control = L.control.scale(clean(__spreadValues({}, props)));
-    whenever(map, (map2) => map2.addControl(control), { immediate: true });
-  }
-});
-async function importLeafletLocateControl(version = LEAFLET_LOCATE_CONTROL_VERSION) {
-  return Promise.all([
-    loadCSSFromCDN(`https://unpkg.com/leaflet.locatecontrol@${version}/dist/L.Control.Locate.min.css`),
-    loadJSFromCDN(`https://unpkg.com/leaflet.locatecontrol@${version}/dist/L.Control.Locate.min.js`)
-  ]);
-}
-var LocateControl = renderless({
-  props: {
-    position: {
-      type: String,
-      default: void 0
-    },
-    strings: {
-      type: Object,
-      default: void 0
-    },
-    version: {
-      type: String,
-      default: void 0
-    }
-  },
-  async setup(props) {
-    const map = inject("map");
-    await importLeaflet(inject("leaflet.version"));
-    await importLeafletLocateControl(props.version);
-    const control = L.control.locate(clean(__spreadValues({}, props)));
-    whenever(map, (map2) => map2.addControl(control), { immediate: true });
-  }
-});
-async function importLeafletPegman(version = LEAFLET_PEGMAN_VERSION) {
-  return Promise.all([
-    loadJSFromCDN(`https://unpkg.com/leaflet-pegman@${version}/leaflet-pegman.js`),
-    loadCSSFromCDN(`https://unpkg.com/leaflet-pegman@${version}/leaflet-pegman.css`)
-  ]);
-}
-var PegmanControl = renderless({
-  emits: ["openstreetview", "closestreetview"],
-  props: {
-    apiKey: {
-      type: String,
-      default: void 0
-    },
-    position: {
-      type: String,
-      default: "bottomright"
-    },
-    theme: {
-      type: String,
-      default: "leaflet-pegman-v3-small"
-    },
-    version: {
-      type: String,
-      default: void 0
-    }
-  },
-  async setup(props, { emit }) {
-    const map = inject("map");
-    if (props.apiKey) {
-      await loadGmapsApi(props.apiKey);
-    }
-    await importLeaflet();
-    await importLeafletPegman(props.version);
-    const mount = async (map2) => {
-      const control = new L.Control.Pegman({
-        position: props.position,
-        theme: props.theme
-      });
-      control.addTo(map2);
-      const observer = new MutationObserver((mutationList) => {
-        var _a, _b;
-        for (const mutation of mutationList) {
-          if (mutation.type === "childList") {
-            for (const node of mutation.addedNodes) {
-              if ((_a = node.classList) == null ? void 0 : _a.contains("pegman-marker")) {
-                emit("openstreetview");
-              }
-            }
-            for (const node of mutation.removedNodes) {
-              if ((_b = node.classList) == null ? void 0 : _b.contains("pegman-marker")) {
-                emit("closestreetview");
-              }
-            }
-          }
-        }
-      });
-      observer.observe(map2._container, { childList: true, subtree: true });
-    };
-    whenever(map, mount, { immediate: true });
-  }
-});
 var DrawControl = renderless({
   props: {
     locale: {
@@ -1070,4 +916,195 @@ var DrawControl = renderless({
     whenever(map, init, { immediate: true });
   }
 });
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+async function importLeafletFullScreen(version = LEAFLET_FULLSCREEN_VERSION) {
+  return Promise.all([
+    loadJSFromCDN(`https://unpkg.com/@runette/leaflet-fullscreen@${version}/dist/Leaflet.fullscreen.js`),
+    loadCSSFromCDN(`https://unpkg.com/@runette/leaflet-fullscreen@${version}/dist/leaflet.fullscreen.css`)
+  ]);
+}
+var FullScreenControl = renderless({
+  props: {
+    position: {
+      type: String,
+      default: void 0
+    },
+    viewText: {
+      type: String,
+      default: void 0
+    },
+    exitText: {
+      type: String,
+      default: void 0
+    },
+    version: {
+      type: String,
+      default: void 0
+    }
+  },
+  async setup(props) {
+    const map = inject("map");
+    await importLeaflet(inject("leaflet.version"));
+    await importLeafletFullScreen(props.version);
+    const options = reactive({
+      position: props.position,
+      title: {
+        "false": props.viewText,
+        "true": props.exitText
+      }
+    });
+    const control = new L.Control.Fullscreen(clean(options));
+    whenever(map, (map2) => map2.addControl(control), { immediate: true });
+  }
+});
+async function importLeafletLocateControl(version = LEAFLET_LOCATE_CONTROL_VERSION) {
+  return Promise.all([
+    loadCSSFromCDN(`https://unpkg.com/leaflet.locatecontrol@${version}/dist/L.Control.Locate.min.css`),
+    loadJSFromCDN(`https://unpkg.com/leaflet.locatecontrol@${version}/dist/L.Control.Locate.min.js`)
+  ]);
+}
+var LocateControl = renderless({
+  props: {
+    position: {
+      type: String,
+      default: void 0
+    },
+    strings: {
+      type: Object,
+      default: void 0
+    },
+    version: {
+      type: String,
+      default: void 0
+    }
+  },
+  async setup(props) {
+    const map = inject("map");
+    await importLeaflet(inject("leaflet.version"));
+    await importLeafletLocateControl(props.version);
+    const control = L.control.locate(clean(__spreadValues({}, props)));
+    whenever(map, (map2) => map2.addControl(control), { immediate: true });
+  }
+});
+async function importLeafletPegman(version = LEAFLET_PEGMAN_VERSION) {
+  return Promise.all([
+    loadJSFromCDN(`https://unpkg.com/leaflet-pegman@${version}/leaflet-pegman.js`),
+    loadCSSFromCDN(`https://unpkg.com/leaflet-pegman@${version}/leaflet-pegman.css`)
+  ]);
+}
+var PegmanControl = renderless({
+  emits: ["openstreetview", "closestreetview"],
+  props: {
+    apiKey: {
+      type: String,
+      default: void 0
+    },
+    position: {
+      type: String,
+      default: "bottomright"
+    },
+    theme: {
+      type: String,
+      default: "leaflet-pegman-v3-small"
+    },
+    version: {
+      type: String,
+      default: void 0
+    }
+  },
+  async setup(props, { emit }) {
+    const map = inject("map");
+    if (props.apiKey) {
+      await loadGmapsApi(props.apiKey);
+    }
+    await importLeaflet();
+    await importLeafletPegman(props.version);
+    const mount = async (map2) => {
+      const control = new L.Control.Pegman({
+        position: props.position,
+        theme: props.theme
+      });
+      control.addTo(map2);
+      const observer = new MutationObserver((mutationList) => {
+        var _a, _b;
+        for (const mutation of mutationList) {
+          if (mutation.type === "childList") {
+            for (const node of mutation.addedNodes) {
+              if ((_a = node.classList) == null ? void 0 : _a.contains("pegman-marker")) {
+                emit("openstreetview");
+              }
+            }
+            for (const node of mutation.removedNodes) {
+              if ((_b = node.classList) == null ? void 0 : _b.contains("pegman-marker")) {
+                emit("closestreetview");
+              }
+            }
+          }
+        }
+      });
+      observer.observe(map2._container, { childList: true, subtree: true });
+    };
+    whenever(map, mount, { immediate: true });
+  }
+});
+var ScaleControl = renderless({
+  props: {
+    position: {
+      type: String,
+      default: void 0
+    },
+    maxWidth: {
+      type: Number,
+      default: void 0
+    },
+    imperial: {
+      type: Boolean,
+      default: void 0
+    },
+    metric: {
+      type: Boolean,
+      default: void 0
+    }
+  },
+  async setup(props) {
+    const map = inject("map");
+    await importLeaflet(inject("leaflet.version"));
+    const control = L.control.scale(clean(__spreadValues({}, props)));
+    whenever(map, (map2) => map2.addControl(control), { immediate: true });
+  }
+});
+var ZoomControl = renderless({
+  props: {
+    position: {
+      type: String,
+      default: void 0
+    },
+    zoomInTitle: {
+      type: String,
+      default: void 0
+    },
+    zoomOutTitle: {
+      type: String,
+      default: void 0
+    }
+  },
+  setup(props) {
+    const map = inject("map");
+    const control = new L.Control.Zoom(clean(__spreadValues({}, props)));
+    const mount = (map2) => {
+      var _a;
+      (_a = map2 == null ? void 0 : map2.zoomControl) == null ? void 0 : _a.remove();
+      map2.addControl(control);
+    };
+    whenever(map, mount, { immediate: true });
+  }
+});
+async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
+  return Promise.all([
+    loadJSFromCDN(`https://unpkg.com/@geoman-io/leaflet-geoman-free@${version}/dist/leaflet-geoman.min.js`),
+    loadCSSFromCDN(`https://unpkg.com/@geoman-io/leaflet-geoman-free@${version}/dist/leaflet-geoman.css`)
+  ]);
+}
+async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
+  return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
+}
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
