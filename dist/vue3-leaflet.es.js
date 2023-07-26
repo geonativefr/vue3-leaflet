@@ -104,7 +104,7 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
-const _sfc_main$a = {
+const _sfc_main$b = {
   __name: "MapContainer",
   props: {
     center: {
@@ -187,7 +187,7 @@ const _sfc_main$a = {
     };
   }
 };
-const _sfc_main$9 = {
+const _sfc_main$a = {
   __name: "OpenStreetMap",
   props: {
     url: {
@@ -217,7 +217,7 @@ const _sfc_main$9 = {
     };
   }
 };
-const _sfc_main$8 = {
+const _sfc_main$9 = {
   __name: "Mapbox",
   props: {
     url: {
@@ -260,6 +260,44 @@ const _sfc_main$8 = {
     const layer = L.tileLayer(props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
+    return (_ctx, _cache) => {
+      return renderSlot(_ctx.$slots, "default");
+    };
+  }
+};
+const _sfc_main$8 = {
+  __name: "IGN",
+  props: {
+    attribution: {
+      type: String,
+      default: '&copy; <a href="https://geoservices.ign.fr/">IGN</a>'
+    },
+    type: {
+      type: String,
+      default: "terrain",
+      validator: (type) => ["satellite", "terrain"].includes(type)
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const $layerGroup = inject("layerGroup");
+    const url = props.type === "satellite" ? "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg" : "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+    const options = props.type === "satellite" ? {
+      minZoom: 0,
+      maxZoom: 21,
+      attribution: props.attribution,
+      tileSize: 256
+    } : {
+      minZoom: 0,
+      maxZoom: 19,
+      attribution: props.attribution,
+      tileSize: 256
+    };
+    const layer = L.tileLayer(url, options);
+    provide("layer", ref(layer));
+    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(layer), {
+      immediate: true
+    });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -1107,4 +1145,4 @@ async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
 async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, LocateControl, _sfc_main$a as MapContainer, _sfc_main$8 as Mapbox, _sfc_main$5 as Marker, _sfc_main$9 as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
