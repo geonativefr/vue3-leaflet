@@ -274,30 +274,39 @@ const _sfc_main$8 = {
     },
     type: {
       type: String,
-      default: "terrain",
-      validator: (type) => ["satellite", "terrain"].includes(type)
+      default: "roadmap",
+      validator: (type) => ["satellite", "roadmap"].includes(type)
     }
   },
   setup(__props) {
     const props = __props;
     const $layerGroup = inject("layerGroup");
-    const url = props.type === "satellite" ? "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg" : "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
-    const options = props.type === "satellite" ? {
-      minZoom: 0,
-      maxZoom: 21,
-      attribution: props.attribution,
-      tileSize: 256
-    } : {
-      minZoom: 0,
-      maxZoom: 19,
-      attribution: props.attribution,
-      tileSize: 256
-    };
-    const layer = L.tileLayer(url, options);
+    const layer = getLayer(props.type, props.attribution);
     provide("layer", ref(layer));
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(layer), {
       immediate: true
     });
+    watch(props, (props2) => {
+      var _a;
+      const layer2 = getLayer(props2.type, props2.attribution);
+      (_a = get($layerGroup)) == null ? void 0 : _a.addLayer(layer2);
+      provide("layer", layer2);
+    }, { deep: true });
+    function getLayer(type, attribution) {
+      const url = type === "satellite" ? "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg" : "https://wxs.ign.fr/9ekkq9nqzr2eix5mc8c6hmip/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
+      const options = type === "satellite" ? {
+        minZoom: 0,
+        maxZoom: 21,
+        attribution,
+        tileSize: 256
+      } : {
+        minZoom: 0,
+        maxZoom: 19,
+        attribution,
+        tileSize: 256
+      };
+      return L.tileLayer(url, options);
+    }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
