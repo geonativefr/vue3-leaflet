@@ -1,0 +1,9 @@
+{
+    "printWidth": 120,
+    "singleQuote": true,
+    "vueIndentScriptAndStyle": true,
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "useTabs": true,
+    "semi": true
+}
