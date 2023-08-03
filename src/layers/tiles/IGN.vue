@@ -32,6 +32,7 @@
 		props,
 		(props) => {
 			set(layer, getLayer(props.type, props.attribution));
+			get($layerGroup)?.clearLayers();
 			get($layerGroup)?.addLayer(get(layer));
 		},
 		{ deep: true }
