@@ -27,6 +27,7 @@
     "@vitejs/plugin-vue": "^2.3.3",
     "leaflet": "^1.9.3",
     "path": "^0.12.7",
+    "prettier": "^3.0.1",
     "vite": "^2.9.9"
   }
 }
