@@ -6,6 +6,7 @@
 	import { whenever } from '@vueuse/core';
 	import { inject, provide, reactive, ref } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
+	import TileLayerOffline from '../Offline';
 
 	const props = defineProps({
 		url: {
@@ -44,7 +45,7 @@
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
 	});
-	const layer = L.tileLayer(props.url, options);
+	const layer = new TileLayerOffline(props.url, options);
 
 	provide('layer', ref(layer));
 	whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });

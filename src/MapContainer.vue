@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="map-container">
 		<Suspense>
 			<div ref="container" v-bind="$attrs">
 				<slot v-if="$map" :map="$map" />

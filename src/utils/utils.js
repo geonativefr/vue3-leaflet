@@ -2,6 +2,18 @@ export function renderless(component) {
 	return Object.assign(component, { render: () => undefined });
 }
 
+async function wait(time) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, time);
+	});
+}
+
+export async function waitever(data) {
+	while (!data) {
+		await wait(20);
+	}
+}
+
 function isRealObject(object) {
 	return 'object' === typeof object && null !== object;
 }
