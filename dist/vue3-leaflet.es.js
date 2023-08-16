@@ -8392,7 +8392,7 @@ function getTilePoints(area, tileSize) {
   }
   return points;
 }
-function getTileUrls(templateUrl, bounds, zoom, tileSize) {
+function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
   const tiles = [];
   const tilePoints = getTilePoints(bounds, tileSize);
   for (let index = 0; index < tilePoints.length; index += 1) {
@@ -8402,7 +8402,7 @@ function getTileUrls(templateUrl, bounds, zoom, tileSize) {
       y: tilePoint.y,
       z: zoom
     };
-    const url = getTileUrl(templateUrl, data);
+    const url = getTileUrl(templateUrl, __spreadValues(__spreadValues({}, options), data));
     tiles.push(url);
   }
   return tiles;
@@ -8426,7 +8426,7 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     image.setAttribute("role", "presentation");
     leafletSrc.exports.DomEvent.on(image, "load", leafletSrc.exports.Util.bind(this._tileOnLoad, this, done, image));
     leafletSrc.exports.DomEvent.on(image, "error", leafletSrc.exports.Util.bind(this._tileOnError, this, done, image));
-    const url = getTileUrl(this._url, coords);
+    const url = getTileUrl(this._url, __spreadValues(__spreadValues({}, this.options), coords));
     (async () => {
       let data;
       if (zoomlevels.includes(coords.z)) {
@@ -8476,7 +8476,7 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     for (let i = 0; i < zoomlevels.length; i += 1) {
       const zoomLevel = zoomlevels[i];
       const area = leafletSrc.exports.bounds(this._map.project(latlngBounds.getNorthWest(), zoomLevel), this._map.project(latlngBounds.getSouthEast(), zoomLevel));
-      tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize()));
+      tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
       nbTiles += tileUrls[zoomLevel].length;
     }
     let nbSaved = 0;

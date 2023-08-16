@@ -39,7 +39,7 @@ function getTilePoints(area, tileSize) {
 	return points;
 }
 
-function getTileUrls(templateUrl, bounds, zoom, tileSize) {
+function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
 	const tiles = [];
 	const tilePoints = getTilePoints(bounds, tileSize);
 	for (let index = 0; index < tilePoints.length; index += 1) {
@@ -49,7 +49,7 @@ function getTileUrls(templateUrl, bounds, zoom, tileSize) {
 			y: tilePoint.y,
 			z: zoom,
 		};
-		const url = getTileUrl(templateUrl, data);
+		const url = getTileUrl(templateUrl, {...options, ...data});
 		tiles.push(url);
 	}
 	return tiles;
@@ -82,7 +82,7 @@ export default class TileLayerOffline extends TileLayer {
 		DomEvent.on(image, 'load', Util.bind(this._tileOnLoad, this, done, image));
 		DomEvent.on(image, 'error', Util.bind(this._tileOnError, this, done, image));
 
-		const url = getTileUrl(this._url, coords);
+		const url = getTileUrl(this._url, {...this.options, ...coords});
 
 		(async () => {
 			let data;
@@ -149,7 +149,7 @@ export default class TileLayerOffline extends TileLayer {
 				this._map.project(latlngBounds.getNorthWest(), zoomLevel),
 				this._map.project(latlngBounds.getSouthEast(), zoomLevel)
 			);
-			tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize()));
+			tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
 			nbTiles += tileUrls[zoomLevel].length;
 		}
 
