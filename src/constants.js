@@ -1,6 +1,6 @@
 export const LayerNames = {
-	googleMaps: 'Google Maps',
-	ign: 'IGN',
-	mapBox: 'MapBox',
-	openStreetMap: 'OpenStreetMap',
+	GOOGLE_MAPS: 'Google Maps',
+	IGN: 'IGN',
+	MAPBOX: 'Mapbox',
+	OPEN_STREET_MAP: 'OpenStreetMap',
 };

@@ -46,7 +46,7 @@
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
 	});
-	const layer = new TileLayerOffline(LayerNames.mapBox, props.type, props.url, options);
+	const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
 
 	provide('layer', ref(layer));
 	whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });

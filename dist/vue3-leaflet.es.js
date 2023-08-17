@@ -8530,10 +8530,10 @@ var Offline = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
   "default": TileLayerOffline
 }, Symbol.toStringTag, { value: "Module" }));
 const LayerNames = {
-  googleMaps: "Google Maps",
-  ign: "IGN",
-  mapBox: "MapBox",
-  openStreetMap: "OpenStreetMap"
+  GOOGLE_MAPS: "Google Maps",
+  IGN: "IGN",
+  MAPBOX: "Mapbox",
+  OPEN_STREET_MAP: "OpenStreetMap"
 };
 const _sfc_main$a = {
   __name: "OpenStreetMap",
@@ -8555,7 +8555,7 @@ const _sfc_main$a = {
   setup(__props) {
     const props = __props;
     const $layerGroup = inject("layerGroup");
-    const layer = new TileLayerOffline(LayerNames.openStreetMap, props.type, props.url, {
+    const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
       attribution: props.attribution
     });
     provide("layer", ref(layer));
@@ -8605,7 +8605,7 @@ const _sfc_main$9 = {
       tileSize: props.tileSize,
       zoomOffset: props.zoomOffset
     });
-    const layer = new TileLayerOffline(LayerNames.mapBox, props.type, props.url, options);
+    const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
     return (_ctx, _cache) => {
@@ -8664,7 +8664,7 @@ const _sfc_main$8 = {
           url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
           break;
       }
-      return new TileLayerOffline(LayerNames.ign, type, url, options);
+      return new TileLayerOffline(LayerNames.IGN, type, url, options);
     }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
