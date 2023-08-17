@@ -6,6 +6,7 @@
 	import { whenever } from '@vueuse/core';
 	import { inject, provide, ref } from 'vue';
 	import TileLayerOffline from '../Offline';
+	import { LayerNames } from '../../constants';
 
 	const props = defineProps({
 		url: {
@@ -24,7 +25,7 @@
 	});
 
 	const $layerGroup = inject('layerGroup');
-	const layer = new TileLayerOffline('openStreetMap', props.type, props.url, {
+	const layer = new TileLayerOffline(LayerNames.openStreetMap, props.type, props.url, {
 		attribution: props.attribution,
 	});
 

@@ -7,6 +7,7 @@
 	import { inject, provide, ref, watch } from 'vue';
 	import mapTypes from '../../utils/map-types';
 	import TileLayerOffline from '../Offline';
+	import { LayerNames } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -60,6 +61,6 @@
 					'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png';
 				break;
 		}
-		return new TileLayerOffline('IGN', type, url, options);
+		return new TileLayerOffline(LayerNames.ign, type, url, options);
 	}
 </script>

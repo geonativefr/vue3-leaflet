@@ -8529,6 +8529,12 @@ var Offline = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
   deleteMap,
   "default": TileLayerOffline
 }, Symbol.toStringTag, { value: "Module" }));
+const LayerNames = {
+  googleMaps: "Google Maps",
+  ign: "IGN",
+  mapBox: "MapBox",
+  openStreetMap: "OpenStreetMap"
+};
 const _sfc_main$a = {
   __name: "OpenStreetMap",
   props: {
@@ -8549,7 +8555,7 @@ const _sfc_main$a = {
   setup(__props) {
     const props = __props;
     const $layerGroup = inject("layerGroup");
-    const layer = new TileLayerOffline("openStreetMap", props.type, props.url, {
+    const layer = new TileLayerOffline(LayerNames.openStreetMap, props.type, props.url, {
       attribution: props.attribution
     });
     provide("layer", ref(layer));
@@ -8599,7 +8605,7 @@ const _sfc_main$9 = {
       tileSize: props.tileSize,
       zoomOffset: props.zoomOffset
     });
-    const layer = new TileLayerOffline("mapbox", props.type, props.url, options);
+    const layer = new TileLayerOffline(LayerNames.mapBox, props.type, props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
     return (_ctx, _cache) => {
@@ -8658,7 +8664,7 @@ const _sfc_main$8 = {
           url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
           break;
       }
-      return new TileLayerOffline("IGN", type, url, options);
+      return new TileLayerOffline(LayerNames.ign, type, url, options);
     }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
@@ -9574,4 +9580,4 @@ async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
 async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerNames, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
