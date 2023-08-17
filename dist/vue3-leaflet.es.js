@@ -8421,6 +8421,13 @@ async function deleteMap(mapName) {
   mainDb.close();
 }
 class TileLayerOffline extends leafletSrc.exports.TileLayer {
+  constructor(provider, type, url, options) {
+    super(url, options);
+    __publicField(this, "provider");
+    __publicField(this, "type");
+    this.provider = provider;
+    this.type = type;
+  }
   createTile(coords, done) {
     const image = document.createElement("img");
     image.setAttribute("role", "presentation");
@@ -8431,6 +8438,8 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
       let data;
       if (zoomlevels.includes(coords.z)) {
         const map = get(maps).find((map2) => {
+          if (map2.provider !== this.provider || map2.type !== this.type)
+            return false;
           const area = leafletSrc.exports.bounds(this._map.project(map2.NE, coords.z), this._map.project(map2.SW, coords.z));
           const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
           const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
@@ -8463,7 +8472,9 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
       name: mapName,
       normalizedName,
       NE: latlngBounds._northEast,
-      SW: latlngBounds._southWest
+      SW: latlngBounds._southWest,
+      provider: this.provider,
+      type: this.type
     };
     await storeDB(mainDb, "maps", map);
     set(maps, [...get(maps), map]);
@@ -8538,7 +8549,7 @@ const _sfc_main$a = {
   setup(__props) {
     const props = __props;
     const $layerGroup = inject("layerGroup");
-    const layer = new TileLayerOffline(props.url, {
+    const layer = new TileLayerOffline("openStreetMap", props.type, props.url, {
       attribution: props.attribution
     });
     provide("layer", ref(layer));
@@ -8588,7 +8599,7 @@ const _sfc_main$9 = {
       tileSize: props.tileSize,
       zoomOffset: props.zoomOffset
     });
-    const layer = new TileLayerOffline(props.url, options);
+    const layer = new TileLayerOffline("mapbox", props.type, props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
     return (_ctx, _cache) => {
@@ -8647,7 +8658,7 @@ const _sfc_main$8 = {
           url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
           break;
       }
-      return new TileLayerOffline(url, options);
+      return new TileLayerOffline("IGN", type, url, options);
     }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
@@ -8692,29 +8703,21 @@ const _sfc_main$7 = {
     const { type } = toRefs(props);
     const defaultOptions = reactive({ type });
     const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-      const mount = (map, options2) => L.gridLayer.googleMutant(options2).addTo(map);
-      const load = async (map, options2 = defaultOptions) => {
+      const mount = (map, options) => L.gridLayer.googleMutant(options).addTo(map);
+      const load = async (map, options = defaultOptions) => {
         await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-        mount(map, options2);
+        mount(map, options);
         return {};
       };
       return { load };
     };
     const $map = inject("map");
-    const options = reactive({
-      apiKey: props.apiKey,
-      attribution: props.attribution,
-      tileSize: props.tileSize,
-      zoomOffset: props.zoomOffset
-    });
-    const layer = new TileLayerOffline(props.url, options);
     const gmaps = useGoogleMutant(props.apiKey);
     const mutant = ref();
     watch(type, () => setMutant(unref($map)));
     async function setMutant(map) {
       set(mutant, await gmaps.load(map, defaultOptions));
     }
-    provide("layer", ref(layer));
     whenever($map, (map) => setMutant(map), { immediate: true });
     return (_ctx, _cache) => {
       return mutant.value ? renderSlot(_ctx.$slots, "default", { key: 0 }) : createCommentVNode("", true);
@@ -9374,10 +9377,18 @@ class OfflineControl extends leafletSrc.exports.Control {
     button.href = "#";
     button.role = "button";
     button.title = "Download";
-    button.style = "display: flex; justify-content: center; align-items: center;";
+    button.style = "display: none; justify-content: center; align-items: center;";
     button.append(image);
     const container = leafletSrc.exports.DomUtil.create("div", "savetiles leaflet-bar");
     container.append(button);
+    const checkMapHasOfflineLayer = () => {
+      let hasOfflineLayer = false;
+      map.eachLayer((layer) => {
+        hasOfflineLayer = hasOfflineLayer || layer instanceof TileLayerOffline;
+      });
+      button.style.display = hasOfflineLayer ? "flex" : "none";
+    };
+    map.addEventListener("layeradd", checkMapHasOfflineLayer);
     button.addEventListener("click", async () => {
       if (!checkMapSizeToSave(map)) {
         if (this.onMaxSize) {
@@ -9410,6 +9421,7 @@ class OfflineControl extends leafletSrc.exports.Control {
         }
       });
     });
+    checkMapHasOfflineLayer();
     return container;
   }
 }
