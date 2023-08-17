@@ -9373,7 +9373,7 @@ class OfflineControl extends leafletSrc.exports.Control {
     const button = document.createElement("a");
     button.href = "#";
     button.role = "button";
-    button.title = "Donwload";
+    button.title = "Download";
     button.style = "display: flex; justify-content: center; align-items: center;";
     button.append(image);
     const container = leafletSrc.exports.DomUtil.create("div", "savetiles leaflet-bar");
