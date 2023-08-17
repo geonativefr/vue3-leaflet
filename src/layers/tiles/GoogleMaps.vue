@@ -54,7 +54,7 @@
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
 	});
-	const layer = new TileLayerOffline(props.url, options);
+	const layer = new TileLayerOffline('google maps', props.type, props.url, options);
 	const gmaps = useGoogleMutant(props.apiKey);
 	const mutant = ref();
 	watch(type, () => setMutant(unref($map)));

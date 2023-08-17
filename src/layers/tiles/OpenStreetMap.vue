@@ -24,7 +24,7 @@
 	});
 
 	const $layerGroup = inject('layerGroup');
-	const layer = new TileLayerOffline(props.url, {
+	const layer = new TileLayerOffline('openStreetMap', props.type, props.url, {
 		attribution: props.attribution,
 	});
 
