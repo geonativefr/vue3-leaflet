@@ -1,7 +1,7 @@
 <template>
 	<div class="map-container">
 		<Suspense>
-			<div ref="container" v-bind="$attrs">
+			<div ref="container" class="map-container_map" v-bind="$attrs">
 				<slot v-if="$map" :map="$map" />
 			</div>
 		</Suspense>
@@ -83,3 +83,13 @@
 		emit('ready', map);
 	});
 </script>
+
+<style lang="scss">
+	.map-container {
+		height: 250px;
+
+		&_map {
+			height: 100%;
+		}
+	}
+</style>

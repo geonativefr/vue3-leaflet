@@ -111,6 +111,7 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
+var MapContainer_vue_vue_type_style_index_0_lang = /* @__PURE__ */ (() => ".map-container{height:250px}.map-container_map{height:100%}\n")();
 const _hoisted_1$2 = { class: "map-container" };
 const _sfc_main$b = {
   __name: "MapContainer",
@@ -183,7 +184,8 @@ const _sfc_main$b = {
           default: withCtx(() => [
             createElementVNode("div", mergeProps({
               ref_key: "container",
-              ref: container
+              ref: container,
+              class: "map-container_map"
             }, _ctx.$attrs), [
               $map.value ? renderSlot(_ctx.$slots, "default", {
                 key: 0,
