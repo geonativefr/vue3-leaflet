@@ -28,11 +28,20 @@ class OfflineControl extends Control {
 		button.href = '#';
 		button.role = 'button';
 		button.title = 'Download';
-		button.style = 'display: flex; justify-content: center; align-items: center;';
+		button.style = 'display: none; justify-content: center; align-items: center;';
 		button.append(image);
 		const container = DomUtil.create('div', 'savetiles leaflet-bar');
 		container.append(button);
 
+		const checkMapHasOfflineLayer = () => {
+			let hasOfflineLayer = false;
+			map.eachLayer((layer) => {
+				hasOfflineLayer = hasOfflineLayer || layer instanceof TileLayerOffline;
+			});
+			button.style.display = hasOfflineLayer ? 'flex' : 'none';
+		};
+
+		map.addEventListener('layeradd', checkMapHasOfflineLayer);
 		button.addEventListener('click', async () => {
 			if (!checkMapSizeToSave(map)) {
 				if (this.onMaxSize) {
@@ -67,6 +76,8 @@ class OfflineControl extends Control {
 				}
 			});
 		});
+
+		checkMapHasOfflineLayer();
 		return container;
 	}
 }

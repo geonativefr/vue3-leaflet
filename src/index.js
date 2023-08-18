@@ -30,3 +30,4 @@ export * from './utils/leaflet-loader.js';
 export * from './utils/leaflet-locatecontrol-loader.js';
 export * from './utils/leaflet-markercluster-loader.js';
 export * from './utils/leaflet-pegman-loader.js';
+export * from './constants.js';

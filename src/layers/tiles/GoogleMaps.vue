@@ -8,7 +8,6 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import TileLayerOffline from '../Offline';
 
 	const props = defineProps({
 		url: {
@@ -48,13 +47,6 @@
 	};
 
 	const $map = inject('map');
-	const options = reactive({
-		apiKey: props.apiKey,
-		attribution: props.attribution,
-		tileSize: props.tileSize,
-		zoomOffset: props.zoomOffset,
-	});
-	const layer = new TileLayerOffline(props.url, options);
 	const gmaps = useGoogleMutant(props.apiKey);
 	const mutant = ref();
 	watch(type, () => setMutant(unref($map)));
@@ -63,6 +55,5 @@
 		set(mutant, await gmaps.load(map, defaultOptions));
 	}
 
-	provide('layer', ref(layer));
 	whenever($map, (map) => setMutant(map), { immediate: true });
 </script>

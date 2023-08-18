@@ -75,6 +75,15 @@ export async function deleteMap(mapName) {
 }
 
 export default class TileLayerOffline extends TileLayer {
+	provider;
+	type;
+
+	constructor(provider, type, url, options) {
+		super(url, options);
+		this.provider = provider;
+		this.type = type;
+	}
+
 	createTile(coords, done) {
 		const image = document.createElement('img');
 		image.setAttribute('role', 'presentation');
@@ -88,6 +97,8 @@ export default class TileLayerOffline extends TileLayer {
 			let data;
 			if (zoomlevels.includes(coords.z)) {
 				const map = get(maps).find((map) => {
+					if (map.provider !== this.provider || map.type !== this.type) return false;
+
 					const area = bounds(this._map.project(map.NE, coords.z), this._map.project(map.SW, coords.z));
 					const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
 					const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
@@ -132,6 +143,8 @@ export default class TileLayerOffline extends TileLayer {
 			normalizedName,
 			NE: latlngBounds._northEast,
 			SW: latlngBounds._southWest,
+			provider: this.provider,
+			type: this.type,
 		};
 		await storeDB(mainDb, 'maps', map);
 		set(maps, [...get(maps), map]);
