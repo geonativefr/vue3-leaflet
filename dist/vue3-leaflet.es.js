@@ -152,14 +152,16 @@ const _sfc_main$b = {
     });
     const container = templateRef("container");
     const $map = ref();
-    const $layerGroup = ref();
+    const $pinLayerGroup = ref();
+    const $tileLayerGroup = ref();
     function fitBounds(map, bounds2) {
       if (bounds2.length > 0) {
         map.fitBounds(bounds2);
       }
     }
     provide("map", $map);
-    provide("layerGroup", $layerGroup);
+    provide("pinLayerGroup", $pinLayerGroup);
+    provide("tileLayerGroup", $tileLayerGroup);
     provide("leaflet.version", props.version);
     onMounted(async () => {
       await importLeaflet(props.version);
@@ -167,10 +169,13 @@ const _sfc_main$b = {
       map.setView(props.center, props.zoom);
       map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
       map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
-      const layerGroup = L.layerGroup();
-      layerGroup.addTo(map);
+      const pinLayerGroup = L.layerGroup();
+      pinLayerGroup.addTo(map);
+      const tilelayerGroup = L.layerGroup();
+      tilelayerGroup.addTo(map);
       set($map, map);
-      set($layerGroup, layerGroup);
+      set($pinLayerGroup, pinLayerGroup);
+      set($tileLayerGroup, tilelayerGroup);
       watch(center, (center2) => map.setView(center2));
       watch(zoom, (zoom2) => map.setView(props.center, zoom2), { immediate: true });
       watch(zoomControl, (zoomControl2) => zoomControl2 ? map.zoomControl.addTo(map) : map.zoomControl.remove(), {
@@ -8557,7 +8562,7 @@ const _sfc_main$a = {
   },
   setup(__props) {
     const props = __props;
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("tileLayerGroup");
     const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
       attribution: props.attribution
     });
@@ -8601,7 +8606,7 @@ const _sfc_main$9 = {
     let __temp, __restore;
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("tileLayerGroup");
     const options = reactive({
       apiKey: props.apiKey,
       attribution: props.attribution,
@@ -8638,7 +8643,7 @@ const _sfc_main$8 = {
   },
   setup(__props) {
     const props = __props;
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("tileLayerGroup");
     const layer = ref(getLayer(props.type, props.attribution));
     provide("layer", layer);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(get(layer)), {
@@ -8744,12 +8749,12 @@ const _sfc_main$6 = {
   __name: "Cluster",
   async setup(__props) {
     let __temp, __restore;
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("pinLayerGroup");
     [__temp, __restore] = withAsyncContext(() => importLeafletMarkerCluster()), await __temp, __restore();
     const cluster = L.markerClusterGroup();
     const $cluster = ref(cluster);
     provide("layer", $cluster);
-    provide("layerGroup", $cluster);
+    provide("pinLayerGroup", $cluster);
     get($layerGroup).addLayer(cluster);
     onUnmounted(() => get($layerGroup).removeLayer(cluster));
     return (_ctx, _cache) => {
@@ -8837,7 +8842,7 @@ const _sfc_main$5 = {
       }, MUTE_ERRORS);
       marker2.update();
     }
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("pinLayerGroup");
     const $marker = ref();
     provide("marker", $marker);
     provide("layer", $marker);
@@ -9103,7 +9108,7 @@ const _sfc_main$2 = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("pinLayerGroup");
     const circle = L.circle(props.center, clean(options));
     provide("layer", circle);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(circle), { immediate: true });
@@ -9148,7 +9153,7 @@ const _sfc_main$1 = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("pinLayerGroup");
     const polyline = L.polyline(props.positions, clean(options));
     provide("layer", polyline);
     onUnmounted(() => polyline.remove());
@@ -9185,7 +9190,7 @@ const _sfc_main = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("layerGroup");
+    const $layerGroup = inject("pinLayerGroup");
     const polygon = L.polygon(props.positions, clean(options));
     provide("layer", polygon);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polygon), { immediate: true });
