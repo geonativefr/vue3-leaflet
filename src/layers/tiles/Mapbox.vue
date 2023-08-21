@@ -7,7 +7,7 @@
 	import { inject, provide, reactive, ref } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import TileLayerOffline from '../Offline';
-	import { LayerNames } from '../../constants';
+	import { LayerGroups, LayerNames } from '../../constants';
 
 	const props = defineProps({
 		url: {
@@ -39,7 +39,7 @@
 	});
 
 	await importLeaflet(inject('leaflet.version'));
-	const $layerGroup = inject('tileLayerGroup');
+	const $layerGroup = inject(LayerGroups.TILE);
 	const options = reactive({
 		apiKey: props.apiKey,
 		attribution: props.attribution,

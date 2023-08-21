@@ -7,7 +7,7 @@
 	import { inject, provide, ref, watch } from 'vue';
 	import mapTypes from '../../utils/map-types';
 	import TileLayerOffline from '../Offline';
-	import { LayerNames } from '../../constants';
+	import { LayerGroups, LayerNames } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -21,7 +21,7 @@
 		},
 	});
 
-	const $layerGroup = inject('tileLayerGroup');
+	const $layerGroup = inject(LayerGroups.TILE);
 
 	const layer = ref(getLayer(props.type, props.attribution));
 

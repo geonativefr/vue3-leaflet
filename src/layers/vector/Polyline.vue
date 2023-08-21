@@ -8,6 +8,7 @@
 	import { importLeafletArrowHeads } from '../../utils/leaflet-leaflet-arrowheads.js';
 	import { clean } from '../../utils/utils.js';
 	import PathProps from '../PathProps.js';
+	import { LayerGroups } from '../../constants';
 
 	const props = defineProps({
 		positions: {
@@ -35,7 +36,7 @@
 		fillColor,
 	});
 
-	const $layerGroup = inject('pinLayerGroup');
+	const $layerGroup = inject(LayerGroups.PIN);
 	const polyline = L.polyline(props.positions, clean(options));
 	provide('layer', polyline);
 	onUnmounted(() => polyline.remove());

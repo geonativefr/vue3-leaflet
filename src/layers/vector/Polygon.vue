@@ -7,6 +7,7 @@
 	import { computed, inject, onUnmounted, provide, reactive, toRefs } from 'vue';
 	import { clean } from '../../utils/utils.js';
 	import PathProps from '../PathProps.js';
+	import { LayerGroups } from '../../constants';
 
 	const props = defineProps({
 		positions: {
@@ -30,7 +31,7 @@
 		fillColor,
 	});
 
-	const $layerGroup = inject('pinLayerGroup');
+	const $layerGroup = inject(LayerGroups.PIN);
 	const polygon = L.polygon(props.positions, clean(options));
 	provide('layer', polygon);
 

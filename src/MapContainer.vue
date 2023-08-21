@@ -12,6 +12,7 @@
 	import { get, set, templateRef, whenever } from '@vueuse/core';
 	import { onMounted, provide, reactive, ref, toRefs, watch } from 'vue';
 	import { importLeaflet } from './utils/leaflet-loader.js';
+	import { LayerGroups } from './constants';
 
 	const emit = defineEmits(['ready', 'move', 'zoomend']);
 	const props = defineProps({
@@ -48,8 +49,8 @@
 	});
 	const container = templateRef('container');
 	const $map = ref();
-	const $pinLayerGroup = ref();
 	const $tileLayerGroup = ref();
+	const $pinLayerGroup = ref();
 
 	function fitBounds(map, bounds) {
 		if (bounds.length > 0) {
@@ -58,8 +59,8 @@
 	}
 
 	provide('map', $map);
-	provide('pinLayerGroup', $pinLayerGroup);
-	provide('tileLayerGroup', $tileLayerGroup);
+	provide(LayerGroups.TILE, $tileLayerGroup);
+	provide(LayerGroups.PIN, $pinLayerGroup);
 	provide('leaflet.version', props.version);
 
 	onMounted(async () => {
@@ -70,14 +71,14 @@
 		map.on('move', (event) => emit('move', { event, center: map.getCenter(), map }));
 		map.on('zoomend', () => emit('zoomend', { zoom: map.getZoom(), bounds: map.getBounds(), map }));
 
-		const pinLayerGroup = L.layerGroup();
-		pinLayerGroup.addTo(map);
 		const tilelayerGroup = L.layerGroup();
 		tilelayerGroup.addTo(map);
+		const pinLayerGroup = L.layerGroup();
+		pinLayerGroup.addTo(map);
 
 		set($map, map);
-		set($pinLayerGroup, pinLayerGroup);
 		set($tileLayerGroup, tilelayerGroup);
+		set($pinLayerGroup, pinLayerGroup);
 
 		watch(center, (center) => map.setView(center));
 		watch(zoom, (zoom) => map.setView(props.center, zoom), { immediate: true });

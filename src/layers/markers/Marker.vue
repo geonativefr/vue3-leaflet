@@ -10,6 +10,7 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { MUTE_ERRORS, silently } from '../../utils/silently.js';
 	import { clean } from '../../utils/utils.js';
+	import { LayerGroups } from '../../constants';
 
 	const emit = defineEmits(['click', 'load']);
 	const props = defineProps({
@@ -84,7 +85,7 @@
 		marker.update();
 	}
 
-	const $layerGroup = inject('pinLayerGroup');
+	const $layerGroup = inject(LayerGroups.PIN);
 	const $marker = ref();
 	provide('marker', $marker);
 	provide('layer', $marker);

@@ -112,6 +112,16 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
+const LayerNames = {
+  GOOGLE_MAPS: "Google Maps",
+  IGN: "IGN",
+  MAPBOX: "Mapbox",
+  OPEN_STREET_MAP: "OpenStreetMap"
+};
+const LayerGroups = {
+  PIN: "pinLayerGroup",
+  TILE: "tileLayerGroup"
+};
 var MapContainer_vue_vue_type_style_index_0_lang = /* @__PURE__ */ (() => ".map-container{height:250px}.map-container_map{height:100%}\n")();
 const _hoisted_1$2 = { class: "map-container" };
 const _sfc_main$b = {
@@ -152,16 +162,16 @@ const _sfc_main$b = {
     });
     const container = templateRef("container");
     const $map = ref();
-    const $pinLayerGroup = ref();
     const $tileLayerGroup = ref();
+    const $pinLayerGroup = ref();
     function fitBounds(map, bounds2) {
       if (bounds2.length > 0) {
         map.fitBounds(bounds2);
       }
     }
     provide("map", $map);
-    provide("pinLayerGroup", $pinLayerGroup);
-    provide("tileLayerGroup", $tileLayerGroup);
+    provide(LayerGroups.TILE, $tileLayerGroup);
+    provide(LayerGroups.PIN, $pinLayerGroup);
     provide("leaflet.version", props.version);
     onMounted(async () => {
       await importLeaflet(props.version);
@@ -169,13 +179,13 @@ const _sfc_main$b = {
       map.setView(props.center, props.zoom);
       map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
       map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
-      const pinLayerGroup = L.layerGroup();
-      pinLayerGroup.addTo(map);
       const tilelayerGroup = L.layerGroup();
       tilelayerGroup.addTo(map);
+      const pinLayerGroup = L.layerGroup();
+      pinLayerGroup.addTo(map);
       set($map, map);
-      set($pinLayerGroup, pinLayerGroup);
       set($tileLayerGroup, tilelayerGroup);
+      set($pinLayerGroup, pinLayerGroup);
       watch(center, (center2) => map.setView(center2));
       watch(zoom, (zoom2) => map.setView(props.center, zoom2), { immediate: true });
       watch(zoomControl, (zoomControl2) => zoomControl2 ? map.zoomControl.addTo(map) : map.zoomControl.remove(), {
@@ -8537,12 +8547,6 @@ var Offline = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
   deleteMap,
   "default": TileLayerOffline
 }, Symbol.toStringTag, { value: "Module" }));
-const LayerNames = {
-  GOOGLE_MAPS: "Google Maps",
-  IGN: "IGN",
-  MAPBOX: "Mapbox",
-  OPEN_STREET_MAP: "OpenStreetMap"
-};
 const _sfc_main$a = {
   __name: "OpenStreetMap",
   props: {
@@ -8562,7 +8566,7 @@ const _sfc_main$a = {
   },
   setup(__props) {
     const props = __props;
-    const $layerGroup = inject("tileLayerGroup");
+    const $layerGroup = inject(LayerGroups.TILE);
     const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
       attribution: props.attribution
     });
@@ -8606,7 +8610,7 @@ const _sfc_main$9 = {
     let __temp, __restore;
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
-    const $layerGroup = inject("tileLayerGroup");
+    const $layerGroup = inject(LayerGroups.TILE);
     const options = reactive({
       apiKey: props.apiKey,
       attribution: props.attribution,
@@ -8643,7 +8647,7 @@ const _sfc_main$8 = {
   },
   setup(__props) {
     const props = __props;
-    const $layerGroup = inject("tileLayerGroup");
+    const $layerGroup = inject(LayerGroups.TILE);
     const layer = ref(getLayer(props.type, props.attribution));
     provide("layer", layer);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(get(layer)), {
@@ -8749,12 +8753,12 @@ const _sfc_main$6 = {
   __name: "Cluster",
   async setup(__props) {
     let __temp, __restore;
-    const $layerGroup = inject("pinLayerGroup");
+    const $layerGroup = inject(LayerGroups.PIN);
     [__temp, __restore] = withAsyncContext(() => importLeafletMarkerCluster()), await __temp, __restore();
     const cluster = L.markerClusterGroup();
     const $cluster = ref(cluster);
     provide("layer", $cluster);
-    provide("pinLayerGroup", $cluster);
+    provide(LayerGroups.PIN, $cluster);
     get($layerGroup).addLayer(cluster);
     onUnmounted(() => get($layerGroup).removeLayer(cluster));
     return (_ctx, _cache) => {
@@ -8842,7 +8846,7 @@ const _sfc_main$5 = {
       }, MUTE_ERRORS);
       marker2.update();
     }
-    const $layerGroup = inject("pinLayerGroup");
+    const $layerGroup = inject(LayerGroups.PIN);
     const $marker = ref();
     provide("marker", $marker);
     provide("layer", $marker);
@@ -9108,7 +9112,7 @@ const _sfc_main$2 = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("pinLayerGroup");
+    const $layerGroup = inject(LayerGroups.PIN);
     const circle = L.circle(props.center, clean(options));
     provide("layer", circle);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(circle), { immediate: true });
@@ -9153,7 +9157,7 @@ const _sfc_main$1 = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("pinLayerGroup");
+    const $layerGroup = inject(LayerGroups.PIN);
     const polyline = L.polyline(props.positions, clean(options));
     provide("layer", polyline);
     onUnmounted(() => polyline.remove());
@@ -9190,7 +9194,7 @@ const _sfc_main = {
       fill,
       fillColor
     });
-    const $layerGroup = inject("pinLayerGroup");
+    const $layerGroup = inject(LayerGroups.PIN);
     const polygon = L.polygon(props.positions, clean(options));
     provide("layer", polygon);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polygon), { immediate: true });
@@ -9588,4 +9592,4 @@ async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
 async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerNames, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LayerNames, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
