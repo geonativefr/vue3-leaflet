@@ -35,7 +35,7 @@
 		fillColor,
 	});
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('pinLayerGroup');
 	const circle = L.circle(props.center, clean(options));
 	provide('layer', circle);
 

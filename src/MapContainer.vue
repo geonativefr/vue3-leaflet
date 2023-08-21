@@ -48,7 +48,8 @@
 	});
 	const container = templateRef('container');
 	const $map = ref();
-	const $layerGroup = ref();
+	const $pinLayerGroup = ref();
+	const $tileLayerGroup = ref();
 
 	function fitBounds(map, bounds) {
 		if (bounds.length > 0) {
@@ -57,7 +58,8 @@
 	}
 
 	provide('map', $map);
-	provide('layerGroup', $layerGroup);
+	provide('pinLayerGroup', $pinLayerGroup);
+	provide('tileLayerGroup', $tileLayerGroup);
 	provide('leaflet.version', props.version);
 
 	onMounted(async () => {
@@ -68,11 +70,14 @@
 		map.on('move', (event) => emit('move', { event, center: map.getCenter(), map }));
 		map.on('zoomend', () => emit('zoomend', { zoom: map.getZoom(), bounds: map.getBounds(), map }));
 
-		const layerGroup = L.layerGroup();
-		layerGroup.addTo(map);
+		const pinLayerGroup = L.layerGroup();
+		pinLayerGroup.addTo(map);
+		const tilelayerGroup = L.layerGroup();
+		tilelayerGroup.addTo(map);
 
 		set($map, map);
-		set($layerGroup, layerGroup);
+		set($pinLayerGroup, pinLayerGroup);
+		set($tileLayerGroup, tilelayerGroup);
 
 		watch(center, (center) => map.setView(center));
 		watch(zoom, (zoom) => map.setView(props.center, zoom), { immediate: true });

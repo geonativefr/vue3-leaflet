@@ -24,7 +24,7 @@
 		},
 	});
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('tileLayerGroup');
 	const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
 		attribution: props.attribution,
 	});

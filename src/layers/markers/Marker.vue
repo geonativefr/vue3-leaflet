@@ -84,7 +84,7 @@
 		marker.update();
 	}
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('pinLayerGroup');
 	const $marker = ref();
 	provide('marker', $marker);
 	provide('layer', $marker);

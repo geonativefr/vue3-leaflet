@@ -30,7 +30,7 @@
 		fillColor,
 	});
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('pinLayerGroup');
 	const polygon = L.polygon(props.positions, clean(options));
 	provide('layer', polygon);
 

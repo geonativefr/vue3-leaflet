@@ -39,7 +39,7 @@
 	});
 
 	await importLeaflet(inject('leaflet.version'));
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('tileLayerGroup');
 	const options = reactive({
 		apiKey: props.apiKey,
 		attribution: props.attribution,

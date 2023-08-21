@@ -35,7 +35,7 @@
 		fillColor,
 	});
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('pinLayerGroup');
 	const polyline = L.polyline(props.positions, clean(options));
 	provide('layer', polyline);
 	onUnmounted(() => polyline.remove());

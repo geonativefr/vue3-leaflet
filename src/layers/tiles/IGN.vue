@@ -21,7 +21,7 @@
 		},
 	});
 
-	const $layerGroup = inject('layerGroup');
+	const $layerGroup = inject('tileLayerGroup');
 
 	const layer = ref(getLayer(props.type, props.attribution));
 
