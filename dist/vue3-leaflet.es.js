@@ -8594,7 +8594,7 @@ const _sfc_main$9 = {
     },
     tileSize: {
       type: Number,
-      default: 512
+      default: 256
     },
     zoomOffset: {
       type: Number,
