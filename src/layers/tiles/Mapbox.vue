@@ -25,7 +25,7 @@
 		},
 		tileSize: {
 			type: Number,
-			default: 512,
+			default: 256,
 		},
 		zoomOffset: {
 			type: Number,
