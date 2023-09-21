@@ -27,6 +27,7 @@
 	const $layerGroup = inject(LayerGroups.TILE);
 	const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
 		attribution: props.attribution,
+		maxZoom: 19,
 	});
 
 	provide('layer', ref(layer));

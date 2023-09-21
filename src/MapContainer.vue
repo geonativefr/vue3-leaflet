@@ -45,7 +45,6 @@
 	const { center, zoom, zoomControl, bounds, scrollWheelZoom } = toRefs(props);
 	const options = reactive({
 		scrollWheelZoom,
-		maxZoom: 18,
 	});
 	const container = templateRef('container');
 	const $map = ref();
@@ -73,6 +72,12 @@
 
 		const tilelayerGroup = L.layerGroup();
 		tilelayerGroup.addTo(map);
+		const oldAddLayer = tilelayerGroup.addLayer;
+		tilelayerGroup.addLayer = function (layer) {
+			if (layer.options?.maxZoom) map.setMaxZoom(layer.options.maxZoom);
+			oldAddLayer.bind(this)(layer);
+		}.bind(tilelayerGroup);
+
 		const pinLayerGroup = L.layerGroup();
 		pinLayerGroup.addTo(map);
 

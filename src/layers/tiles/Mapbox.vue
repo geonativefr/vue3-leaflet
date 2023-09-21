@@ -45,6 +45,7 @@
 		attribution: props.attribution,
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
+		maxZoom: 19,
 	});
 	const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
 

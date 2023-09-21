@@ -54,7 +54,6 @@
 			case mapTypes.satellite:
 				url =
 					'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg';
-				options.maxZoom = 21;
 				break;
 			case mapTypes.cadastral:
 				url =
