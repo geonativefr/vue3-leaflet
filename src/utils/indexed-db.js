@@ -43,14 +43,15 @@ export function deleteEntry(db, tableName, id) {
 	});
 }
 
-export function storeDB(db, tableName, data, key) {
+export function storeDB(db, tableName, data, { key, update } = { update: false }) {
 	return new Promise(async (resolve, reject) => {
 		const transaction = db.transaction([tableName], 'readwrite');
 		const store = transaction.objectStore(tableName);
 
 		let request;
-
-		if (key) {
+		if (update) {
+			request = store.put(data);
+		} else if (key) {
 			const old = await new Promise((res, rej) => {
 				const req = store.get(key);
 				req.addEventListener('success', () => {
@@ -69,8 +70,8 @@ export function storeDB(db, tableName, data, key) {
 		} else {
 			request = store.add(data);
 		}
-		request.addEventListener('success', () => {
-			resolve();
+		request.addEventListener('success', (event) => {
+			resolve(event.target.result);
 		});
 		request.addEventListener('error', (e) => {
 			console.error(e);

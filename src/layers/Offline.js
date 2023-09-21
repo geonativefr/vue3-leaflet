@@ -1,9 +1,10 @@
-import { ref } from 'vue';
+import { ref, unref } from 'vue';
 import { get, set } from '@vueuse/core';
-import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
+import { bounds, DomEvent, Point, TileLayer, Util, latLngBounds } from 'leaflet';
 import { deleteDB, deleteEntry, openDB, readDB, readAllDB, storeDB, storeArrayDB } from '../utils/indexed-db.js';
 
-const zoomlevels = [12, 13, 14, 15, 16, 17, 18];
+const oldZoomlevels = [12, 13, 14, 15, 16, 17, 18];
+const zoomlevels = [12, 13, 14, 15, 16, 17, 18, 19];
 
 const DB_NAME = 'leaflet-offline';
 
@@ -12,7 +13,24 @@ let maps = ref([]);
 (async () => {
 	try {
 		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-		set(maps, await readAllDB(mainDb, 'maps'));
+		const _maps = await readAllDB(mainDb, 'maps');
+		set(maps, _maps);
+		for (let i = 0; i < _maps.length; i++) {
+			const map = _maps[i];
+			if (!map.structure) {
+				map.structure = oldZoomlevels.reduce(
+					(structure, zoomLevel) => ({ ...structure, [zoomLevel]: ['0'] }),
+					{}
+				);
+				const bounds = latLngBounds(map.NE, map.SW);
+				map.NW = bounds.getNorthWest();
+				map.SE = bounds.getSouthEast();
+				delete map.NE;
+				delete map.SW;
+				console.log(map.target);
+				await storeDB(mainDb, 'maps', map, { update: true });
+			}
+		}
 		mainDb.close();
 	} catch (e) {
 		console.error('fail open db', e);
@@ -42,17 +60,30 @@ function getTilePoints(area, tileSize) {
 function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
 	const tiles = [];
 	const tilePoints = getTilePoints(bounds, tileSize);
+
 	for (let index = 0; index < tilePoints.length; index += 1) {
-		const tilePoint = tilePoints[index];
+		const point = tilePoints[index];
 		const data = {
-			x: tilePoint.x,
-			y: tilePoint.y,
+			x: point.x,
+			y: point.y,
 			z: zoom,
 		};
-		const url = getTileUrl(templateUrl, {...options, ...data});
-		tiles.push(url);
+		const url = getTileUrl(templateUrl, { ...options, ...data });
+		tiles.push({ point, url });
 	}
 	return tiles;
+}
+
+function getPointIndex(area, tileSize, point) {
+	const topLeftTile = area.min.divideBy(tileSize.x).floor();
+	const bottomRightTile = area.max.divideBy(tileSize.x).floor();
+
+	const start = new Point(topLeftTile.x, topLeftTile.y);
+	const end = new Point(bottomRightTile.x, bottomRightTile.y);
+
+	return (
+		Math.floor((point.x - start.x) / 10) + Math.floor((point.y - start.y) / 10) * Math.ceil((end.x - start.x) / 10)
+	);
 }
 
 function getTileUrl(urlTemplate, data) {
@@ -91,7 +122,7 @@ export default class TileLayerOffline extends TileLayer {
 		DomEvent.on(image, 'load', Util.bind(this._tileOnLoad, this, done, image));
 		DomEvent.on(image, 'error', Util.bind(this._tileOnError, this, done, image));
 
-		const url = getTileUrl(this._url, {...this.options, ...coords});
+		const url = getTileUrl(this._url, { ...this.options, ...coords });
 
 		(async () => {
 			let data;
@@ -99,7 +130,7 @@ export default class TileLayerOffline extends TileLayer {
 				const map = get(maps).find((map) => {
 					if (map.provider !== this.provider || map.type !== this.type) return false;
 
-					const area = bounds(this._map.project(map.NE, coords.z), this._map.project(map.SW, coords.z));
+					const area = bounds(this._map.project(map.NW, coords.z), this._map.project(map.SE, coords.z));
 					const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
 					const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
 					return (
@@ -112,9 +143,22 @@ export default class TileLayerOffline extends TileLayer {
 				const db =
 					map &&
 					(await openDB(DB_NAME + '-' + map.normalizedName, 1, (db) => {
-						zoomlevels.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
+						Object.keys(map.structure).forEach((zoomLevel) =>
+							tileUrls[zoomLevel].forEach((index) => db.createObjectStore(`tiles-${zoomLevel}-${index}`))
+						);
 					}));
-				data = db && (await readDB(db, 'tiles-' + coords.z, url));
+				const index =
+					db &&
+					getPointIndex(
+						bounds(this._map.project(map.NW, coords.z), this._map.project(map.SE, coords.z)),
+						this.getTileSize(),
+						coords
+					);
+				data =
+					db &&
+					map.structure[coords.z]?.includes('' + index) &&
+					(await readDB(db, `tiles-${coords.z}-${index}`, url));
+
 				db?.close();
 			}
 			if (data) {
@@ -141,56 +185,73 @@ export default class TileLayerOffline extends TileLayer {
 		const map = {
 			name: mapName,
 			normalizedName,
-			NE: latlngBounds._northEast,
-			SW: latlngBounds._southWest,
+			NW: latlngBounds.getNorthWest(),
+			SE: latlngBounds.getSouthEast(),
 			provider: this.provider,
 			type: this.type,
 		};
 		await storeDB(mainDb, 'maps', map);
 		set(maps, [...get(maps), map]);
-		mainDb.close();
 
-		const db = await openDB(DB_NAME + '-' + normalizedName, 1, (db) => {
-			zoomlevels.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
-		});
-
-		const tileUrls = zoomlevels.reduce((tileUrls, zoomLevel) => ({ ...tileUrls, [zoomLevel]: [] }), {});
+		const tileUrls = zoomlevels.reduce((tileUrls, zoomLevel) => ({ ...tileUrls, [zoomLevel]: {} }), {});
 		let nbTiles = 0;
 		for (let i = 0; i < zoomlevels.length; i += 1) {
 			const zoomLevel = zoomlevels[i];
+
 			const area = bounds(
 				this._map.project(latlngBounds.getNorthWest(), zoomLevel),
 				this._map.project(latlngBounds.getSouthEast(), zoomLevel)
 			);
-			tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
-			nbTiles += tileUrls[zoomLevel].length;
+			getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options).forEach(({ point, url }) => {
+				const pointIndex = getPointIndex(area, this.getTileSize(), point);
+				if (!tileUrls[zoomLevel][pointIndex]) tileUrls[zoomLevel][pointIndex] = [];
+				tileUrls[zoomLevel][pointIndex].push(url);
+				nbTiles++;
+			});
 		}
 
+		const db = await openDB(DB_NAME + '-' + normalizedName, 1, (db) => {
+			Object.keys(tileUrls).forEach((zoomLevel) =>
+				Object.keys(tileUrls[zoomLevel]).forEach((index) => db.createObjectStore(`tiles-${zoomLevel}-${index}`))
+			);
+		});
 		let nbSaved = 0;
 		for (let i = 0; i < zoomlevels.length; i += 1) {
 			const zoomLevel = zoomlevels[i];
-			const urls = arraySplit(tileUrls[zoomLevel], 20);
-			const datas = [];
-			for (let j = 0; j < urls.length; j++) {
-				await Promise.all(
-					urls[j].map(async (tileUrl) => {
-						try {
-							const response = await fetch(tileUrl);
-							if (response.ok) {
-								datas.push({ key: tileUrl, value: await response.blob() });
+			const indexes = Object.keys(tileUrls[zoomLevel]);
+			for (let j = 0; j < indexes.length; j++) {
+				const index = indexes[j];
+				const urls = arraySplit(tileUrls[zoomLevel][index], 20);
+				const datas = [];
+				for (let k = 0; k < urls.length; k++) {
+					await Promise.all(
+						urls[k].map(async (url) => {
+							try {
+								const response = await fetch(url);
+								if (response.ok) {
+									datas.push({ key: url, value: await response.blob() });
+								}
+							} catch (e) {
+								console.error(e);
+							} finally {
+								nbSaved++;
 							}
-						} catch (e) {
-							console.error(e);
-						} finally {
-							nbSaved++;
-						}
-					})
-				);
-				await storeArrayDB(db, 'tiles-' + zoomLevel, datas);
-				progressHandler(nbSaved, nbTiles);
+						})
+					);
+					await storeArrayDB(db, `tiles-${zoomLevel}-${index}`, datas);
+					progressHandler(nbSaved, nbTiles);
+				}
 			}
 		}
 		db.close();
+
+		map.structure = Object.keys(tileUrls).reduce(
+			(structure, zoomLevel) => ({ ...structure, [zoomLevel]: Object.keys(tileUrls[zoomLevel]) }),
+			{}
+		);
+
+		await storeDB(mainDb, 'maps', map, { update: true });
+		mainDb.close();
 		console.timeEnd('saveTiles');
 	}
 }
