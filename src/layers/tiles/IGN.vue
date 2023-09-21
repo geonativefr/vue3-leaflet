@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-	import { whenever, get, set } from '@vueuse/core';
+	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, watch } from 'vue';
 	import mapTypes from '../../utils/map-types';
 	import TileLayerOffline from '../Offline';
@@ -26,9 +26,6 @@
 	const layer = ref(getLayer(props.type, props.attribution));
 
 	provide('layer', layer);
-	whenever($layerGroup, (layerGroup) => layerGroup.addLayer(get(layer)), {
-		immediate: true,
-	});
 
 	watch(
 		props,
@@ -37,7 +34,7 @@
 			get($layerGroup)?.clearLayers();
 			get($layerGroup)?.addLayer(get(layer));
 		},
-		{ deep: true }
+		{ deep: true, immediate: true }
 	);
 
 	function getLayer(type, attribution) {

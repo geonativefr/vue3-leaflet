@@ -56,5 +56,12 @@
 		set(mutant, await gmaps.load(layerGroup, defaultOptions));
 	}
 
-	whenever($layerGroup, (layerGroup) => setMutant(layerGroup), { immediate: true });
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			layerGroup.clearLayers();
+			setMutant(layerGroup);
+		},
+		{ immediate: true }
+	);
 </script>

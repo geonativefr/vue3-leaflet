@@ -31,5 +31,12 @@
 	});
 
 	provide('layer', ref(layer));
-	whenever($layerGroup, (layerGroup) => layerGroup.addLayer(layer), { immediate: true });
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			layerGroup.clearLayers();
+			layerGroup.addLayer(layer);
+		},
+		{ immediate: true }
+	);
 </script>

@@ -50,5 +50,12 @@
 	const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
 
 	provide('layer', ref(layer));
-	whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			layerGroup.clearLayers();
+			layerGroup.addLayer(layer);
+		},
+		{ immediate: true }
+	);
 </script>
