@@ -4,10 +4,11 @@
 
 <script setup>
 	import { set, whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref, toRefs, unref, watch } from 'vue';
+	import { inject, reactive, ref, toRefs, unref, toRaw, watch } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
+	import { LayerGroups } from '../../constants';
 
 	const props = defineProps({
 		url: {
@@ -36,24 +37,31 @@
 	const defaultOptions = reactive({ type });
 
 	const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-		const mount = (map, options) => L.gridLayer.googleMutant(options).addTo(map);
-		const load = async (map, options = defaultOptions) => {
+		const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
+		const load = async (layerGroup, options = defaultOptions) => {
 			await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-			mount(map, options);
+			mount(layerGroup, options);
 			return {};
 		};
 
 		return { load };
 	};
 
-	const $map = inject('map');
+	const $layerGroup = inject(LayerGroups.TILE);
 	const gmaps = useGoogleMutant(props.apiKey);
 	const mutant = ref();
-	watch(type, () => setMutant(unref($map)));
+	watch(type, () => setMutant(unref($layerGroup)));
 
-	async function setMutant(map) {
-		set(mutant, await gmaps.load(map, defaultOptions));
+	async function setMutant(layerGroup) {
+		set(mutant, await gmaps.load(layerGroup, defaultOptions));
 	}
 
-	whenever($map, (map) => setMutant(map), { immediate: true });
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			toRaw(layerGroup).clearLayers();
+			setMutant(layerGroup);
+		},
+		{ immediate: true }
+	);
 </script>

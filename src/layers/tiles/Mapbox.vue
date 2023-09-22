@@ -4,7 +4,7 @@
 
 <script setup>
 	import { whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref } from 'vue';
+	import { inject, provide, reactive, ref, toRaw } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, LayerNames } from '../../constants';
@@ -45,9 +45,17 @@
 		attribution: props.attribution,
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
+		maxZoom: 19,
 	});
 	const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
 
 	provide('layer', ref(layer));
-	whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			toRaw(layerGroup).clearLayers();
+			toRaw(layerGroup).addLayer(layer);
+		},
+		{ immediate: true }
+	);
 </script>
