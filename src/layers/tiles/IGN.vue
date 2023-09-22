@@ -4,7 +4,7 @@
 
 <script setup>
 	import { get, set } from '@vueuse/core';
-	import { inject, provide, ref, watch } from 'vue';
+	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import mapTypes from '../../utils/map-types';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, LayerNames } from '../../constants';
@@ -31,8 +31,8 @@
 		props,
 		(props) => {
 			set(layer, getLayer(props.type, props.attribution));
-			get($layerGroup)?.clearLayers();
-			get($layerGroup)?.addLayer(get(layer));
+			toRaw(get($layerGroup))?.clearLayers();
+			toRaw(get($layerGroup))?.addLayer(get(layer));
 		},
 		{ deep: true, immediate: true }
 	);

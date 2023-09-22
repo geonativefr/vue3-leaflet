@@ -4,7 +4,7 @@
 
 <script setup>
 	import { set, whenever } from '@vueuse/core';
-	import { inject, reactive, ref, toRefs, unref, watch } from 'vue';
+	import { inject, reactive, ref, toRefs, unref, toRaw, watch } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
@@ -59,7 +59,7 @@
 	whenever(
 		$layerGroup,
 		(layerGroup) => {
-			layerGroup.clearLayers();
+			toRaw(layerGroup).clearLayers();
 			setMutant(layerGroup);
 		},
 		{ immediate: true }

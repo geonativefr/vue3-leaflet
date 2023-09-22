@@ -4,7 +4,7 @@
 
 <script setup>
 	import { whenever } from '@vueuse/core';
-	import { inject, provide, ref } from 'vue';
+	import { inject, provide, ref, toRaw } from 'vue';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, LayerNames } from '../../constants';
 
@@ -34,8 +34,8 @@
 	whenever(
 		$layerGroup,
 		(layerGroup) => {
-			layerGroup.clearLayers();
-			layerGroup.addLayer(layer);
+			toRaw(layerGroup).clearLayers();
+			toRaw(layerGroup).addLayer(layer);
 		},
 		{ immediate: true }
 	);

@@ -4,7 +4,7 @@
 
 <script setup>
 	import { whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref } from 'vue';
+	import { inject, provide, reactive, ref, toRaw } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, LayerNames } from '../../constants';
@@ -53,8 +53,8 @@
 	whenever(
 		$layerGroup,
 		(layerGroup) => {
-			layerGroup.clearLayers();
-			layerGroup.addLayer(layer);
+			toRaw(layerGroup).clearLayers();
+			toRaw(layerGroup).addLayer(layer);
 		},
 		{ immediate: true }
 	);
