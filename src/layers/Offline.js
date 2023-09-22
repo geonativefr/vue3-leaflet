@@ -222,8 +222,8 @@ export default class TileLayerOffline extends TileLayer {
 			for (let j = 0; j < indexes.length; j++) {
 				const index = indexes[j];
 				const urls = arraySplit(tileUrls[zoomLevel][index], 20);
-				const datas = [];
 				for (let k = 0; k < urls.length; k++) {
+					const datas = [];
 					await Promise.all(
 						urls[k].map(async (url) => {
 							try {
