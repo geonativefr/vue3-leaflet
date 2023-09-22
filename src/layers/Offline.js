@@ -1,4 +1,4 @@
-import { ref, unref } from 'vue';
+import { ref } from 'vue';
 import { get, set } from '@vueuse/core';
 import { bounds, DomEvent, Point, TileLayer, Util, latLngBounds } from 'leaflet';
 import { deleteDB, deleteEntry, openDB, readDB, readAllDB, storeDB, storeArrayDB } from '../utils/indexed-db.js';
@@ -15,6 +15,7 @@ let maps = ref([]);
 		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
 		const _maps = await readAllDB(mainDb, 'maps');
 		set(maps, _maps);
+		// migrate old maps to new format
 		for (let i = 0; i < _maps.length; i++) {
 			const map = _maps[i];
 			if (!map.structure) {
@@ -27,7 +28,6 @@ let maps = ref([]);
 				map.SE = bounds.getSouthEast();
 				delete map.NE;
 				delete map.SW;
-				console.log(map.target);
 				await storeDB(mainDb, 'maps', map, { update: true });
 			}
 		}
