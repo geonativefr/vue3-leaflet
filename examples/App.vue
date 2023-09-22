@@ -1,24 +1,44 @@
 <template>
-	<Map :zoom-control="false" style="height: 600px; width: 1000px" :center="center" :zoom="16" version="1.8.0">
-		<!-- <GoogleMaps api-key="">
-			<PegmanControl />
-		</GoogleMaps> -->
-		<IGN :type="mapType"></IGN>
-		<!-- <Mapbox></Mapbox> -->
-		<ZoomControl position="bottomright" />
-		<ScaleControl />
-		<LocateControl position="bottomright" />
-		<OfflineControl @progress="downloadProgress" />
-	</Map>
-	<div>
-		<label>
-			<input type="radio" :value="mapTypes.satellite" v-model="mapType" />
-			{{ mapTypes.satellite }}
-		</label>
-		<label>
-			<input type="radio" :value="mapTypes.roadmap" v-model="mapType" />
-			{{ mapTypes.roadmap }}
-		</label>
+	<div class="app">
+		<Map :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
+			<GoogleMaps v-if="provider === 'gmaps'" :api-key="API_KEYS.gmaps" :type="mapType"></GoogleMaps>
+			<IGN v-if="provider === 'ign'" :type="mapType"></IGN>
+			<Mapbox v-if="provider === 'mapbox'" :apiKey="API_KEYS.mapbox"></Mapbox>
+			<OpenStreetMap v-if="provider === 'osm'"></OpenStreetMap>
+			<ZoomControl position="bottomright" />
+			<ScaleControl />
+			<LocateControl position="bottomright" />
+			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
+			<Marker v-for="point of latlngs" :position="point"></Marker>
+		</Map>
+		<div>
+			<label>
+				<input type="radio" :value="mapTypes.satellite" v-model="mapType" />
+				{{ mapTypes.satellite }}
+			</label>
+			<label>
+				<input type="radio" :value="mapTypes.roadmap" v-model="mapType" />
+				{{ mapTypes.roadmap }}
+			</label>
+		</div>
+		<div>
+			<label>
+				<input type="radio" value="gmaps" v-model="provider" />
+				Google maps
+			</label>
+			<label>
+				<input type="radio" value="ign" v-model="provider" />
+				IGN
+			</label>
+			<label>
+				<input type="radio" value="mapbox" v-model="provider" />
+				Mapbox
+			</label>
+			<label>
+				<input type="radio" value="osm" v-model="provider" />
+				Open Street Map
+			</label>
+		</div>
 	</div>
 </template>
 
@@ -26,15 +46,23 @@
 	import { ref } from 'vue';
 	import GoogleMaps from '../src/layers/tiles/GoogleMaps.vue';
 	import Mapbox from '../src/layers/tiles/Mapbox.vue';
+	import IGN from '../src/layers/tiles/IGN.vue';
+	import OpenStreetMap from '../src/layers/tiles/OpenStreetMap.vue';
 	import Map from '../src/MapContainer.vue';
 	import ZoomControl from '../src/controls/ZoomControl.js';
 	import ScaleControl from '../src/controls/ScaleControl.js';
 	import LocateControl from '../src/controls/LocateControl.js';
 	import OfflineControl from '../src/controls/OfflineControl';
-	import IGN from '../src/layers/tiles/IGN.vue';
 	import mapTypes from '../src/utils/map-types';
+	import Marker from '../src/layers/markers/Marker.vue';
 
 	const mapType = ref(mapTypes.roadmap);
+	const provider = ref('ign');
+
+	const API_KEYS = {
+		gmaps: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+		mapbox: import.meta.env.VITE_MAPBOX_API_KEY,
+	};
 
 	const center = ref([50.60097732180697, 3.065646079092121]);
 	const latlngs = [
@@ -143,4 +171,16 @@
 	function downloadProgress(e) {
 		console.log('progress', e);
 	}
+
+	function onMaxSize() {
+		console.log('maxSize');
+	}
 </script>
+
+<style lang="scss">
+	.app {
+		.map-container {
+			height: 600px;
+		}
+	}
+</style>
