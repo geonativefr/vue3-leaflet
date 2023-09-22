@@ -72,10 +72,10 @@
 
 		const tilelayerGroup = L.layerGroup();
 		tilelayerGroup.addTo(map);
-		const oldAddLayer = tilelayerGroup.addLayer;
+		const originalAddLayer = tilelayerGroup.addLayer;
 		tilelayerGroup.addLayer = function (layer) {
 			if (layer.options?.maxZoom) map.setMaxZoom(layer.options.maxZoom);
-			oldAddLayer.bind(this)(layer);
+			originalAddLayer.bind(this)(layer);
 		}.bind(tilelayerGroup);
 
 		const pinLayerGroup = L.layerGroup();
