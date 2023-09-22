@@ -178,7 +178,7 @@ Add markers on map
 
 Play with `examles/App.vue` and watch for changes:
 
-Add a .env.local file :
+Add a `.env.local` file:
 
 ```env
 VITE_GOOGLE_MAPS_API_KEY=
