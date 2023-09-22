@@ -18,7 +18,7 @@ cd vue3-leaflet
 yarn install
 ```
 
-##  Usage
+## Usage
 
 ### MapContainer
 
@@ -26,18 +26,18 @@ Wraps `L.Map` inside a container.
 
 ```vue
 <template>
-  <MapContainer :center="center" />
+	<MapContainer :center="center" />
 </template>
 
 <script setup>
-import { MapContainer } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
+	const center = ref([48.3151, 3.68461]);
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet/dist/leaflet.css';
 </style>
 ```
 
@@ -47,21 +47,21 @@ Above example will show an "empty" map. To add tiles:
 
 ```vue
 <template>
-  <MapContainer :center="center">
-    <GoogleMaps :api-key="apiKey" type="satellite" />
-  </MapContainer>
+	<MapContainer :center="center">
+		<GoogleMaps :api-key="apiKey" type="satellite" />
+	</MapContainer>
 </template>
 
 <script setup>
-import { MapContainer, GoogleMaps } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer, GoogleMaps } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
-const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
+	const center = ref([48.3151, 3.68461]);
+	const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet/dist/leaflet.css';
 </style>
 ```
 
@@ -71,24 +71,24 @@ Add controls on map (zoom, geolocation, scale)
 
 ```vue
 <template>
-  <MapContainer :center="center">
-    <GoogleMaps :api-key="apiKey" type="satellite" />
-    <ZoomControl />
-    <ScaleControl />
-    <LocateControl />
-  </MapContainer>
+	<MapContainer :center="center">
+		<GoogleMaps :api-key="apiKey" type="satellite" />
+		<ZoomControl />
+		<ScaleControl />
+		<LocateControl />
+	</MapContainer>
 </template>
 
 <script setup>
-import { MapContainer, GoogleMaps, ZoomControl, ScaleControl, LocateControl } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer, GoogleMaps, ZoomControl, ScaleControl, LocateControl } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
-const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
+	const center = ref([48.3151, 3.68461]);
+	const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet/dist/leaflet.css';
 </style>
 ```
 
@@ -96,23 +96,23 @@ const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
 
 ```vue
 <template>
-  <MapContainer :center="center">
-    <GoogleMaps :api-key="apiKey" type="satellite" />
-    <PegmanControl :api-key="apiKey" />
-  </MapContainer>
+	<MapContainer :center="center">
+		<GoogleMaps :api-key="apiKey" type="satellite" />
+		<PegmanControl :api-key="apiKey" />
+	</MapContainer>
 </template>
 
 <script setup>
-import { MapContainer, GoogleMaps, PegmanControl } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer, GoogleMaps, PegmanControl } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
-const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
+	const center = ref([48.3151, 3.68461]);
+	const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
-@import 'leaflet-pegman/leaflet-pegman.css';
+	@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet-pegman/leaflet-pegman.css';
 </style>
 ```
 
@@ -122,26 +122,26 @@ Add vectors on map (Circle, Polygon, Polyline)
 
 ```vue
 <template>
-  <MapContainer :center="center">
-    <GoogleMaps :api-key="apiKey" type="satellite" />
-    <Circle :center="circle.center" :radius="circle.radius" color="blue" fill-color="green" />
-  </MapContainer>
+	<MapContainer :center="center">
+		<GoogleMaps :api-key="apiKey" type="satellite" />
+		<Circle :center="circle.center" :radius="circle.radius" color="blue" fill-color="green" />
+	</MapContainer>
 </template>
 
 <script setup>
-import { MapContainer, GoogleMaps, Circle } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer, GoogleMaps, Circle } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
-const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
-const circle = {
-  center: [48.3151, 3.68461],
-  radius: 250, // in meters
-}
+	const center = ref([48.3151, 3.68461]);
+	const apiKey = ref('AIzaSyCzoMz4nAXXLRc1WAcToAVzfNoQ60UWdkt');
+	const circle = {
+		center: [48.3151, 3.68461],
+		radius: 250, // in meters
+	};
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet/dist/leaflet.css';
 </style>
 ```
 
@@ -151,32 +151,41 @@ Add markers on map
 
 ```vue
 <template>
-  <MapContainer :center="center">
-    <OpenStreetMap />
-    <Marker :position="[48.3151, 3.68461]" icon="/path/to/icon.png" />
-    <Marker :position="[49.68561, 3.9881]" :icon="{iconUrl: '/path/to/icon.png'}">
-      <Popup>
-        <div class="text-blue-600 font-semibold">Hello world!</div>
-      </Popup>
-    </Marker>
-  </MapContainer>
+	<MapContainer :center="center">
+		<OpenStreetMap />
+		<Marker :position="[48.3151, 3.68461]" icon="/path/to/icon.png" />
+		<Marker :position="[49.68561, 3.9881]" :icon="{ iconUrl: '/path/to/icon.png' }">
+			<Popup>
+				<div class="text-blue-600 font-semibold">Hello world!</div>
+			</Popup>
+		</Marker>
+	</MapContainer>
 </template>
 
 <script setup>
-import { MapContainer, OpenStreetMap, Marker, Popup } from 'vue3-leaflet';
-import { ref } from 'vue';
+	import { MapContainer, OpenStreetMap, Marker, Popup } from 'vue3-leaflet';
+	import { ref } from 'vue';
 
-const center = ref([48.3151, 3.68461]);
+	const center = ref([48.3151, 3.68461]);
 </script>
 
 <style lang="scss">
-@import 'leaflet/dist/leaflet.css';
+	@import 'leaflet/dist/leaflet.css';
 </style>
 ```
 
 ## HMR
 
 Play with `examles/App.vue` and watch for changes:
+
+Add a `.env.local` file:
+
+```env
+VITE_GOOGLE_MAPS_API_KEY=
+VITE_MAPBOX_API_KEY=
+```
+
+then
 
 ```bash
 yarn dev
