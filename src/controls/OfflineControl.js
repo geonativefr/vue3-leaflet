@@ -116,5 +116,5 @@ function checkMapSizeToSave(map) {
 	const size =
 		Math.abs(latlngBounds._northEast.lat - latlngBounds._southWest.lat) *
 		Math.abs(latlngBounds._southWest.lng - latlngBounds._northEast.lng);
-	return size <= 0.002;
+	return size <= 0.02;
 }
