@@ -205,13 +205,13 @@ export default class TileLayerOffline extends TileLayer {
 
 		let nbSaved = 0;
 		for (const urls of arraySplit(tileUrls, 20)) {
-			const datas = [];
+			const data = [];
 			await Promise.all(
 				urls.map(async (tileUrl) => {
 					try {
 						const response = await fetch(tileUrl);
 						if (response.ok) {
-							datas.push({
+							data.push({
 								key: tileUrl,
 								value: { map: map.normalizedName, tile: await response.blob() },
 							});
@@ -223,7 +223,7 @@ export default class TileLayerOffline extends TileLayer {
 					}
 				})
 			);
-			await storeArrayDB(state.db, TABLES.TILES.name, datas);
+			await storeArrayDB(state.db, TABLES.TILES.name, data);
 			progressHandler(nbSaved, tileUrls.length);
 		}
 		console.timeEnd('saveTiles');
