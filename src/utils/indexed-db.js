@@ -170,3 +170,42 @@ export function readDB(db, tableName, key, transaction = null) {
 		if (commit) transaction.commit();
 	});
 }
+
+const queues = {};
+
+export function readQueuedDB(queueName, db, tableName, key) {
+	return new Promise((resolve, reject) => {
+		if (!queues[queueName]) {
+			queues[queueName] = {
+				db,
+				tableName,
+				keys: [],
+			};
+			readQueue(queues[queueName]);
+		}
+		queues[queueName].keys.push({
+			key,
+			resolve,
+			reject,
+		});
+	});
+}
+
+async function readQueue(queue) {
+	if (queue.keys.length) {
+		const transaction = queue.db.transaction([queue.tableName]);
+		const store = transaction.objectStore(queue.tableName);
+		do {
+			const { key, resolve, reject } = queue.keys.shift();
+			const request = store.get(key);
+			request.addEventListener('success', () => {
+				resolve(request.result);
+			});
+			request.addEventListener('error', () => {
+				reject('Failed to read the data');
+			});
+		} while (queue.keys.length);
+		transaction.commit();
+	}
+	setTimeout(() => readQueue(queue), 100);
+}

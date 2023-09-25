@@ -10,6 +10,7 @@ import {
 	readAllKeysDB,
 	storeDB,
 	storeArrayDB,
+	readQueuedDB,
 } from '../utils/indexed-db.js';
 import { waitForDefined } from '../utils/utils.js';
 
@@ -55,7 +56,7 @@ async function mainDBUpdate(db, oldVersion, newVersion, transaction) {
 					await storeDB(db, tableNames.TILES, { map: map.normalizedName, tile }, key, transaction);
 				}
 			}
-			await deleteDB();
+			await deleteDB(subDbName);
 		}
 	}
 }
@@ -151,9 +152,7 @@ export default class TileLayerOffline extends TileLayer {
 					);
 				});
 				await waitForDefined(() => state.db);
-				console.time(url);
-				data = await readDB(state.db, tableNames.TILES, url);
-				console.timeEnd(url);
+				data = await readQueuedDB(tableNames.TILES, state.db, tableNames.TILES, url);
 			}
 			if (data) {
 				image.src = URL.createObjectURL(data.tile);
