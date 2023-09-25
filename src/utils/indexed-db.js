@@ -150,3 +150,39 @@ export function readDB(db, tableName, key) {
 		transaction.commit();
 	});
 }
+
+const queue = [];
+
+export function readQueuedDB(db, tableName, key) {
+	return new Promise((resolve, reject) => {
+		queue.push({
+			db,
+			tableName,
+			key,
+			resolve,
+			reject,
+		});
+	});
+}
+
+async function readQueue() {
+	let next = queue.shift();
+	if (next) {
+		const transaction = next.db.transaction([next.tableName]);
+		const store = transaction.objectStore(next.tableName);
+		while (next) {
+			const request = store.get(next.key);
+			const { resolve, reject } = next;
+			request.addEventListener('success', () => {
+				resolve(request.result);
+			});
+			request.addEventListener('error', () => {
+				reject('Failed to read the data');
+			});
+			next = queue.shift();
+		}
+		transaction.commit();
+	}
+	setTimeout(readQueue, 100);
+}
+readQueue();

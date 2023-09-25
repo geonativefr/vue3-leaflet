@@ -1,23 +1,27 @@
-import { ref } from 'vue';
-import { get, set } from '@vueuse/core';
+import { reactive } from 'vue';
 import { bounds, DomEvent, Point, TileLayer, Util, latLngBounds } from 'leaflet';
-import { deleteDB, deleteEntry, openDB, readDB, readAllDB, storeDB, storeArrayDB } from '../utils/indexed-db.js';
+import { deleteDB, deleteEntry, openDB, readQueuedDB, readAllDB, storeDB, storeArrayDB } from '../utils/indexed-db.js';
+import { waitForDefined } from '../utils/utils.js';
 
 const oldZoomlevels = [12, 13, 14, 15, 16, 17, 18];
 const zoomlevels = [12, 13, 14, 15, 16, 17, 18, 19];
 
 const DB_NAME = 'leaflet-offline';
 
-let maps = ref([]);
+const state = reactive({
+	db: {},
+	maps: [],
+	initialized: undefined,
+});
 
-(async () => {
+init();
+
+async function init() {
 	try {
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-		const _maps = await readAllDB(mainDb, 'maps');
-		set(maps, _maps);
+		state.db.main = await openDB(DB_NAME, 1, mainDBUpdate);
+		state.maps = await readAllDB(state.db.main, 'maps');
 		// migrate old maps to new format
-		for (let i = 0; i < _maps.length; i++) {
-			const map = _maps[i];
+		for (const map of state.maps) {
 			if (!map.structure) {
 				map.structure = oldZoomlevels.reduce(
 					(structure, zoomLevel) => ({ ...structure, [zoomLevel]: ['0'] }),
@@ -28,17 +32,24 @@ let maps = ref([]);
 				map.SE = bounds.getSouthEast();
 				delete map.NE;
 				delete map.SW;
-				await storeDB(mainDb, 'maps', map, { update: true });
+				await storeDB(state.db.main, 'maps', map, { update: true });
 			}
+			state.db[map.normalizedName] = await openDB(DB_NAME + '-' + map.normalizedName, 1, subDBUpdate);
 		}
-		mainDb.close();
 	} catch (e) {
 		console.error('fail open db', e);
 	}
-})();
+	state.initialized = true;
+}
 
 function mainDBUpdate(db) {
 	db.createObjectStore('maps', { keyPath: 'normalizedName' });
+}
+
+function subDBUpdate(db) {
+	Object.keys(map.structure).forEach((zoomLevel) =>
+		tileUrls[zoomLevel].forEach((index) => db.createObjectStore(`tiles-${zoomLevel}-${index}`))
+	);
 }
 
 function getTilePoints(area, tileSize) {
@@ -96,13 +107,8 @@ export function getMaps() {
 
 export async function deleteMap(mapName) {
 	await deleteDB(DB_NAME + '-' + mapName);
-	set(
-		maps,
-		get(maps).filter((map) => map.normalizedName !== mapName)
-	);
-	const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-	await deleteEntry(mainDb, 'maps', mapName);
-	mainDb.close();
+	state.maps = state.maps.filter((map) => map.normalizedName !== mapName);
+	await deleteEntry(state.db.main, 'maps', mapName);
 }
 
 export default class TileLayerOffline extends TileLayer {
@@ -126,8 +132,9 @@ export default class TileLayerOffline extends TileLayer {
 
 		(async () => {
 			let data;
+			await waitForDefined(() => state.initialized);
 			if (zoomlevels.includes(coords.z)) {
-				const map = get(maps).find((map) => {
+				const map = state.maps.find((map) => {
 					if (map.provider !== this.provider || map.type !== this.type) return false;
 
 					const area = bounds(this._map.project(map.NW, coords.z), this._map.project(map.SE, coords.z));
@@ -140,13 +147,7 @@ export default class TileLayerOffline extends TileLayer {
 						coords.y <= bottomRightTile.y
 					);
 				});
-				const db =
-					map &&
-					(await openDB(DB_NAME + '-' + map.normalizedName, 1, (db) => {
-						Object.keys(map.structure).forEach((zoomLevel) =>
-							tileUrls[zoomLevel].forEach((index) => db.createObjectStore(`tiles-${zoomLevel}-${index}`))
-						);
-					}));
+				const db = map && (await waitForDefined(() => state.db[map.normalizedName]));
 				const index =
 					db &&
 					getPointIndex(
@@ -157,9 +158,7 @@ export default class TileLayerOffline extends TileLayer {
 				data =
 					db &&
 					map.structure[coords.z]?.includes('' + index) &&
-					(await readDB(db, `tiles-${coords.z}-${index}`, url));
-
-				db?.close();
+					(await readQueuedDB(db, `tiles-${coords.z}-${index}`, url));
 			}
 			if (data) {
 				image.src = URL.createObjectURL(data);
@@ -174,14 +173,13 @@ export default class TileLayerOffline extends TileLayer {
 	async saveTiles(mapName, progressHandler) {
 		const normalizedName = mapName.replace(/[^A-Za-z0-9]/g, ''); //remove non ascii characters
 
-		if (get(maps)?.find((map) => map.normalizedName === normalizedName)) {
+		if (state.maps.find((map) => map.normalizedName === normalizedName)) {
 			throw `this name already exist : ${normalizedName}`;
 		}
 
 		console.time('saveTiles');
 
 		const latlngBounds = this._map.getBounds();
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
 		const map = {
 			name: mapName,
 			normalizedName,
@@ -190,8 +188,8 @@ export default class TileLayerOffline extends TileLayer {
 			provider: this.provider,
 			type: this.type,
 		};
-		await storeDB(mainDb, 'maps', map);
-		set(maps, [...get(maps), map]);
+		await storeDB(state.db.main, 'maps', map);
+		state.maps.push(map);
 
 		const tileUrls = zoomlevels.reduce((tileUrls, zoomLevel) => ({ ...tileUrls, [zoomLevel]: {} }), {});
 		let nbTiles = 0;
@@ -210,7 +208,7 @@ export default class TileLayerOffline extends TileLayer {
 			});
 		}
 
-		const db = await openDB(DB_NAME + '-' + normalizedName, 1, (db) => {
+		state.db[map.normalizedName] = await openDB(DB_NAME + '-' + normalizedName, 1, (db) => {
 			Object.keys(tileUrls).forEach((zoomLevel) =>
 				Object.keys(tileUrls[zoomLevel]).forEach((index) => db.createObjectStore(`tiles-${zoomLevel}-${index}`))
 			);
@@ -238,20 +236,18 @@ export default class TileLayerOffline extends TileLayer {
 							}
 						})
 					);
-					await storeArrayDB(db, `tiles-${zoomLevel}-${index}`, datas);
+					await storeArrayDB(state.db[map.normalizedName], `tiles-${zoomLevel}-${index}`, datas);
 					progressHandler(nbSaved, nbTiles);
 				}
 			}
 		}
-		db.close();
 
 		map.structure = Object.keys(tileUrls).reduce(
 			(structure, zoomLevel) => ({ ...structure, [zoomLevel]: Object.keys(tileUrls[zoomLevel]) }),
 			{}
 		);
 
-		await storeDB(mainDb, 'maps', map, { update: true });
-		mainDb.close();
+		await storeDB(state.db.main, 'maps', map, { update: true });
 		console.timeEnd('saveTiles');
 	}
 }
