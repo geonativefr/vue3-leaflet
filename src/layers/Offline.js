@@ -1,5 +1,4 @@
 import { reactive } from 'vue';
-import { get, set } from '@vueuse/core';
 import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
 import {
 	deleteDB,
@@ -11,6 +10,7 @@ import {
 	storeDB,
 	storeArrayDB,
 	readQueuedDB,
+	readAllKeysIndex,
 } from '../utils/indexed-db.js';
 import { waitForDefined } from '../utils/utils.js';
 
@@ -18,9 +18,16 @@ const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 
 const DB_NAME = 'leaflet-offline';
 
-const tableNames = {
-	MAPS: 'maps',
-	TILES: 'tiles',
+const TABLES = {
+	MAPS: {
+		name: 'maps',
+	},
+	TILES: {
+		name: 'tiles',
+		indexes: {
+			MAP: 'map',
+		},
+	},
 };
 
 const state = reactive({
@@ -31,26 +38,26 @@ const state = reactive({
 (async () => {
 	try {
 		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
-		state.maps, await readAllDB(state.db, tableNames.MAPS);
+		state.maps = await readAllDB(state.db, TABLES.MAPS.name);
 	} catch (e) {
 		console.error('fail open db', e);
 	}
 })();
 
-async function mainDBUpdate(db, oldVersion, newVersion, transaction) {
+async function mainDBUpdate(db, oldVersion, newVersion) {
 	if (oldVersion < 1 && newVersion >= 1) {
-		db.createObjectStore(tableNames.MAPS, { keyPath: 'normalizedName' });
+		db.createObjectStore(TABLES.MAPS.name, { keyPath: 'normalizedName' });
 	}
 	if (oldVersion < 2 && newVersion >= 2) {
-		const tileObjectStore = db.createObjectStore(tableNames.TILES);
-		tileObjectStore.createIndex('map', 'map', { unique: false });
+		const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
+		tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, 'map', { unique: false });
 		migrateV1Maps();
 	}
 }
 
 async function migrateV1Maps() {
 	await waitForDefined(() => state.db);
-	const maps = await readAllDB(state.db, tableNames.MAPS);
+	const maps = await readAllDB(state.db, TABLES.MAPS.name);
 	for (const map of maps) {
 		const subDbName = DB_NAME + '-' + map.normalizedName;
 		const subDb = await openDB(subDbName, 1, subDBUpdate);
@@ -59,7 +66,7 @@ async function migrateV1Maps() {
 				const keys = await readAllKeysDB(subDb, 'tiles-' + zoomLevel);
 				for (const key of keys) {
 					const tile = await readDB(subDb, 'tiles-' + zoomLevel, key);
-					await storeDB(state.db, tableNames.TILES, { map: map.normalizedName, tile }, key);
+					await storeDB(state.db, TABLES.TILES.name, { map: map.normalizedName, tile }, key);
 				}
 			} catch (e) {
 				console.error(subDbName, 'tiles-' + zoomLevel, e);
@@ -115,14 +122,18 @@ export function getMaps() {
 }
 
 export async function deleteMap(mapName) {
-	await deleteDB(DB_NAME + '-' + mapName);
-	set(
-		maps,
-		get(maps).filter((map) => map.normalizedName !== mapName)
+	const map = state.maps.find((map) => map.normalizedName === mapName);
+	state.maps = state.maps.filter((_map) => _map !== map);
+	await deleteEntry(state.db, TABLES.MAPS.name, mapName);
+	const keys = await readAllKeysIndex(
+		state.db,
+		TABLES.TILES.name,
+		TABLES.TILES.indexes.MAP,
+		IDBKeyRange.only(map.normalizedName)
 	);
-	const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-	await deleteEntry(mainDb, 'maps', mapName);
-	mainDb.close();
+	for (const key of keys) {
+		await deleteEntry(state.db, TABLES.TILES, key);
+	}
 }
 
 export default class TileLayerOffline extends TileLayer {
@@ -147,21 +158,8 @@ export default class TileLayerOffline extends TileLayer {
 		(async () => {
 			let data;
 			if (ZOOM_LEVELS.includes(coords.z)) {
-				const map = state.maps.find((map) => {
-					if (map.provider !== this.provider || map.type !== this.type) return false;
-
-					const area = bounds(this._map.project(map.NE, coords.z), this._map.project(map.SW, coords.z));
-					const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
-					const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
-					return (
-						coords.x >= topLeftTile.x &&
-						coords.x <= bottomRightTile.x &&
-						coords.y >= topLeftTile.y &&
-						coords.y <= bottomRightTile.y
-					);
-				});
 				await waitForDefined(() => state.db);
-				data = await readQueuedDB(tableNames.TILES, state.db, tableNames.TILES, url);
+				data = await readQueuedDB(TABLES.TILES.name, state.db, TABLES.TILES.name, url);
 			}
 			if (data) {
 				image.src = URL.createObjectURL(data.tile);
@@ -225,7 +223,7 @@ export default class TileLayerOffline extends TileLayer {
 					}
 				})
 			);
-			await storeArrayDB(state.db, tableNames.TILES, datas);
+			await storeArrayDB(state.db, TABLES.TILES.name, datas);
 			progressHandler(nbSaved, tileUrls.length);
 		}
 		console.timeEnd('saveTiles');

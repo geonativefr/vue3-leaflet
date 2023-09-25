@@ -155,6 +155,23 @@ export function readAllKeysDB(db, tableName, transaction = null) {
 	});
 }
 
+export function readAllKeysIndex(db, tableName, indexName, keyRange = null, transaction = null) {
+	return new Promise((resolve, reject) => {
+		let commit = false;
+		if (!transaction) [transaction, commit] = [db.transaction([tableName]), true];
+		const store = transaction.objectStore(tableName);
+		const index = store.index(indexName);
+		const request = index.getAllKeys(keyRange);
+		request.addEventListener('success', () => {
+			resolve(request.result);
+		});
+		request.addEventListener('error', () => {
+			reject('Failed to read the data');
+		});
+		if (commit) transaction.commit();
+	});
+}
+
 export function readDB(db, tableName, key, transaction = null) {
 	return new Promise((resolve, reject) => {
 		let commit = false;
