@@ -44,20 +44,29 @@ async function mainDBUpdate(db, oldVersion, newVersion, transaction) {
 	if (oldVersion < 2 && newVersion >= 2) {
 		const tileObjectStore = db.createObjectStore(tableNames.TILES);
 		tileObjectStore.createIndex('map', 'map', { unique: false });
+		migrateV1Maps();
+	}
+}
 
-		const maps = await readAllDB(db, tableNames.MAPS, transaction);
-		for (const map of maps) {
-			const subDbName = DB_NAME + '-' + map.normalizedName;
-			const subDb = await openDB(subDbName, 1, subDBUpdate);
-			for (const zoomLevel of ZOOM_LEVELS) {
-				const keys = await readAllKeysDB(subDb, 'tiles-' + zoomLevel, transaction);
+async function migrateV1Maps() {
+	await waitForDefined(() => state.db);
+	const maps = await readAllDB(state.db, tableNames.MAPS);
+	for (const map of maps) {
+		const subDbName = DB_NAME + '-' + map.normalizedName;
+		const subDb = await openDB(subDbName, 1, subDBUpdate);
+		for (const zoomLevel of ZOOM_LEVELS) {
+			try {
+				const keys = await readAllKeysDB(subDb, 'tiles-' + zoomLevel);
 				for (const key of keys) {
-					const tile = await readDB(subDb, 'tiles-' + zoomLevel, key, transaction);
-					await storeDB(db, tableNames.TILES, { map: map.normalizedName, tile }, key, transaction);
+					const tile = await readDB(subDb, 'tiles-' + zoomLevel, key);
+					await storeDB(state.db, tableNames.TILES, { map: map.normalizedName, tile }, key);
 				}
+			} catch (e) {
+				console.error(subDbName, 'tiles-' + zoomLevel, e);
 			}
-			await deleteDB(subDbName);
 		}
+		subDb.close();
+		await deleteDB(subDbName);
 	}
 }
 
