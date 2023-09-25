@@ -1,4 +1,4 @@
-import { ref, unref } from 'vue';
+import { reactive } from 'vue';
 import { get, set } from '@vueuse/core';
 import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
 import {
@@ -11,45 +11,57 @@ import {
 	storeDB,
 	storeArrayDB,
 } from '../utils/indexed-db.js';
+import { waitForDefined } from '../utils/utils.js';
 
-const zoomlevels = [12, 13, 14, 15, 16, 17, 18, 19];
+const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 
 const DB_NAME = 'leaflet-offline';
 
-const SUB_DB_VERSION = 2;
+const tableNames = {
+	MAPS: 'maps',
+	TILES: 'tiles',
+};
 
-let maps = ref([]);
+const state = reactive({
+	db: undefined,
+	maps: [],
+});
 
 (async () => {
 	try {
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-		set(maps, await readAllDB(mainDb, 'maps'));
-		mainDb.close();
+		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
+		state.maps, await readAllDB(state.db, tableNames.MAPS);
 	} catch (e) {
 		console.error('fail open db', e);
 	}
 })();
 
-function mainDBUpdate(db) {
-	db.createObjectStore('maps', { keyPath: 'normalizedName' });
-}
-
-async function subDBUpdate(db, oldVersion, newVersion, transaction) {
+async function mainDBUpdate(db, oldVersion, newVersion, transaction) {
 	if (oldVersion < 1 && newVersion >= 1) {
-		zoomlevels.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
+		db.createObjectStore(tableNames.MAPS, { keyPath: 'normalizedName' });
 	}
 	if (oldVersion < 2 && newVersion >= 2) {
-		db.createObjectStore('tiles');
-		for (const zoomLevel of zoomlevels) {
-			const keys = await readAllKeysDB(db, 'tiles-' + zoomLevel, transaction);
-			for (const key of keys) {
-				const tile = await readDB(db, 'tiles-' + zoomLevel, key, transaction);
-				await storeDB(db, 'tiles', tile, key, transaction);
-			}
-		}
+		const tileObjectStore = db.createObjectStore(tableNames.TILES);
+		tileObjectStore.createIndex('map', 'map', { unique: false });
 
-		zoomlevels.forEach((zoomLevel) => db.deleteObjectStore('tiles-' + zoomLevel));
+		const maps = await readAllDB(db, tableNames.MAPS, transaction);
+		for (const map of maps) {
+			const subDbName = DB_NAME + '-' + map.normalizedName;
+			const subDb = await openDB(subDbName, 1, subDBUpdate);
+			for (const zoomLevel of ZOOM_LEVELS) {
+				const keys = await readAllKeysDB(subDb, 'tiles-' + zoomLevel, transaction);
+				for (const key of keys) {
+					const tile = await readDB(subDb, 'tiles-' + zoomLevel, key, transaction);
+					await storeDB(db, tableNames.TILES, { map: map.normalizedName, tile }, key, transaction);
+				}
+			}
+			await deleteDB();
+		}
 	}
+}
+
+async function subDBUpdate(db) {
+	ZOOM_LEVELS.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
 }
 
 function getTilePoints(area, tileSize) {
@@ -89,7 +101,7 @@ function getTileUrl(urlTemplate, data) {
 }
 
 export function getMaps() {
-	return maps;
+	return state.maps;
 }
 
 export async function deleteMap(mapName) {
@@ -124,8 +136,8 @@ export default class TileLayerOffline extends TileLayer {
 
 		(async () => {
 			let data;
-			if (zoomlevels.includes(coords.z)) {
-				const map = get(maps).find((map) => {
+			if (ZOOM_LEVELS.includes(coords.z)) {
+				const map = state.maps.find((map) => {
 					if (map.provider !== this.provider || map.type !== this.type) return false;
 
 					const area = bounds(this._map.project(map.NE, coords.z), this._map.project(map.SW, coords.z));
@@ -138,12 +150,13 @@ export default class TileLayerOffline extends TileLayer {
 						coords.y <= bottomRightTile.y
 					);
 				});
-				const db = map && (await openDB(DB_NAME + '-' + map.normalizedName, SUB_DB_VERSION, subDBUpdate));
-				data = db && (await readDB(db, 'tiles', url));
-				db?.close();
+				await waitForDefined(() => state.db);
+				console.time(url);
+				data = await readDB(state.db, tableNames.TILES, url);
+				console.timeEnd(url);
 			}
 			if (data) {
-				image.src = URL.createObjectURL(data);
+				image.src = URL.createObjectURL(data.tile);
 			} else {
 				image.src = url;
 			}
@@ -155,14 +168,13 @@ export default class TileLayerOffline extends TileLayer {
 	async saveTiles(mapName, progressHandler) {
 		const normalizedName = mapName.replace(/[^A-Za-z0-9]/g, ''); //remove non ascii characters
 
-		if (get(maps)?.find((map) => map.normalizedName === normalizedName)) {
+		if (state.maps.find((map) => map.normalizedName === normalizedName)) {
 			throw `this name already exist : ${normalizedName}`;
 		}
 
 		console.time('saveTiles');
 
 		const latlngBounds = this._map.getBounds();
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
 		const map = {
 			name: mapName,
 			normalizedName,
@@ -171,15 +183,13 @@ export default class TileLayerOffline extends TileLayer {
 			provider: this.provider,
 			type: this.type,
 		};
-		await storeDB(mainDb, 'maps', map);
-		set(maps, [...get(maps), map]);
-		mainDb.close();
-
-		const db = await openDB(DB_NAME + '-' + normalizedName, SUB_DB_VERSION, subDBUpdate);
+		await waitForDefined(() => state.db);
+		await storeDB(state.db, 'maps', map);
+		state.maps.push(map);
 
 		const tileUrls = [];
-		for (let i = 0; i < zoomlevels.length; i += 1) {
-			const zoomLevel = zoomlevels[i];
+		for (let i = 0; i < ZOOM_LEVELS.length; i += 1) {
+			const zoomLevel = ZOOM_LEVELS[i];
 			const area = bounds(
 				this._map.project(latlngBounds.getNorthWest(), zoomLevel),
 				this._map.project(latlngBounds.getSouthEast(), zoomLevel)
@@ -195,7 +205,10 @@ export default class TileLayerOffline extends TileLayer {
 					try {
 						const response = await fetch(tileUrl);
 						if (response.ok) {
-							datas.push({ key: tileUrl, value: await response.blob() });
+							datas.push({
+								key: tileUrl,
+								value: { map: map.normalizedName, tile: await response.blob() },
+							});
 						}
 					} catch (e) {
 						console.error(e);
@@ -204,10 +217,9 @@ export default class TileLayerOffline extends TileLayer {
 					}
 				})
 			);
-			await storeArrayDB(db, 'tiles', datas);
+			await storeArrayDB(state.db, tableNames.TILES, datas);
 			progressHandler(nbSaved, tileUrls.length);
 		}
-		db.close();
 		console.timeEnd('saveTiles');
 	}
 }
