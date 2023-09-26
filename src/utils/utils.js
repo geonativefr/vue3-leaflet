@@ -77,3 +77,16 @@ export async function loadCSSFromCDN(url) {
 		document.head.appendChild(el);
 	});
 }
+
+export function waitForDefined(getter, { timeout = 1000, interval = 100 } = {}) {
+	const start = new Date().getTime();
+	return new Promise((resolve, reject) => {
+		const recurse = () => {
+			const data = getter();
+			if (data !== undefined) return resolve(data);
+			if (new Date().getTime() - start > timeout) return reject();
+			setTimeout(recurse, interval);
+		};
+		recurse();
+	});
+}

@@ -1,26 +1,84 @@
-import { ref } from 'vue';
-import { get, set } from '@vueuse/core';
+import { reactive } from 'vue';
 import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
-import { deleteDB, deleteEntry, openDB, readDB, readAllDB, storeDB, storeArrayDB } from '../utils/indexed-db.js';
+import {
+	deleteDB,
+	deleteEntry,
+	openDB,
+	readDB,
+	readAllDB,
+	readAllKeysDB,
+	storeDB,
+	storeArrayDB,
+	readQueuedDB,
+	readAllKeysIndex,
+} from '../utils/indexed-db.js';
+import { waitForDefined } from '../utils/utils.js';
 
-const zoomlevels = [12, 13, 14, 15, 16, 17, 18];
+const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 
 const DB_NAME = 'leaflet-offline';
 
-let maps = ref([]);
+const TABLES = {
+	MAPS: {
+		name: 'maps',
+	},
+	TILES: {
+		name: 'tiles',
+		indexes: {
+			MAP: 'map',
+		},
+	},
+};
+
+const state = reactive({
+	db: undefined,
+	maps: [],
+});
 
 (async () => {
 	try {
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-		set(maps, await readAllDB(mainDb, 'maps'));
-		mainDb.close();
+		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
+		state.maps = await readAllDB(state.db, TABLES.MAPS.name);
 	} catch (e) {
 		console.error('fail open db', e);
 	}
 })();
 
-function mainDBUpdate(db) {
-	db.createObjectStore('maps', { keyPath: 'normalizedName' });
+async function mainDBUpdate(db, oldVersion, newVersion) {
+	if (oldVersion < 1 && newVersion >= 1) {
+		db.createObjectStore(TABLES.MAPS.name, { keyPath: 'normalizedName' });
+	}
+	if (oldVersion < 2 && newVersion >= 2) {
+		const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
+		tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, 'map', { unique: false });
+		migrateV1Maps();
+	}
+}
+
+async function migrateV1Maps() {
+	await waitForDefined(() => state.db);
+	const maps = await readAllDB(state.db, TABLES.MAPS.name);
+	for (const map of maps) {
+		const subDbName = DB_NAME + '-' + map.normalizedName;
+		const subDb = await openDB(subDbName, 1, subDBUpdate);
+		for (const zoomLevel of ZOOM_LEVELS) {
+			try {
+				const keys = await readAllKeysDB(subDb, 'tiles-' + zoomLevel);
+				for (const key of keys) {
+					const tile = await readDB(subDb, 'tiles-' + zoomLevel, key);
+					await storeDB(state.db, TABLES.TILES.name, { map: map.normalizedName, tile }, key);
+				}
+			} catch (e) {
+				console.error(subDbName, 'tiles-' + zoomLevel, e);
+			}
+		}
+		subDb.close();
+		await deleteDB(subDbName);
+	}
+}
+
+async function subDBUpdate(db) {
+	ZOOM_LEVELS.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
 }
 
 function getTilePoints(area, tileSize) {
@@ -49,7 +107,7 @@ function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
 			y: tilePoint.y,
 			z: zoom,
 		};
-		const url = getTileUrl(templateUrl, {...options, ...data});
+		const url = getTileUrl(templateUrl, { ...options, ...data });
 		tiles.push(url);
 	}
 	return tiles;
@@ -60,18 +118,22 @@ function getTileUrl(urlTemplate, data) {
 }
 
 export function getMaps() {
-	return maps;
+	return state.maps;
 }
 
 export async function deleteMap(mapName) {
-	await deleteDB(DB_NAME + '-' + mapName);
-	set(
-		maps,
-		get(maps).filter((map) => map.normalizedName !== mapName)
+	const map = state.maps.find((map) => map.normalizedName === mapName);
+	state.maps = state.maps.filter((_map) => _map !== map);
+	await deleteEntry(state.db, TABLES.MAPS.name, mapName);
+	const keys = await readAllKeysIndex(
+		state.db,
+		TABLES.TILES.name,
+		TABLES.TILES.indexes.MAP,
+		IDBKeyRange.only(map.normalizedName)
 	);
-	const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-	await deleteEntry(mainDb, 'maps', mapName);
-	mainDb.close();
+	for (const key of keys) {
+		await deleteEntry(state.db, TABLES.TILES, key);
+	}
 }
 
 export default class TileLayerOffline extends TileLayer {
@@ -91,34 +153,16 @@ export default class TileLayerOffline extends TileLayer {
 		DomEvent.on(image, 'load', Util.bind(this._tileOnLoad, this, done, image));
 		DomEvent.on(image, 'error', Util.bind(this._tileOnError, this, done, image));
 
-		const url = getTileUrl(this._url, {...this.options, ...coords});
+		const url = getTileUrl(this._url, { ...this.options, ...coords });
 
 		(async () => {
 			let data;
-			if (zoomlevels.includes(coords.z)) {
-				const map = get(maps).find((map) => {
-					if (map.provider !== this.provider || map.type !== this.type) return false;
-
-					const area = bounds(this._map.project(map.NE, coords.z), this._map.project(map.SW, coords.z));
-					const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
-					const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
-					return (
-						coords.x >= topLeftTile.x &&
-						coords.x <= bottomRightTile.x &&
-						coords.y >= topLeftTile.y &&
-						coords.y <= bottomRightTile.y
-					);
-				});
-				const db =
-					map &&
-					(await openDB(DB_NAME + '-' + map.normalizedName, 1, (db) => {
-						zoomlevels.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
-					}));
-				data = db && (await readDB(db, 'tiles-' + coords.z, url));
-				db?.close();
+			if (ZOOM_LEVELS.includes(coords.z)) {
+				await waitForDefined(() => state.db);
+				data = await readQueuedDB(TABLES.TILES.name, state.db, TABLES.TILES.name, url);
 			}
 			if (data) {
-				image.src = URL.createObjectURL(data);
+				image.src = URL.createObjectURL(data.tile);
 			} else {
 				image.src = url;
 			}
@@ -130,14 +174,13 @@ export default class TileLayerOffline extends TileLayer {
 	async saveTiles(mapName, progressHandler) {
 		const normalizedName = mapName.replace(/[^A-Za-z0-9]/g, ''); //remove non ascii characters
 
-		if (get(maps)?.find((map) => map.normalizedName === normalizedName)) {
+		if (state.maps.find((map) => map.normalizedName === normalizedName)) {
 			throw `this name already exist : ${normalizedName}`;
 		}
 
 		console.time('saveTiles');
 
 		const latlngBounds = this._map.getBounds();
-		const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
 		const map = {
 			name: mapName,
 			normalizedName,
@@ -146,51 +189,43 @@ export default class TileLayerOffline extends TileLayer {
 			provider: this.provider,
 			type: this.type,
 		};
-		await storeDB(mainDb, 'maps', map);
-		set(maps, [...get(maps), map]);
-		mainDb.close();
+		await waitForDefined(() => state.db);
+		await storeDB(state.db, 'maps', map);
+		state.maps.push(map);
 
-		const db = await openDB(DB_NAME + '-' + normalizedName, 1, (db) => {
-			zoomlevels.forEach((zoomLevel) => db.createObjectStore('tiles-' + zoomLevel));
-		});
-
-		const tileUrls = zoomlevels.reduce((tileUrls, zoomLevel) => ({ ...tileUrls, [zoomLevel]: [] }), {});
-		let nbTiles = 0;
-		for (let i = 0; i < zoomlevels.length; i += 1) {
-			const zoomLevel = zoomlevels[i];
+		const tileUrls = [];
+		for (let i = 0; i < ZOOM_LEVELS.length; i += 1) {
+			const zoomLevel = ZOOM_LEVELS[i];
 			const area = bounds(
 				this._map.project(latlngBounds.getNorthWest(), zoomLevel),
 				this._map.project(latlngBounds.getSouthEast(), zoomLevel)
 			);
-			tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
-			nbTiles += tileUrls[zoomLevel].length;
+			tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
 		}
 
 		let nbSaved = 0;
-		for (let i = 0; i < zoomlevels.length; i += 1) {
-			const zoomLevel = zoomlevels[i];
-			const urls = arraySplit(tileUrls[zoomLevel], 20);
-			const datas = [];
-			for (let j = 0; j < urls.length; j++) {
-				await Promise.all(
-					urls[j].map(async (tileUrl) => {
-						try {
-							const response = await fetch(tileUrl);
-							if (response.ok) {
-								datas.push({ key: tileUrl, value: await response.blob() });
-							}
-						} catch (e) {
-							console.error(e);
-						} finally {
-							nbSaved++;
+		for (const urls of arraySplit(tileUrls, 20)) {
+			const data = [];
+			await Promise.all(
+				urls.map(async (tileUrl) => {
+					try {
+						const response = await fetch(tileUrl);
+						if (response.ok) {
+							data.push({
+								key: tileUrl,
+								value: { map: map.normalizedName, tile: await response.blob() },
+							});
 						}
-					})
-				);
-				await storeArrayDB(db, 'tiles-' + zoomLevel, datas);
-				progressHandler(nbSaved, nbTiles);
-			}
+					} catch (e) {
+						console.error(e);
+					} finally {
+						nbSaved++;
+					}
+				})
+			);
+			await storeArrayDB(state.db, TABLES.TILES.name, data);
+			progressHandler(nbSaved, tileUrls.length);
 		}
-		db.close();
 		console.timeEnd('saveTiles');
 	}
 }
