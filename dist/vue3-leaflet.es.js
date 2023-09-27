@@ -1,7 +1,5 @@
 (function(){"use strict";try{if(typeof document!="undefined"){var e=document.createElement("style");e.appendChild(document.createTextNode(".map-container{height:250px}.map-container_map{height:100%}")),document.head.appendChild(e)}}catch(t){console.error("vite-plugin-css-injected-by-js",t)}})();
 var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -17,12 +15,11 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, withAsyncContext, unref, onUnmounted, computed, toRaw, Teleport, nextTick } from "vue";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, toRaw, withAsyncContext, unref, onUnmounted, computed, Teleport, nextTick } from "vue";
 import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.2";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
@@ -106,6 +103,20 @@ async function loadCSSFromCDN(url) {
     document.head.appendChild(el);
   });
 }
+function waitForDefined(getter, { timeout = 1e3, interval = 100 } = {}) {
+  const start = new Date().getTime();
+  return new Promise((resolve, reject) => {
+    const recurse = () => {
+      const data = getter();
+      if (data !== void 0)
+        return resolve(data);
+      if (new Date().getTime() - start > timeout)
+        return reject();
+      setTimeout(recurse, interval);
+    };
+    recurse();
+  });
+}
 async function importLeaflet(version = LEAFLET_VERSION) {
   await Promise.all([
     loadJSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.js`),
@@ -157,8 +168,7 @@ const _sfc_main$b = {
     const props = __props;
     const { center, zoom, zoomControl, bounds, scrollWheelZoom } = toRefs(props);
     const options = reactive({
-      scrollWheelZoom,
-      maxZoom: 18
+      scrollWheelZoom
     });
     const container = templateRef("container");
     const $map = ref();
@@ -181,6 +191,13 @@ const _sfc_main$b = {
       map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
       const tilelayerGroup = L.layerGroup();
       tilelayerGroup.addTo(map);
+      const originalAddLayer = tilelayerGroup.addLayer;
+      tilelayerGroup.addLayer = function(layer) {
+        var _a;
+        if ((_a = layer.options) == null ? void 0 : _a.maxZoom)
+          map.setMaxZoom(layer.options.maxZoom);
+        originalAddLayer.bind(this)(layer);
+      }.bind(tilelayerGroup);
       const pinLayerGroup = L.layerGroup();
       pinLayerGroup.addTo(map);
       set($map, map);
@@ -8252,7 +8269,7 @@ function openDB(name, version, upgradeNeeded) {
       resolve(request.result);
     });
     request.addEventListener("upgradeneeded", (event) => {
-      upgradeNeeded(event.target.result);
+      upgradeNeeded(event.target.result, event.oldVersion, event.newVersion, event.target.transaction);
     });
   });
 }
@@ -8268,9 +8285,11 @@ function deleteDB(name) {
     });
   });
 }
-function deleteEntry(db, tableName, id) {
+function deleteEntry(db, tableName, id, transaction = null) {
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([tableName], "readwrite");
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName], "readwrite"), true];
     const store = transaction.objectStore(tableName);
     const request = store.delete(id);
     request.addEventListener("error", (e) => {
@@ -8280,12 +8299,15 @@ function deleteEntry(db, tableName, id) {
     request.addEventListener("success", () => {
       resolve(request.result);
     });
-    transaction.commit();
+    if (commit)
+      transaction.commit();
   });
 }
-function storeDB(db, tableName, data, key) {
+function storeDB(db, tableName, data, key, transaction = null) {
   return new Promise(async (resolve, reject) => {
-    const transaction = db.transaction([tableName], "readwrite");
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName], "readwrite"), true];
     const store = transaction.objectStore(tableName);
     let request;
     if (key) {
@@ -8313,11 +8335,14 @@ function storeDB(db, tableName, data, key) {
       console.error(e);
       reject("Failed to save the data");
     });
-    transaction.commit();
+    if (commit)
+      transaction.commit();
   });
 }
-async function storeArrayDB(db, tableName, datas) {
-  const transaction = db.transaction([tableName], "readwrite");
+async function storeArrayDB(db, tableName, datas, transaction = null) {
+  let commit = false;
+  if (!transaction)
+    [transaction, commit] = [db.transaction([tableName], "readwrite"), true];
   const store = transaction.objectStore(tableName);
   let requests = datas.map(async (data) => {
     let request;
@@ -8350,12 +8375,15 @@ async function storeArrayDB(db, tableName, datas) {
     });
   });
   return Promise.all(requests).then(() => {
-    transaction.commit();
+    if (commit)
+      transaction.commit();
   });
 }
-function readAllDB(db, tableName) {
+function readAllDB(db, tableName, transaction = null) {
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([tableName]);
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName]), true];
     const store = transaction.objectStore(tableName);
     const request = store.getAll();
     request.addEventListener("success", () => {
@@ -8364,12 +8392,50 @@ function readAllDB(db, tableName) {
     request.addEventListener("error", () => {
       reject("Failed to read the data");
     });
-    transaction.commit();
+    if (commit)
+      transaction.commit();
   });
 }
-function readDB(db, tableName, key) {
+function readAllKeysDB(db, tableName, transaction = null) {
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([tableName]);
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName]), true];
+    const store = transaction.objectStore(tableName);
+    const request = store.getAllKeys();
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+    request.addEventListener("error", () => {
+      reject("Failed to read the data");
+    });
+    if (commit)
+      transaction.commit();
+  });
+}
+function readAllKeysIndex(db, tableName, indexName, keyRange = null, transaction = null) {
+  return new Promise((resolve, reject) => {
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName]), true];
+    const store = transaction.objectStore(tableName);
+    const index = store.index(indexName);
+    const request = index.getAllKeys(keyRange);
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+    request.addEventListener("error", () => {
+      reject("Failed to read the data");
+    });
+    if (commit)
+      transaction.commit();
+  });
+}
+function readDB(db, tableName, key, transaction = null) {
+  return new Promise((resolve, reject) => {
+    let commit = false;
+    if (!transaction)
+      [transaction, commit] = [db.transaction([tableName]), true];
     const store = transaction.objectStore(tableName);
     const request = store.get(key);
     request.addEventListener("success", () => {
@@ -8378,23 +8444,104 @@ function readDB(db, tableName, key) {
     request.addEventListener("error", () => {
       reject("Failed to read the data");
     });
-    transaction.commit();
+    if (commit)
+      transaction.commit();
   });
 }
-const zoomlevels = [12, 13, 14, 15, 16, 17, 18];
+const queues = {};
+function readQueuedDB(queueName, db, tableName, key) {
+  return new Promise((resolve, reject) => {
+    if (!queues[queueName]) {
+      queues[queueName] = {
+        db,
+        tableName,
+        keys: []
+      };
+      readQueue(queues[queueName]);
+    }
+    queues[queueName].keys.push({
+      key,
+      resolve,
+      reject
+    });
+  });
+}
+async function readQueue(queue) {
+  if (queue.keys.length) {
+    const transaction = queue.db.transaction([queue.tableName]);
+    const store = transaction.objectStore(queue.tableName);
+    do {
+      const { key, resolve, reject } = queue.keys.shift();
+      const request = store.get(key);
+      request.addEventListener("success", () => {
+        resolve(request.result);
+      });
+      request.addEventListener("error", () => {
+        reject("Failed to read the data");
+      });
+    } while (queue.keys.length);
+    transaction.commit();
+  }
+  setTimeout(() => readQueue(queue), 100);
+}
+const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 const DB_NAME = "leaflet-offline";
-let maps = ref([]);
+const TABLES = {
+  MAPS: {
+    name: "maps"
+  },
+  TILES: {
+    name: "tiles",
+    indexes: {
+      MAP: "map"
+    }
+  }
+};
+const state = reactive({
+  db: void 0,
+  maps: []
+});
 (async () => {
   try {
-    const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-    set(maps, await readAllDB(mainDb, "maps"));
-    mainDb.close();
+    state.db = await openDB(DB_NAME, 2, mainDBUpdate);
+    state.maps = await readAllDB(state.db, TABLES.MAPS.name);
   } catch (e) {
     console.error("fail open db", e);
   }
 })();
-function mainDBUpdate(db) {
-  db.createObjectStore("maps", { keyPath: "normalizedName" });
+async function mainDBUpdate(db, oldVersion, newVersion) {
+  if (oldVersion < 1 && newVersion >= 1) {
+    db.createObjectStore(TABLES.MAPS.name, { keyPath: "normalizedName" });
+  }
+  if (oldVersion < 2 && newVersion >= 2) {
+    const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
+    tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, "map", { unique: false });
+    migrateV1Maps();
+  }
+}
+async function migrateV1Maps() {
+  await waitForDefined(() => state.db);
+  const maps = await readAllDB(state.db, TABLES.MAPS.name);
+  for (const map of maps) {
+    const subDbName = DB_NAME + "-" + map.normalizedName;
+    const subDb = await openDB(subDbName, 1, subDBUpdate);
+    for (const zoomLevel of ZOOM_LEVELS) {
+      try {
+        const keys = await readAllKeysDB(subDb, "tiles-" + zoomLevel);
+        for (const key of keys) {
+          const tile = await readDB(subDb, "tiles-" + zoomLevel, key);
+          await storeDB(state.db, TABLES.TILES.name, { map: map.normalizedName, tile }, key);
+        }
+      } catch (e) {
+        console.error(subDbName, "tiles-" + zoomLevel, e);
+      }
+    }
+    subDb.close();
+    await deleteDB(subDbName);
+  }
+}
+async function subDBUpdate(db) {
+  ZOOM_LEVELS.forEach((zoomLevel) => db.createObjectStore("tiles-" + zoomLevel));
 }
 function getTilePoints(area, tileSize) {
   const points = [];
@@ -8429,14 +8576,16 @@ function getTileUrl(urlTemplate, data) {
   return leafletSrc.exports.Util.template(urlTemplate, data);
 }
 function getMaps() {
-  return maps;
+  return state.maps;
 }
 async function deleteMap(mapName) {
-  await deleteDB(DB_NAME + "-" + mapName);
-  set(maps, get(maps).filter((map) => map.normalizedName !== mapName));
-  const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
-  await deleteEntry(mainDb, "maps", mapName);
-  mainDb.close();
+  const map = state.maps.find((map2) => map2.normalizedName === mapName);
+  state.maps = state.maps.filter((_map) => _map !== map);
+  await deleteEntry(state.db, TABLES.MAPS.name, mapName);
+  const keys = await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName));
+  for (const key of keys) {
+    await deleteEntry(state.db, TABLES.TILES, key);
+  }
 }
 class TileLayerOffline extends leafletSrc.exports.TileLayer {
   constructor(provider, type, url, options) {
@@ -8454,23 +8603,12 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     const url = getTileUrl(this._url, __spreadValues(__spreadValues({}, this.options), coords));
     (async () => {
       let data;
-      if (zoomlevels.includes(coords.z)) {
-        const map = get(maps).find((map2) => {
-          if (map2.provider !== this.provider || map2.type !== this.type)
-            return false;
-          const area = leafletSrc.exports.bounds(this._map.project(map2.NE, coords.z), this._map.project(map2.SW, coords.z));
-          const topLeftTile = area.min.divideBy(this.getTileSize().x).floor();
-          const bottomRightTile = area.max.divideBy(this.getTileSize().x).floor();
-          return coords.x >= topLeftTile.x && coords.x <= bottomRightTile.x && coords.y >= topLeftTile.y && coords.y <= bottomRightTile.y;
-        });
-        const db = map && await openDB(DB_NAME + "-" + map.normalizedName, 1, (db2) => {
-          zoomlevels.forEach((zoomLevel) => db2.createObjectStore("tiles-" + zoomLevel));
-        });
-        data = db && await readDB(db, "tiles-" + coords.z, url);
-        db == null ? void 0 : db.close();
+      if (ZOOM_LEVELS.includes(coords.z)) {
+        await waitForDefined(() => state.db);
+        data = await readQueuedDB(TABLES.TILES.name, state.db, TABLES.TILES.name, url);
       }
       if (data) {
-        image.src = URL.createObjectURL(data);
+        image.src = URL.createObjectURL(data.tile);
       } else {
         image.src = url;
       }
@@ -8478,14 +8616,12 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     return image;
   }
   async saveTiles(mapName, progressHandler) {
-    var _a;
     const normalizedName = mapName.replace(/[^A-Za-z0-9]/g, "");
-    if ((_a = get(maps)) == null ? void 0 : _a.find((map2) => map2.normalizedName === normalizedName)) {
+    if (state.maps.find((map2) => map2.normalizedName === normalizedName)) {
       throw `this name already exist : ${normalizedName}`;
     }
     console.time("saveTiles");
     const latlngBounds = this._map.getBounds();
-    const mainDb = await openDB(DB_NAME, 1, mainDBUpdate);
     const map = {
       name: mapName,
       normalizedName,
@@ -8494,43 +8630,36 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
       provider: this.provider,
       type: this.type
     };
-    await storeDB(mainDb, "maps", map);
-    set(maps, [...get(maps), map]);
-    mainDb.close();
-    const db = await openDB(DB_NAME + "-" + normalizedName, 1, (db2) => {
-      zoomlevels.forEach((zoomLevel) => db2.createObjectStore("tiles-" + zoomLevel));
-    });
-    const tileUrls = zoomlevels.reduce((tileUrls2, zoomLevel) => __spreadProps(__spreadValues({}, tileUrls2), { [zoomLevel]: [] }), {});
-    let nbTiles = 0;
-    for (let i = 0; i < zoomlevels.length; i += 1) {
-      const zoomLevel = zoomlevels[i];
+    await waitForDefined(() => state.db);
+    await storeDB(state.db, "maps", map);
+    state.maps.push(map);
+    const tileUrls = [];
+    for (let i = 0; i < ZOOM_LEVELS.length; i += 1) {
+      const zoomLevel = ZOOM_LEVELS[i];
       const area = leafletSrc.exports.bounds(this._map.project(latlngBounds.getNorthWest(), zoomLevel), this._map.project(latlngBounds.getSouthEast(), zoomLevel));
-      tileUrls[zoomLevel].push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
-      nbTiles += tileUrls[zoomLevel].length;
+      tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
     }
     let nbSaved = 0;
-    for (let i = 0; i < zoomlevels.length; i += 1) {
-      const zoomLevel = zoomlevels[i];
-      const urls = arraySplit(tileUrls[zoomLevel], 20);
-      const datas = [];
-      for (let j = 0; j < urls.length; j++) {
-        await Promise.all(urls[j].map(async (tileUrl) => {
-          try {
-            const response = await fetch(tileUrl);
-            if (response.ok) {
-              datas.push({ key: tileUrl, value: await response.blob() });
-            }
-          } catch (e) {
-            console.error(e);
-          } finally {
-            nbSaved++;
+    for (const urls of arraySplit(tileUrls, 20)) {
+      const data = [];
+      await Promise.all(urls.map(async (tileUrl) => {
+        try {
+          const response = await fetch(tileUrl);
+          if (response.ok) {
+            data.push({
+              key: tileUrl,
+              value: { map: map.normalizedName, tile: await response.blob() }
+            });
           }
-        }));
-        await storeArrayDB(db, "tiles-" + zoomLevel, datas);
-        progressHandler(nbSaved, nbTiles);
-      }
+        } catch (e) {
+          console.error(e);
+        } finally {
+          nbSaved++;
+        }
+      }));
+      await storeArrayDB(state.db, TABLES.TILES.name, data);
+      progressHandler(nbSaved, tileUrls.length);
     }
-    db.close();
     console.timeEnd("saveTiles");
   }
 }
@@ -8568,10 +8697,14 @@ const _sfc_main$a = {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
     const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
-      attribution: props.attribution
+      attribution: props.attribution,
+      maxZoom: 19
     });
     provide("layer", ref(layer));
-    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(layer), { immediate: true });
+    whenever($layerGroup, (layerGroup) => {
+      toRaw(layerGroup).clearLayers();
+      toRaw(layerGroup).addLayer(layer);
+    }, { immediate: true });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -8615,11 +8748,15 @@ const _sfc_main$9 = {
       apiKey: props.apiKey,
       attribution: props.attribution,
       tileSize: props.tileSize,
-      zoomOffset: props.zoomOffset
+      zoomOffset: props.zoomOffset,
+      maxZoom: 19
     });
     const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
     provide("layer", ref(layer));
-    whenever($layerGroup, (map) => map.addLayer(layer), { immediate: true });
+    whenever($layerGroup, (layerGroup) => {
+      toRaw(layerGroup).clearLayers();
+      toRaw(layerGroup).addLayer(layer);
+    }, { immediate: true });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -8650,15 +8787,12 @@ const _sfc_main$8 = {
     const $layerGroup = inject(LayerGroups.TILE);
     const layer = ref(getLayer(props.type, props.attribution));
     provide("layer", layer);
-    whenever($layerGroup, (layerGroup) => layerGroup.addLayer(get(layer)), {
-      immediate: true
-    });
     watch(props, (props2) => {
       var _a, _b;
       set(layer, getLayer(props2.type, props2.attribution));
-      (_a = get($layerGroup)) == null ? void 0 : _a.clearLayers();
-      (_b = get($layerGroup)) == null ? void 0 : _b.addLayer(get(layer));
-    }, { deep: true });
+      (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
+      (_b = toRaw(get($layerGroup))) == null ? void 0 : _b.addLayer(get(layer));
+    }, { deep: true, immediate: true });
     function getLayer(type, attribution) {
       const options = {
         minZoom: 0,
@@ -8670,7 +8804,6 @@ const _sfc_main$8 = {
       switch (type) {
         case mapTypes.satellite:
           url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
-          options.maxZoom = 21;
           break;
         case mapTypes.cadastral:
           url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
@@ -8721,22 +8854,25 @@ const _sfc_main$7 = {
     const { type } = toRefs(props);
     const defaultOptions = reactive({ type });
     const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-      const mount = (map, options) => L.gridLayer.googleMutant(options).addTo(map);
-      const load = async (map, options = defaultOptions) => {
+      const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
+      const load = async (layerGroup, options = defaultOptions) => {
         await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-        mount(map, options);
+        mount(layerGroup, options);
         return {};
       };
       return { load };
     };
-    const $map = inject("map");
+    const $layerGroup = inject(LayerGroups.TILE);
     const gmaps = useGoogleMutant(props.apiKey);
     const mutant = ref();
-    watch(type, () => setMutant(unref($map)));
-    async function setMutant(map) {
-      set(mutant, await gmaps.load(map, defaultOptions));
+    watch(type, () => setMutant(unref($layerGroup)));
+    async function setMutant(layerGroup) {
+      set(mutant, await gmaps.load(layerGroup, defaultOptions));
     }
-    whenever($map, (map) => setMutant(map), { immediate: true });
+    whenever($layerGroup, (layerGroup) => {
+      toRaw(layerGroup).clearLayers();
+      setMutant(layerGroup);
+    }, { immediate: true });
     return (_ctx, _cache) => {
       return mutant.value ? renderSlot(_ctx.$slots, "default", { key: 0 }) : createCommentVNode("", true);
     };
@@ -9468,7 +9604,7 @@ var OfflineControl$1 = renderless({
 function checkMapSizeToSave(map) {
   const latlngBounds = map.getBounds();
   const size = Math.abs(latlngBounds._northEast.lat - latlngBounds._southWest.lat) * Math.abs(latlngBounds._southWest.lng - latlngBounds._northEast.lng);
-  return size <= 2e-3;
+  return size <= 0.02;
 }
 async function importLeafletPegman(version = LEAFLET_PEGMAN_VERSION) {
   return Promise.all([
