@@ -19,7 +19,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, toRaw, withAsyncContext, unref, onUnmounted, computed, Teleport, nextTick } from "vue";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, computed, inject, toRaw, withAsyncContext, unref, onUnmounted, Teleport, nextTick } from "vue";
 import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
 const LEAFLET_VERSION = "1.9.4";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.79.0";
@@ -8576,7 +8576,7 @@ function getTileUrl(urlTemplate, data) {
   return leafletSrc.exports.Util.template(urlTemplate, data);
 }
 function getMaps() {
-  return state.maps;
+  return computed(() => state.maps);
 }
 async function deleteMap(mapName) {
   const map = state.maps.find((map2) => map2.normalizedName === mapName);
@@ -8584,7 +8584,7 @@ async function deleteMap(mapName) {
   await deleteEntry(state.db, TABLES.MAPS.name, mapName);
   const keys = await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName));
   for (const key of keys) {
-    await deleteEntry(state.db, TABLES.TILES, key);
+    await deleteEntry(state.db, TABLES.TILES.name, key);
   }
 }
 class TileLayerOffline extends leafletSrc.exports.TileLayer {
