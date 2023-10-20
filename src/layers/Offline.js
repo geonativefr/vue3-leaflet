@@ -132,7 +132,7 @@ export async function deleteMap(mapName) {
 		IDBKeyRange.only(map.normalizedName)
 	);
 	for (const key of keys) {
-		await deleteEntry(state.db, TABLES.TILES, key);
+		await deleteEntry(state.db, TABLES.TILES.name, key);
 	}
 }
 
