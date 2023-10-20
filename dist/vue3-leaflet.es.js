@@ -21,15 +21,15 @@ var __publicField = (obj, key, value) => {
 };
 import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, inject, toRaw, withAsyncContext, unref, onUnmounted, computed, Teleport, nextTick } from "vue";
 import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
-const LEAFLET_VERSION = "1.9.2";
-const LEAFLET_LOCATE_CONTROL_VERSION = "0.78.0";
-const LEAFLET_GOOGLE_MUTANT_VERSION = "0.13.5";
+const LEAFLET_VERSION = "1.9.4";
+const LEAFLET_LOCATE_CONTROL_VERSION = "0.79.0";
+const LEAFLET_GOOGLE_MUTANT_VERSION = "0.14.0";
 const LEAFLET_PEGMAN_VERSION = "0.1.6";
 const LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION = "2.0.1";
 const LEAFLET_ARROWHEADS_VERSION = "1.4.0";
-const LEAFLET_GEOMETRYUTIL_VERSION = "0.10.1";
-const LEAFLET_GEOMAN_VERSION = "2.13.0";
-const LEAFLET_MARKERCLUSTER_VERSION = "1.4.1";
+const LEAFLET_GEOMETRYUTIL_VERSION = "0.10.2";
+const LEAFLET_GEOMAN_VERSION = "2.14.2";
+const LEAFLET_MARKERCLUSTER_VERSION = "1.5.3";
 const LEAFLET_FULLSCREEN_VERSION = "1.0.5";
 function renderless(component) {
   return Object.assign(component, { render: () => void 0 });
