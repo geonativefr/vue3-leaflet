@@ -2,7 +2,7 @@
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
 			<GoogleMaps v-if="provider === 'gmaps'" :api-key="API_KEYS.gmaps" :type="mapType" />
-			<IGN v-if="provider === 'ign'" :type="mapType" />
+			<IGN v-if="provider === 'ign'" :type="mapType" :detect-retina="true" />
 			<Mapbox v-if="provider === 'mapbox'" :apiKey="API_KEYS.mapbox" />
 			<OpenStreetMap v-if="provider === 'osm'" />
 			<ZoomControl position="bottomright" />

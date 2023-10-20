@@ -22,12 +22,17 @@
 			default: 'roadmap',
 			validator: (type) => ['roadmap'].includes(type),
 		},
+		detectRetina: {
+			type: Boolean,
+			default: false,
+		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
 	const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
 		attribution: props.attribution,
 		maxZoom: 19,
+		detectRetina: props.detectRetina,
 	});
 
 	provide('layer', ref(layer));

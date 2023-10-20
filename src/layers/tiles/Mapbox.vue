@@ -36,6 +36,10 @@
 			default: 'roadmap',
 			validator: (type) => ['roadmap'].includes(type),
 		},
+		detectRetina: {
+			type: Boolean,
+			default: false,
+		},
 	});
 
 	await importLeaflet(inject('leaflet.version'));
@@ -46,6 +50,7 @@
 		tileSize: props.tileSize,
 		zoomOffset: props.zoomOffset,
 		maxZoom: 19,
+		detectRetina: props.detectRetina,
 	});
 	const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
 

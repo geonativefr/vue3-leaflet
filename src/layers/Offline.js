@@ -153,6 +153,8 @@ export default class TileLayerOffline extends TileLayer {
 		DomEvent.on(image, 'load', Util.bind(this._tileOnLoad, this, done, image));
 		DomEvent.on(image, 'error', Util.bind(this._tileOnError, this, done, image));
 
+		coords.z = this._getZoomForUrl(); // To be able to use retina
+
 		const url = getTileUrl(this._url, { ...this.options, ...coords });
 
 		(async () => {

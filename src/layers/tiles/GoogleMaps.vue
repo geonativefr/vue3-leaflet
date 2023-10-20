@@ -28,6 +28,10 @@
 			type: String,
 			default: undefined,
 		},
+		detectRetina: {
+			type: Boolean,
+			default: false,
+		},
 	});
 
 	await importLeaflet(inject('leaflet.version'));

@@ -19,6 +19,10 @@
 			default: mapTypes.roadmap,
 			validator: (type) => [mapTypes.satellite, mapTypes.roadmap, mapTypes.cadastral].includes(type),
 		},
+		detectRetina: {
+			type: Boolean,
+			default: false,
+		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
@@ -44,6 +48,7 @@
 			maxZoom: 19,
 			attribution: attribution,
 			tileSize: 256,
+			detectRetina: props.detectRetina,
 		};
 		let url =
 			'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png';
