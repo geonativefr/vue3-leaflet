@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
 import {
 	deleteDB,
@@ -118,7 +118,7 @@ function getTileUrl(urlTemplate, data) {
 }
 
 export function getMaps() {
-	return state.maps;
+	return computed(() => state.maps);
 }
 
 export async function deleteMap(mapName) {
@@ -132,7 +132,7 @@ export async function deleteMap(mapName) {
 		IDBKeyRange.only(map.normalizedName)
 	);
 	for (const key of keys) {
-		await deleteEntry(state.db, TABLES.TILES, key);
+		await deleteEntry(state.db, TABLES.TILES.name, key);
 	}
 }
 
