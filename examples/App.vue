@@ -1,6 +1,6 @@
 <template>
 	<div class="app">
-		<Map :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
+		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
 			<GoogleMaps v-if="provider === 'gmaps'" :api-key="API_KEYS.gmaps" :type="mapType" />
 			<IGN v-if="provider === 'ign'" :type="mapType" />
 			<Mapbox v-if="provider === 'mapbox'" :apiKey="API_KEYS.mapbox" />
@@ -10,7 +10,7 @@
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
-		</Map>
+		</MapContainer>
 		<div>
 			<label>
 				<input type="radio" :value="mapTypes.satellite" v-model="mapType" />
@@ -44,17 +44,19 @@
 
 <script setup>
 	import { ref } from 'vue';
-	import GoogleMaps from '../src/layers/tiles/GoogleMaps.vue';
-	import Mapbox from '../src/layers/tiles/Mapbox.vue';
-	import IGN from '../src/layers/tiles/IGN.vue';
-	import OpenStreetMap from '../src/layers/tiles/OpenStreetMap.vue';
-	import Map from '../src/MapContainer.vue';
-	import ZoomControl from '../src/controls/ZoomControl.js';
-	import ScaleControl from '../src/controls/ScaleControl.js';
-	import LocateControl from '../src/controls/LocateControl.js';
-	import OfflineControl from '../src/controls/OfflineControl';
-	import mapTypes from '../src/utils/map-types';
-	import Marker from '../src/layers/markers/Marker.vue';
+	import {
+		GoogleMaps,
+		Mapbox,
+		IGN,
+		OpenStreetMap,
+		MapContainer,
+		ZoomControl,
+		ScaleControl,
+		LocateControl,
+		OfflineControl,
+		mapTypes,
+		Marker,
+	} from '../src';
 	import positions from './positions.json';
 
 	const mapType = ref(mapTypes.roadmap);
