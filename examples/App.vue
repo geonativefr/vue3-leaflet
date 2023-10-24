@@ -1,7 +1,7 @@
 <template>
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
-			<GoogleMaps v-if="provider === 'gmaps'" :api-key="API_KEYS.gmaps" :type="mapType" />
+			<GoogleMaps v-if="provider === 'gmaps'" :type="mapType" />
 			<IGN v-if="provider === 'ign'" :type="mapType" />
 			<Mapbox v-if="provider === 'mapbox'" />
 			<OpenStreetMap v-if="provider === 'osm'" />
@@ -78,14 +78,12 @@
 	const mapType = ref(MapTypes.ROADMAP);
 	const provider = ref('ign');
 
-	const API_KEYS = {
-		gmaps: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-		mapbox: import.meta.env.VITE_MAPBOX_API_KEY,
-	};
-
 	useVue3Leaflet({
+		[Layers.GOOGLE_MAPS]: {
+			apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+		},
 		[Layers.MAPBOX]: {
-			apiKey: API_KEYS.mapbox,
+			apiKey: import.meta.env.VITE_MAPBOX_API_KEY,
 		},
 	});
 

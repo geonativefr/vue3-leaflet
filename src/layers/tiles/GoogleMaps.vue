@@ -8,17 +8,9 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import { LayerGroups } from '../../constants';
+	import { LayerGroups, Layers, getOptions } from '../../constants';
 
 	const props = defineProps({
-		url: {
-			type: String,
-			default: 'https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-		},
-		apiKey: {
-			type: String,
-			required: true,
-		},
 		type: {
 			type: String,
 			default: 'roadmap',
@@ -48,7 +40,7 @@
 	};
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const gmaps = useGoogleMutant(props.apiKey);
+	const gmaps = useGoogleMutant(getOptions(Layers.GOOGLE_MAPS).apiKey);
 	const mutant = ref();
 	watch(type, () => setMutant(unref($layerGroup)));
 
