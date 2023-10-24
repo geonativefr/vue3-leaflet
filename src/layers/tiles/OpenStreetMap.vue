@@ -4,15 +4,11 @@
 
 <script setup>
 	import { whenever } from '@vueuse/core';
-	import { inject, provide, ref, toRaw } from 'vue';
+	import { inject, provide, reactive, ref, toRaw } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, LayerNames } from '../../constants';
+	import { LayerGroups, Layers, LayerUrls } from '../../constants';
 
 	const props = defineProps({
-		url: {
-			type: String,
-			default: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-		},
 		attribution: {
 			type: String,
 			default: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -25,9 +21,8 @@
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
+	const layer = new TileLayerOffline(Layers.OPEN_STREET_MAP, props.type, LayerUrls.OPEN_STREET_MAP(), {
 		attribution: props.attribution,
-		maxZoom: 19,
 	});
 
 	provide('layer', ref(layer));

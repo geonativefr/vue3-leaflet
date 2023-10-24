@@ -5,9 +5,8 @@
 <script setup>
 	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, toRaw, watch } from 'vue';
-	import mapTypes from '../../utils/map-types';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, LayerNames } from '../../constants';
+	import { LayerGroups, Layers, MapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -16,47 +15,30 @@
 		},
 		type: {
 			type: String,
-			default: mapTypes.roadmap,
-			validator: (type) => [mapTypes.satellite, mapTypes.roadmap, mapTypes.cadastral].includes(type),
+			default: MapTypes.ROADMAP,
+			validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
 
-	const layer = ref(getLayer(props.type, props.attribution));
+	const layer = ref(getLayer(props.type));
 
 	provide('layer', layer);
 
 	watch(
 		props,
 		(props) => {
-			set(layer, getLayer(props.type, props.attribution));
+			set(layer, getLayer(props.type));
 			toRaw(get($layerGroup))?.clearLayers();
 			toRaw(get($layerGroup))?.addLayer(get(layer));
 		},
 		{ deep: true, immediate: true }
 	);
 
-	function getLayer(type, attribution) {
-		//type: mapTypes.roadmap
-		const options = {
-			minZoom: 0,
-			maxZoom: 19,
-			attribution: attribution,
-			tileSize: 256,
-		};
-		let url =
-			'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png';
-		switch (type) {
-			case mapTypes.satellite:
-				url =
-					'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg';
-				break;
-			case mapTypes.cadastral:
-				url =
-					'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png';
-				break;
-		}
-		return new TileLayerOffline(LayerNames.IGN, type, url, options);
+	function getLayer(type) {
+		return new TileLayerOffline(Layers.IGN, type, {
+			attribution: props.attribution,
+		});
 	}
 </script>

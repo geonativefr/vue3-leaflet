@@ -30,5 +30,4 @@ export * from './utils/leaflet-loader.js';
 export * from './utils/leaflet-locatecontrol-loader.js';
 export * from './utils/leaflet-markercluster-loader.js';
 export * from './utils/leaflet-pegman-loader.js';
-export { default as mapTypes } from './utils/map-types.js';
 export * from './constants.js';

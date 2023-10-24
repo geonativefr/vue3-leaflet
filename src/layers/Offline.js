@@ -1,5 +1,5 @@
 import { reactive, computed } from 'vue';
-import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
+import { bounds, DomEvent, CRS, Point, TileLayer, Util } from 'leaflet';
 import {
 	deleteDB,
 	deleteEntry,
@@ -13,6 +13,8 @@ import {
 	readAllKeysIndex,
 } from '../utils/indexed-db.js';
 import { waitForDefined } from '../utils/utils.js';
+import { LayerUrls, getOptions } from '../constants.js';
+import merge from 'lodash.merge';
 
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 
@@ -29,6 +31,11 @@ const TABLES = {
 		},
 	},
 };
+const MAP_STATES = {
+	CHECKING: 'CHECKING',
+	COMPLETE: 'COMPLETE',
+	WIP: 'WIP',
+};
 
 const state = reactive({
 	db: undefined,
@@ -38,7 +45,20 @@ const state = reactive({
 (async () => {
 	try {
 		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
-		state.maps = await readAllDB(state.db, TABLES.MAPS.name);
+		state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => ({
+			...map,
+			state: MAP_STATES.CHECKING,
+		}));
+		for (const map of state.maps) {
+			const tilesUrls = await checkMap(map);
+			if (tilesUrls.length === 0) {
+				map.state = MAP_STATES.COMPLETE;
+				continue;
+			}
+			map.state = MAP_STATES.WIP;
+			await saveTileUrls(tilesUrls, map.normalizedName, () => {});
+			map.state = MAP_STATES.COMPLETE;
+		}
 	} catch (e) {
 		console.error('fail open db', e);
 	}
@@ -117,6 +137,59 @@ function getTileUrl(urlTemplate, data) {
 	return Util.template(urlTemplate, data);
 }
 
+async function saveTileUrls(tileUrls, mapName, progressHandler) {
+	let nbSaved = 0;
+	for (const urls of arraySplit(tileUrls, 20)) {
+		const data = [];
+		await Promise.all(
+			urls.map(async (tileUrl) => {
+				try {
+					const response = await fetch(tileUrl);
+					if (response.ok) {
+						data.push({
+							key: tileUrl,
+							value: { map: mapName, tile: await response.blob() },
+						});
+					}
+				} catch (e) {
+					console.error(e);
+				} finally {
+					nbSaved++;
+				}
+			})
+		);
+		await storeArrayDB(state.db, TABLES.TILES.name, data);
+		progressHandler(nbSaved, tileUrls.length);
+	}
+}
+
+async function checkMap(map) {
+	const options = merge(getOptions(map.provider), map.options);
+	const tileSize = options.tileSize ?? 256;
+	const urls = ZOOM_LEVELS.map((zoomLevel) => {
+		const area = bounds(
+			CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel),
+			CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel)
+		);
+		return getTileUrls(
+			LayerUrls[map.provider](map.type),
+			area,
+			zoomLevel,
+			tileSize instanceof Point ? tileSize : new Point(tileSize, tileSize),
+			map.options
+		);
+	}).flat();
+
+	const savedUrls = await readAllKeysIndex(
+		state.db,
+		TABLES.TILES.name,
+		TABLES.TILES.indexes.MAP,
+		IDBKeyRange.only(map.normalizedName)
+	);
+
+	return urls.filter((url) => !savedUrls.includes(url));
+}
+
 export function getMaps() {
 	return computed(() => state.maps);
 }
@@ -140,8 +213,8 @@ export default class TileLayerOffline extends TileLayer {
 	provider;
 	type;
 
-	constructor(provider, type, url, options) {
-		super(url, options);
+	constructor(provider, type, options) {
+		super(LayerUrls[provider](type), merge(getOptions(provider), options));
 		this.provider = provider;
 		this.type = type;
 	}
@@ -191,6 +264,7 @@ export default class TileLayerOffline extends TileLayer {
 		};
 		await waitForDefined(() => state.db);
 		await storeDB(state.db, 'maps', map);
+		map.state = MAP_STATES.WIP;
 		state.maps.push(map);
 
 		const tileUrls = [];
@@ -203,29 +277,8 @@ export default class TileLayerOffline extends TileLayer {
 			tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
 		}
 
-		let nbSaved = 0;
-		for (const urls of arraySplit(tileUrls, 20)) {
-			const data = [];
-			await Promise.all(
-				urls.map(async (tileUrl) => {
-					try {
-						const response = await fetch(tileUrl);
-						if (response.ok) {
-							data.push({
-								key: tileUrl,
-								value: { map: map.normalizedName, tile: await response.blob() },
-							});
-						}
-					} catch (e) {
-						console.error(e);
-					} finally {
-						nbSaved++;
-					}
-				})
-			);
-			await storeArrayDB(state.db, TABLES.TILES.name, data);
-			progressHandler(nbSaved, tileUrls.length);
-		}
+		await saveTileUrls(tileUrls, map.normalizedName, progressHandler);
+		map.state = MAP_STATES.COMPLETE;
 		console.timeEnd('saveTiles');
 	}
 }
