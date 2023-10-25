@@ -1,5 +1,7 @@
 (function(){"use strict";try{if(typeof document!="undefined"){var e=document.createElement("style");e.appendChild(document.createTextNode(".map-container{height:250px}.map-container_map{height:100%}")),document.head.appendChild(e)}}catch(t){console.error("vite-plugin-css-injected-by-js",t)}})();
 var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -15,6 +17,7 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
@@ -123,6 +126,693 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
+var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+var lodash_merge = { exports: {} };
+(function(module, exports) {
+  var LARGE_ARRAY_SIZE = 200;
+  var HASH_UNDEFINED = "__lodash_hash_undefined__";
+  var HOT_COUNT = 800, HOT_SPAN = 16;
+  var MAX_SAFE_INTEGER = 9007199254740991;
+  var argsTag = "[object Arguments]", arrayTag = "[object Array]", asyncTag = "[object AsyncFunction]", boolTag = "[object Boolean]", dateTag = "[object Date]", errorTag = "[object Error]", funcTag = "[object Function]", genTag = "[object GeneratorFunction]", mapTag = "[object Map]", numberTag = "[object Number]", nullTag = "[object Null]", objectTag = "[object Object]", proxyTag = "[object Proxy]", regexpTag = "[object RegExp]", setTag = "[object Set]", stringTag = "[object String]", undefinedTag = "[object Undefined]", weakMapTag = "[object WeakMap]";
+  var arrayBufferTag = "[object ArrayBuffer]", dataViewTag = "[object DataView]", float32Tag = "[object Float32Array]", float64Tag = "[object Float64Array]", int8Tag = "[object Int8Array]", int16Tag = "[object Int16Array]", int32Tag = "[object Int32Array]", uint8Tag = "[object Uint8Array]", uint8ClampedTag = "[object Uint8ClampedArray]", uint16Tag = "[object Uint16Array]", uint32Tag = "[object Uint32Array]";
+  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+  var reIsUint = /^(?:0|[1-9]\d*)$/;
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+  var freeGlobal = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+  var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+  var root = freeGlobal || freeSelf || Function("return this")();
+  var freeExports = exports && !exports.nodeType && exports;
+  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var freeProcess = moduleExports && freeGlobal.process;
+  var nodeUtil = function() {
+    try {
+      var types = freeModule && freeModule.require && freeModule.require("util").types;
+      if (types) {
+        return types;
+      }
+      return freeProcess && freeProcess.binding && freeProcess.binding("util");
+    } catch (e) {
+    }
+  }();
+  var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+  function apply(func, thisArg, args) {
+    switch (args.length) {
+      case 0:
+        return func.call(thisArg);
+      case 1:
+        return func.call(thisArg, args[0]);
+      case 2:
+        return func.call(thisArg, args[0], args[1]);
+      case 3:
+        return func.call(thisArg, args[0], args[1], args[2]);
+    }
+    return func.apply(thisArg, args);
+  }
+  function baseTimes(n, iteratee) {
+    var index = -1, result = Array(n);
+    while (++index < n) {
+      result[index] = iteratee(index);
+    }
+    return result;
+  }
+  function baseUnary(func) {
+    return function(value) {
+      return func(value);
+    };
+  }
+  function getValue(object, key) {
+    return object == null ? void 0 : object[key];
+  }
+  function overArg(func, transform) {
+    return function(arg) {
+      return func(transform(arg));
+    };
+  }
+  var arrayProto = Array.prototype, funcProto = Function.prototype, objectProto = Object.prototype;
+  var coreJsData = root["__core-js_shared__"];
+  var funcToString = funcProto.toString;
+  var hasOwnProperty = objectProto.hasOwnProperty;
+  var maskSrcKey = function() {
+    var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || "");
+    return uid ? "Symbol(src)_1." + uid : "";
+  }();
+  var nativeObjectToString = objectProto.toString;
+  var objectCtorString = funcToString.call(Object);
+  var reIsNative = RegExp("^" + funcToString.call(hasOwnProperty).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
+  var Buffer2 = moduleExports ? root.Buffer : void 0, Symbol2 = root.Symbol, Uint8Array2 = root.Uint8Array, allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0, getPrototype = overArg(Object.getPrototypeOf, Object), objectCreate = Object.create, propertyIsEnumerable = objectProto.propertyIsEnumerable, splice = arrayProto.splice, symToStringTag = Symbol2 ? Symbol2.toStringTag : void 0;
+  var defineProperty = function() {
+    try {
+      var func = getNative(Object, "defineProperty");
+      func({}, "", {});
+      return func;
+    } catch (e) {
+    }
+  }();
+  var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0, nativeMax = Math.max, nativeNow = Date.now;
+  var Map = getNative(root, "Map"), nativeCreate = getNative(Object, "create");
+  var baseCreate = function() {
+    function object() {
+    }
+    return function(proto) {
+      if (!isObject(proto)) {
+        return {};
+      }
+      if (objectCreate) {
+        return objectCreate(proto);
+      }
+      object.prototype = proto;
+      var result = new object();
+      object.prototype = void 0;
+      return result;
+    };
+  }();
+  function Hash(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function hashClear() {
+    this.__data__ = nativeCreate ? nativeCreate(null) : {};
+    this.size = 0;
+  }
+  function hashDelete(key) {
+    var result = this.has(key) && delete this.__data__[key];
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  function hashGet(key) {
+    var data = this.__data__;
+    if (nativeCreate) {
+      var result = data[key];
+      return result === HASH_UNDEFINED ? void 0 : result;
+    }
+    return hasOwnProperty.call(data, key) ? data[key] : void 0;
+  }
+  function hashHas(key) {
+    var data = this.__data__;
+    return nativeCreate ? data[key] !== void 0 : hasOwnProperty.call(data, key);
+  }
+  function hashSet(key, value) {
+    var data = this.__data__;
+    this.size += this.has(key) ? 0 : 1;
+    data[key] = nativeCreate && value === void 0 ? HASH_UNDEFINED : value;
+    return this;
+  }
+  Hash.prototype.clear = hashClear;
+  Hash.prototype["delete"] = hashDelete;
+  Hash.prototype.get = hashGet;
+  Hash.prototype.has = hashHas;
+  Hash.prototype.set = hashSet;
+  function ListCache(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function listCacheClear() {
+    this.__data__ = [];
+    this.size = 0;
+  }
+  function listCacheDelete(key) {
+    var data = this.__data__, index = assocIndexOf(data, key);
+    if (index < 0) {
+      return false;
+    }
+    var lastIndex = data.length - 1;
+    if (index == lastIndex) {
+      data.pop();
+    } else {
+      splice.call(data, index, 1);
+    }
+    --this.size;
+    return true;
+  }
+  function listCacheGet(key) {
+    var data = this.__data__, index = assocIndexOf(data, key);
+    return index < 0 ? void 0 : data[index][1];
+  }
+  function listCacheHas(key) {
+    return assocIndexOf(this.__data__, key) > -1;
+  }
+  function listCacheSet(key, value) {
+    var data = this.__data__, index = assocIndexOf(data, key);
+    if (index < 0) {
+      ++this.size;
+      data.push([key, value]);
+    } else {
+      data[index][1] = value;
+    }
+    return this;
+  }
+  ListCache.prototype.clear = listCacheClear;
+  ListCache.prototype["delete"] = listCacheDelete;
+  ListCache.prototype.get = listCacheGet;
+  ListCache.prototype.has = listCacheHas;
+  ListCache.prototype.set = listCacheSet;
+  function MapCache(entries) {
+    var index = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function mapCacheClear() {
+    this.size = 0;
+    this.__data__ = {
+      "hash": new Hash(),
+      "map": new (Map || ListCache)(),
+      "string": new Hash()
+    };
+  }
+  function mapCacheDelete(key) {
+    var result = getMapData(this, key)["delete"](key);
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  function mapCacheGet(key) {
+    return getMapData(this, key).get(key);
+  }
+  function mapCacheHas(key) {
+    return getMapData(this, key).has(key);
+  }
+  function mapCacheSet(key, value) {
+    var data = getMapData(this, key), size = data.size;
+    data.set(key, value);
+    this.size += data.size == size ? 0 : 1;
+    return this;
+  }
+  MapCache.prototype.clear = mapCacheClear;
+  MapCache.prototype["delete"] = mapCacheDelete;
+  MapCache.prototype.get = mapCacheGet;
+  MapCache.prototype.has = mapCacheHas;
+  MapCache.prototype.set = mapCacheSet;
+  function Stack(entries) {
+    var data = this.__data__ = new ListCache(entries);
+    this.size = data.size;
+  }
+  function stackClear() {
+    this.__data__ = new ListCache();
+    this.size = 0;
+  }
+  function stackDelete(key) {
+    var data = this.__data__, result = data["delete"](key);
+    this.size = data.size;
+    return result;
+  }
+  function stackGet(key) {
+    return this.__data__.get(key);
+  }
+  function stackHas(key) {
+    return this.__data__.has(key);
+  }
+  function stackSet(key, value) {
+    var data = this.__data__;
+    if (data instanceof ListCache) {
+      var pairs = data.__data__;
+      if (!Map || pairs.length < LARGE_ARRAY_SIZE - 1) {
+        pairs.push([key, value]);
+        this.size = ++data.size;
+        return this;
+      }
+      data = this.__data__ = new MapCache(pairs);
+    }
+    data.set(key, value);
+    this.size = data.size;
+    return this;
+  }
+  Stack.prototype.clear = stackClear;
+  Stack.prototype["delete"] = stackDelete;
+  Stack.prototype.get = stackGet;
+  Stack.prototype.has = stackHas;
+  Stack.prototype.set = stackSet;
+  function arrayLikeKeys(value, inherited) {
+    var isArr = isArray(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer(value), isType = !isArr && !isArg && !isBuff && isTypedArray(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes(value.length, String) : [], length = result.length;
+    for (var key in value) {
+      if ((inherited || hasOwnProperty.call(value, key)) && !(skipIndexes && (key == "length" || isBuff && (key == "offset" || key == "parent") || isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || isIndex(key, length)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function assignMergeValue(object, key, value) {
+    if (value !== void 0 && !eq(object[key], value) || value === void 0 && !(key in object)) {
+      baseAssignValue(object, key, value);
+    }
+  }
+  function assignValue(object, key, value) {
+    var objValue = object[key];
+    if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) || value === void 0 && !(key in object)) {
+      baseAssignValue(object, key, value);
+    }
+  }
+  function assocIndexOf(array, key) {
+    var length = array.length;
+    while (length--) {
+      if (eq(array[length][0], key)) {
+        return length;
+      }
+    }
+    return -1;
+  }
+  function baseAssignValue(object, key, value) {
+    if (key == "__proto__" && defineProperty) {
+      defineProperty(object, key, {
+        "configurable": true,
+        "enumerable": true,
+        "value": value,
+        "writable": true
+      });
+    } else {
+      object[key] = value;
+    }
+  }
+  var baseFor = createBaseFor();
+  function baseGetTag(value) {
+    if (value == null) {
+      return value === void 0 ? undefinedTag : nullTag;
+    }
+    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+  }
+  function baseIsArguments(value) {
+    return isObjectLike(value) && baseGetTag(value) == argsTag;
+  }
+  function baseIsNative(value) {
+    if (!isObject(value) || isMasked(value)) {
+      return false;
+    }
+    var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
+    return pattern.test(toSource(value));
+  }
+  function baseIsTypedArray(value) {
+    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
+  }
+  function baseKeysIn(object) {
+    if (!isObject(object)) {
+      return nativeKeysIn(object);
+    }
+    var isProto = isPrototype(object), result = [];
+    for (var key in object) {
+      if (!(key == "constructor" && (isProto || !hasOwnProperty.call(object, key)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function baseMerge(object, source, srcIndex, customizer, stack) {
+    if (object === source) {
+      return;
+    }
+    baseFor(source, function(srcValue, key) {
+      stack || (stack = new Stack());
+      if (isObject(srcValue)) {
+        baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
+      } else {
+        var newValue = customizer ? customizer(safeGet(object, key), srcValue, key + "", object, source, stack) : void 0;
+        if (newValue === void 0) {
+          newValue = srcValue;
+        }
+        assignMergeValue(object, key, newValue);
+      }
+    }, keysIn);
+  }
+  function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
+    var objValue = safeGet(object, key), srcValue = safeGet(source, key), stacked = stack.get(srcValue);
+    if (stacked) {
+      assignMergeValue(object, key, stacked);
+      return;
+    }
+    var newValue = customizer ? customizer(objValue, srcValue, key + "", object, source, stack) : void 0;
+    var isCommon = newValue === void 0;
+    if (isCommon) {
+      var isArr = isArray(srcValue), isBuff = !isArr && isBuffer(srcValue), isTyped = !isArr && !isBuff && isTypedArray(srcValue);
+      newValue = srcValue;
+      if (isArr || isBuff || isTyped) {
+        if (isArray(objValue)) {
+          newValue = objValue;
+        } else if (isArrayLikeObject(objValue)) {
+          newValue = copyArray(objValue);
+        } else if (isBuff) {
+          isCommon = false;
+          newValue = cloneBuffer(srcValue, true);
+        } else if (isTyped) {
+          isCommon = false;
+          newValue = cloneTypedArray(srcValue, true);
+        } else {
+          newValue = [];
+        }
+      } else if (isPlainObject(srcValue) || isArguments(srcValue)) {
+        newValue = objValue;
+        if (isArguments(objValue)) {
+          newValue = toPlainObject(objValue);
+        } else if (!isObject(objValue) || isFunction(objValue)) {
+          newValue = initCloneObject(srcValue);
+        }
+      } else {
+        isCommon = false;
+      }
+    }
+    if (isCommon) {
+      stack.set(srcValue, newValue);
+      mergeFunc(newValue, srcValue, srcIndex, customizer, stack);
+      stack["delete"](srcValue);
+    }
+    assignMergeValue(object, key, newValue);
+  }
+  function baseRest(func, start) {
+    return setToString(overRest(func, start, identity), func + "");
+  }
+  var baseSetToString = !defineProperty ? identity : function(func, string) {
+    return defineProperty(func, "toString", {
+      "configurable": true,
+      "enumerable": false,
+      "value": constant(string),
+      "writable": true
+    });
+  };
+  function cloneBuffer(buffer, isDeep) {
+    if (isDeep) {
+      return buffer.slice();
+    }
+    var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+    buffer.copy(result);
+    return result;
+  }
+  function cloneArrayBuffer(arrayBuffer) {
+    var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+    new Uint8Array2(result).set(new Uint8Array2(arrayBuffer));
+    return result;
+  }
+  function cloneTypedArray(typedArray, isDeep) {
+    var buffer = isDeep ? cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
+    return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+  }
+  function copyArray(source, array) {
+    var index = -1, length = source.length;
+    array || (array = Array(length));
+    while (++index < length) {
+      array[index] = source[index];
+    }
+    return array;
+  }
+  function copyObject(source, props, object, customizer) {
+    var isNew = !object;
+    object || (object = {});
+    var index = -1, length = props.length;
+    while (++index < length) {
+      var key = props[index];
+      var newValue = customizer ? customizer(object[key], source[key], key, object, source) : void 0;
+      if (newValue === void 0) {
+        newValue = source[key];
+      }
+      if (isNew) {
+        baseAssignValue(object, key, newValue);
+      } else {
+        assignValue(object, key, newValue);
+      }
+    }
+    return object;
+  }
+  function createAssigner(assigner) {
+    return baseRest(function(object, sources) {
+      var index = -1, length = sources.length, customizer = length > 1 ? sources[length - 1] : void 0, guard = length > 2 ? sources[2] : void 0;
+      customizer = assigner.length > 3 && typeof customizer == "function" ? (length--, customizer) : void 0;
+      if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+        customizer = length < 3 ? void 0 : customizer;
+        length = 1;
+      }
+      object = Object(object);
+      while (++index < length) {
+        var source = sources[index];
+        if (source) {
+          assigner(object, source, index, customizer);
+        }
+      }
+      return object;
+    });
+  }
+  function createBaseFor(fromRight) {
+    return function(object, iteratee, keysFunc) {
+      var index = -1, iterable = Object(object), props = keysFunc(object), length = props.length;
+      while (length--) {
+        var key = props[fromRight ? length : ++index];
+        if (iteratee(iterable[key], key, iterable) === false) {
+          break;
+        }
+      }
+      return object;
+    };
+  }
+  function getMapData(map, key) {
+    var data = map.__data__;
+    return isKeyable(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
+  }
+  function getNative(object, key) {
+    var value = getValue(object, key);
+    return baseIsNative(value) ? value : void 0;
+  }
+  function getRawTag(value) {
+    var isOwn = hasOwnProperty.call(value, symToStringTag), tag = value[symToStringTag];
+    try {
+      value[symToStringTag] = void 0;
+      var unmasked = true;
+    } catch (e) {
+    }
+    var result = nativeObjectToString.call(value);
+    if (unmasked) {
+      if (isOwn) {
+        value[symToStringTag] = tag;
+      } else {
+        delete value[symToStringTag];
+      }
+    }
+    return result;
+  }
+  function initCloneObject(object) {
+    return typeof object.constructor == "function" && !isPrototype(object) ? baseCreate(getPrototype(object)) : {};
+  }
+  function isIndex(value, length) {
+    var type = typeof value;
+    length = length == null ? MAX_SAFE_INTEGER : length;
+    return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+  }
+  function isIterateeCall(value, index, object) {
+    if (!isObject(object)) {
+      return false;
+    }
+    var type = typeof index;
+    if (type == "number" ? isArrayLike(object) && isIndex(index, object.length) : type == "string" && index in object) {
+      return eq(object[index], value);
+    }
+    return false;
+  }
+  function isKeyable(value) {
+    var type = typeof value;
+    return type == "string" || type == "number" || type == "symbol" || type == "boolean" ? value !== "__proto__" : value === null;
+  }
+  function isMasked(func) {
+    return !!maskSrcKey && maskSrcKey in func;
+  }
+  function isPrototype(value) {
+    var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto;
+    return value === proto;
+  }
+  function nativeKeysIn(object) {
+    var result = [];
+    if (object != null) {
+      for (var key in Object(object)) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function objectToString(value) {
+    return nativeObjectToString.call(value);
+  }
+  function overRest(func, start, transform) {
+    start = nativeMax(start === void 0 ? func.length - 1 : start, 0);
+    return function() {
+      var args = arguments, index = -1, length = nativeMax(args.length - start, 0), array = Array(length);
+      while (++index < length) {
+        array[index] = args[start + index];
+      }
+      index = -1;
+      var otherArgs = Array(start + 1);
+      while (++index < start) {
+        otherArgs[index] = args[index];
+      }
+      otherArgs[start] = transform(array);
+      return apply(func, this, otherArgs);
+    };
+  }
+  function safeGet(object, key) {
+    if (key === "constructor" && typeof object[key] === "function") {
+      return;
+    }
+    if (key == "__proto__") {
+      return;
+    }
+    return object[key];
+  }
+  var setToString = shortOut(baseSetToString);
+  function shortOut(func) {
+    var count = 0, lastCalled = 0;
+    return function() {
+      var stamp = nativeNow(), remaining = HOT_SPAN - (stamp - lastCalled);
+      lastCalled = stamp;
+      if (remaining > 0) {
+        if (++count >= HOT_COUNT) {
+          return arguments[0];
+        }
+      } else {
+        count = 0;
+      }
+      return func.apply(void 0, arguments);
+    };
+  }
+  function toSource(func) {
+    if (func != null) {
+      try {
+        return funcToString.call(func);
+      } catch (e) {
+      }
+      try {
+        return func + "";
+      } catch (e) {
+      }
+    }
+    return "";
+  }
+  function eq(value, other) {
+    return value === other || value !== value && other !== other;
+  }
+  var isArguments = baseIsArguments(function() {
+    return arguments;
+  }()) ? baseIsArguments : function(value) {
+    return isObjectLike(value) && hasOwnProperty.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
+  };
+  var isArray = Array.isArray;
+  function isArrayLike(value) {
+    return value != null && isLength(value.length) && !isFunction(value);
+  }
+  function isArrayLikeObject(value) {
+    return isObjectLike(value) && isArrayLike(value);
+  }
+  var isBuffer = nativeIsBuffer || stubFalse;
+  function isFunction(value) {
+    if (!isObject(value)) {
+      return false;
+    }
+    var tag = baseGetTag(value);
+    return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
+  }
+  function isLength(value) {
+    return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+  }
+  function isObject(value) {
+    var type = typeof value;
+    return value != null && (type == "object" || type == "function");
+  }
+  function isObjectLike(value) {
+    return value != null && typeof value == "object";
+  }
+  function isPlainObject(value) {
+    if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
+      return false;
+    }
+    var proto = getPrototype(value);
+    if (proto === null) {
+      return true;
+    }
+    var Ctor = hasOwnProperty.call(proto, "constructor") && proto.constructor;
+    return typeof Ctor == "function" && Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString;
+  }
+  var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+  function toPlainObject(value) {
+    return copyObject(value, keysIn(value));
+  }
+  function keysIn(object) {
+    return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
+  }
+  var merge2 = createAssigner(function(object, source, srcIndex) {
+    baseMerge(object, source, srcIndex);
+  });
+  function constant(value) {
+    return function() {
+      return value;
+    };
+  }
+  function identity(value) {
+    return value;
+  }
+  function stubFalse() {
+    return false;
+  }
+  module.exports = merge2;
+})(lodash_merge, lodash_merge.exports);
+var merge = lodash_merge.exports;
+const Layers = {
+  GOOGLE_MAPS: "GOOGLE_MAPS",
+  IGN: "IGN",
+  MAPBOX: "MAPBOX",
+  OPEN_STREET_MAP: "OPEN_STREET_MAP"
+};
+const MapTypes = {
+  ROADMAP: "roadmap",
+  SATELLITE: "satellite",
+  TERRAIN: "terrain",
+  HYBRID: "hybrid",
+  CADASTRAL: "cadastral"
+};
 const LayerNames = {
   GOOGLE_MAPS: "Google Maps",
   IGN: "IGN",
@@ -133,6 +823,42 @@ const LayerGroups = {
   PIN: "pinLayerGroup",
   TILE: "tileLayerGroup"
 };
+let options = {
+  IGN: {
+    maxZoom: 19
+  },
+  MAPBOX: {
+    maxZoom: 19,
+    zoomOffset: -1
+  },
+  OPEN_STREET_MAP: {
+    maxZoom: 19
+  }
+};
+function useVue3Leaflet(_options) {
+  options = merge(options, _options);
+}
+const LayerUrls = {
+  IGN: (mapType) => {
+    switch (mapType) {
+      case MapTypes.SATELLITE:
+        return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
+      case MapTypes.CADASTRAL:
+        return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+      default:
+        return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+    }
+  },
+  MAPBOX: (mapType) => {
+    return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}".replace("{apiKey}", options.MAPBOX.apiKey);
+  },
+  OPEN_STREET_MAP: (mapType) => {
+    return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  }
+};
+function getOptions(layer) {
+  return options[layer];
+}
 var MapContainer_vue_vue_type_style_index_0_lang = /* @__PURE__ */ (() => ".map-container{height:250px}.map-container_map{height:100%}\n")();
 const _hoisted_1$2 = { class: "map-container" };
 const _sfc_main$b = {
@@ -167,7 +893,7 @@ const _sfc_main$b = {
   setup(__props, { emit }) {
     const props = __props;
     const { center, zoom, zoomControl, bounds, scrollWheelZoom } = toRefs(props);
-    const options = reactive({
+    const options2 = reactive({
       scrollWheelZoom
     });
     const container = templateRef("container");
@@ -185,7 +911,7 @@ const _sfc_main$b = {
     provide("leaflet.version", props.version);
     onMounted(async () => {
       await importLeaflet(props.version);
-      const map = L.map(get(container), options);
+      const map = L.map(get(container), options2);
       map.setView(props.center, props.zoom);
       map.on("move", (event) => emit("move", { event, center: map.getCenter(), map }));
       map.on("zoomend", () => emit("zoomend", { zoom: map.getZoom(), bounds: map.getBounds(), map }));
@@ -232,7 +958,6 @@ const _sfc_main$b = {
     };
   }
 };
-var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var leafletSrc = { exports: {} };
 /* @preserve
  * Leaflet 1.9.3, a JS library for interactive maps. https://leafletjs.com
@@ -318,12 +1043,12 @@ var leafletSrc = { exports: {} };
     function splitWords(str) {
       return trim(str).split(/\s+/);
     }
-    function setOptions(obj, options) {
+    function setOptions(obj, options2) {
       if (!Object.prototype.hasOwnProperty.call(obj, "options")) {
         obj.options = obj.options ? create$2(obj.options) : {};
       }
-      for (var i in options) {
-        obj.options[i] = options[i];
+      for (var i in options2) {
+        obj.options[i] = options2[i];
       }
       return obj.options;
     }
@@ -466,8 +1191,8 @@ var leafletSrc = { exports: {} };
       }
       return this;
     };
-    Class.mergeOptions = function(options) {
-      extend(this.prototype.options, options);
+    Class.mergeOptions = function(options2) {
+      extend(this.prototype.options, options2);
       return this;
     };
     Class.addInitHook = function(fn) {
@@ -1917,8 +2642,8 @@ var leafletSrc = { exports: {} };
         zoomDelta: 1,
         trackResize: true
       },
-      initialize: function(id, options) {
-        options = setOptions(this, options);
+      initialize: function(id, options2) {
+        options2 = setOptions(this, options2);
         this._handlers = [];
         this._layers = {};
         this._zoomBoundLayers = {};
@@ -1927,14 +2652,14 @@ var leafletSrc = { exports: {} };
         this._initLayout();
         this._onResize = bind(this._onResize, this);
         this._initEvents();
-        if (options.maxBounds) {
-          this.setMaxBounds(options.maxBounds);
+        if (options2.maxBounds) {
+          this.setMaxBounds(options2.maxBounds);
         }
-        if (options.zoom !== void 0) {
-          this._zoom = this._limitZoom(options.zoom);
+        if (options2.zoom !== void 0) {
+          this._zoom = this._limitZoom(options2.zoom);
         }
-        if (options.center && options.zoom !== void 0) {
-          this.setView(toLatLng(options.center), options.zoom, { reset: true });
+        if (options2.center && options2.zoom !== void 0) {
+          this.setView(toLatLng(options2.center), options2.zoom, { reset: true });
         }
         this.callInitHooks();
         this._zoomAnimated = TRANSITION && Browser.any3d && !Browser.mobileOpera && this.options.zoomAnimation;
@@ -1944,49 +2669,49 @@ var leafletSrc = { exports: {} };
         }
         this._addLayers(this.options.layers);
       },
-      setView: function(center, zoom2, options) {
+      setView: function(center, zoom2, options2) {
         zoom2 = zoom2 === void 0 ? this._zoom : this._limitZoom(zoom2);
         center = this._limitCenter(toLatLng(center), zoom2, this.options.maxBounds);
-        options = options || {};
+        options2 = options2 || {};
         this._stop();
-        if (this._loaded && !options.reset && options !== true) {
-          if (options.animate !== void 0) {
-            options.zoom = extend({ animate: options.animate }, options.zoom);
-            options.pan = extend({ animate: options.animate, duration: options.duration }, options.pan);
+        if (this._loaded && !options2.reset && options2 !== true) {
+          if (options2.animate !== void 0) {
+            options2.zoom = extend({ animate: options2.animate }, options2.zoom);
+            options2.pan = extend({ animate: options2.animate, duration: options2.duration }, options2.pan);
           }
-          var moved = this._zoom !== zoom2 ? this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom2, options.zoom) : this._tryAnimatedPan(center, options.pan);
+          var moved = this._zoom !== zoom2 ? this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom2, options2.zoom) : this._tryAnimatedPan(center, options2.pan);
           if (moved) {
             clearTimeout(this._sizeTimer);
             return this;
           }
         }
-        this._resetView(center, zoom2, options.pan && options.pan.noMoveStart);
+        this._resetView(center, zoom2, options2.pan && options2.pan.noMoveStart);
         return this;
       },
-      setZoom: function(zoom2, options) {
+      setZoom: function(zoom2, options2) {
         if (!this._loaded) {
           this._zoom = zoom2;
           return this;
         }
-        return this.setView(this.getCenter(), zoom2, { zoom: options });
+        return this.setView(this.getCenter(), zoom2, { zoom: options2 });
       },
-      zoomIn: function(delta, options) {
+      zoomIn: function(delta, options2) {
         delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
-        return this.setZoom(this._zoom + delta, options);
+        return this.setZoom(this._zoom + delta, options2);
       },
-      zoomOut: function(delta, options) {
+      zoomOut: function(delta, options2) {
         delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
-        return this.setZoom(this._zoom - delta, options);
+        return this.setZoom(this._zoom - delta, options2);
       },
-      setZoomAround: function(latlng, zoom2, options) {
+      setZoomAround: function(latlng, zoom2, options2) {
         var scale2 = this.getZoomScale(zoom2), viewHalf = this.getSize().divideBy(2), containerPoint = latlng instanceof Point ? latlng : this.latLngToContainerPoint(latlng), centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale2), newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
-        return this.setView(newCenter, zoom2, { zoom: options });
+        return this.setView(newCenter, zoom2, { zoom: options2 });
       },
-      _getBoundsCenterZoom: function(bounds, options) {
-        options = options || {};
+      _getBoundsCenterZoom: function(bounds, options2) {
+        options2 = options2 || {};
         bounds = bounds.getBounds ? bounds.getBounds() : toLatLngBounds(bounds);
-        var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]), paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]), zoom2 = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
-        zoom2 = typeof options.maxZoom === "number" ? Math.min(options.maxZoom, zoom2) : zoom2;
+        var paddingTL = toPoint(options2.paddingTopLeft || options2.padding || [0, 0]), paddingBR = toPoint(options2.paddingBottomRight || options2.padding || [0, 0]), zoom2 = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
+        zoom2 = typeof options2.maxZoom === "number" ? Math.min(options2.maxZoom, zoom2) : zoom2;
         if (zoom2 === Infinity) {
           return {
             center: bounds.getCenter(),
@@ -1999,27 +2724,27 @@ var leafletSrc = { exports: {} };
           zoom: zoom2
         };
       },
-      fitBounds: function(bounds, options) {
+      fitBounds: function(bounds, options2) {
         bounds = toLatLngBounds(bounds);
         if (!bounds.isValid()) {
           throw new Error("Bounds are not valid.");
         }
-        var target = this._getBoundsCenterZoom(bounds, options);
-        return this.setView(target.center, target.zoom, options);
+        var target = this._getBoundsCenterZoom(bounds, options2);
+        return this.setView(target.center, target.zoom, options2);
       },
-      fitWorld: function(options) {
-        return this.fitBounds([[-90, -180], [90, 180]], options);
+      fitWorld: function(options2) {
+        return this.fitBounds([[-90, -180], [90, 180]], options2);
       },
-      panTo: function(center, options) {
-        return this.setView(center, this._zoom, { pan: options });
+      panTo: function(center, options2) {
+        return this.setView(center, this._zoom, { pan: options2 });
       },
-      panBy: function(offset, options) {
+      panBy: function(offset, options2) {
         offset = toPoint(offset).round();
-        options = options || {};
+        options2 = options2 || {};
         if (!offset.x && !offset.y) {
           return this.fire("moveend");
         }
-        if (options.animate !== true && !this.getSize().contains(offset)) {
+        if (options2.animate !== true && !this.getSize().contains(offset)) {
           this._resetView(this.unproject(this.project(this.getCenter()).add(offset)), this.getZoom());
           return this;
         }
@@ -2030,23 +2755,23 @@ var leafletSrc = { exports: {} };
             "end": this._onPanTransitionEnd
           }, this);
         }
-        if (!options.noMoveStart) {
+        if (!options2.noMoveStart) {
           this.fire("movestart");
         }
-        if (options.animate !== false) {
+        if (options2.animate !== false) {
           addClass(this._mapPane, "leaflet-pan-anim");
           var newPos = this._getMapPanePos().subtract(offset).round();
-          this._panAnim.run(this._mapPane, newPos, options.duration || 0.25, options.easeLinearity);
+          this._panAnim.run(this._mapPane, newPos, options2.duration || 0.25, options2.easeLinearity);
         } else {
           this._rawPanBy(offset);
           this.fire("move").fire("moveend");
         }
         return this;
       },
-      flyTo: function(targetCenter, targetZoom, options) {
-        options = options || {};
-        if (options.animate === false || !Browser.any3d) {
-          return this.setView(targetCenter, targetZoom, options);
+      flyTo: function(targetCenter, targetZoom, options2) {
+        options2 = options2 || {};
+        if (options2.animate === false || !Browser.any3d) {
+          return this.setView(targetCenter, targetZoom, options2);
         }
         this._stop();
         var from = this.project(this.getCenter()), to = this.project(targetCenter), size = this.getSize(), startZoom = this._zoom;
@@ -2077,7 +2802,7 @@ var leafletSrc = { exports: {} };
         function easeOut(t) {
           return 1 - Math.pow(1 - t, 1.5);
         }
-        var start = Date.now(), S = (r(1) - r0) / rho, duration = options.duration ? 1e3 * options.duration : 1e3 * S * 0.8;
+        var start = Date.now(), S = (r(1) - r0) / rho, duration = options2.duration ? 1e3 * options2.duration : 1e3 * S * 0.8;
         function frame() {
           var t = (Date.now() - start) / duration, s = easeOut(t) * S;
           if (t <= 1) {
@@ -2087,13 +2812,13 @@ var leafletSrc = { exports: {} };
             this._move(targetCenter, targetZoom)._moveEnd(true);
           }
         }
-        this._moveStart(true, options.noMoveStart);
+        this._moveStart(true, options2.noMoveStart);
         frame.call(this);
         return this;
       },
-      flyToBounds: function(bounds, options) {
-        var target = this._getBoundsCenterZoom(bounds, options);
-        return this.flyTo(target.center, target.zoom, options);
+      flyToBounds: function(bounds, options2) {
+        var target = this._getBoundsCenterZoom(bounds, options2);
+        return this.flyTo(target.center, target.zoom, options2);
       },
       setMaxBounds: function(bounds) {
         bounds = toLatLngBounds(bounds);
@@ -2132,37 +2857,37 @@ var leafletSrc = { exports: {} };
         }
         return this;
       },
-      panInsideBounds: function(bounds, options) {
+      panInsideBounds: function(bounds, options2) {
         this._enforcingBounds = true;
         var center = this.getCenter(), newCenter = this._limitCenter(center, this._zoom, toLatLngBounds(bounds));
         if (!center.equals(newCenter)) {
-          this.panTo(newCenter, options);
+          this.panTo(newCenter, options2);
         }
         this._enforcingBounds = false;
         return this;
       },
-      panInside: function(latlng, options) {
-        options = options || {};
-        var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]), paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]), pixelCenter = this.project(this.getCenter()), pixelPoint = this.project(latlng), pixelBounds = this.getPixelBounds(), paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]), paddedSize = paddedBounds.getSize();
+      panInside: function(latlng, options2) {
+        options2 = options2 || {};
+        var paddingTL = toPoint(options2.paddingTopLeft || options2.padding || [0, 0]), paddingBR = toPoint(options2.paddingBottomRight || options2.padding || [0, 0]), pixelCenter = this.project(this.getCenter()), pixelPoint = this.project(latlng), pixelBounds = this.getPixelBounds(), paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]), paddedSize = paddedBounds.getSize();
         if (!paddedBounds.contains(pixelPoint)) {
           this._enforcingBounds = true;
           var centerOffset = pixelPoint.subtract(paddedBounds.getCenter());
           var offset = paddedBounds.extend(pixelPoint).getSize().subtract(paddedSize);
           pixelCenter.x += centerOffset.x < 0 ? -offset.x : offset.x;
           pixelCenter.y += centerOffset.y < 0 ? -offset.y : offset.y;
-          this.panTo(this.unproject(pixelCenter), options);
+          this.panTo(this.unproject(pixelCenter), options2);
           this._enforcingBounds = false;
         }
         return this;
       },
-      invalidateSize: function(options) {
+      invalidateSize: function(options2) {
         if (!this._loaded) {
           return this;
         }
-        options = extend({
+        options2 = extend({
           animate: false,
           pan: true
-        }, options === true ? { animate: true } : options);
+        }, options2 === true ? { animate: true } : options2);
         var oldSize = this.getSize();
         this._sizeChanged = true;
         this._lastCenter = null;
@@ -2170,14 +2895,14 @@ var leafletSrc = { exports: {} };
         if (!offset.x && !offset.y) {
           return this;
         }
-        if (options.animate && options.pan) {
+        if (options2.animate && options2.pan) {
           this.panBy(offset);
         } else {
-          if (options.pan) {
+          if (options2.pan) {
             this._rawPanBy(offset);
           }
           this.fire("move");
-          if (options.debounceMoveend) {
+          if (options2.debounceMoveend) {
             clearTimeout(this._sizeTimer);
             this._sizeTimer = setTimeout(bind(this.fire, this, "moveend"), 200);
           } else {
@@ -2196,11 +2921,11 @@ var leafletSrc = { exports: {} };
         }
         return this._stop();
       },
-      locate: function(options) {
-        options = this._locateOptions = extend({
+      locate: function(options2) {
+        options2 = this._locateOptions = extend({
           timeout: 1e4,
           watch: false
-        }, options);
+        }, options2);
         if (!("geolocation" in navigator)) {
           this._handleGeolocationError({
             code: 0,
@@ -2209,10 +2934,10 @@ var leafletSrc = { exports: {} };
           return this;
         }
         var onResponse = bind(this._handleGeolocationResponse, this), onError = bind(this._handleGeolocationError, this);
-        if (options.watch) {
-          this._locationWatchId = navigator.geolocation.watchPosition(onResponse, onError, options);
+        if (options2.watch) {
+          this._locationWatchId = navigator.geolocation.watchPosition(onResponse, onError, options2);
         } else {
-          navigator.geolocation.getCurrentPosition(onResponse, onError, options);
+          navigator.geolocation.getCurrentPosition(onResponse, onError, options2);
         }
         return this;
       },
@@ -2242,10 +2967,10 @@ var leafletSrc = { exports: {} };
         if (!this._container._leaflet_id) {
           return;
         }
-        var lat = pos.coords.latitude, lng = pos.coords.longitude, latlng = new LatLng(lat, lng), bounds = latlng.toBounds(pos.coords.accuracy * 2), options = this._locateOptions;
-        if (options.setView) {
+        var lat = pos.coords.latitude, lng = pos.coords.longitude, latlng = new LatLng(lat, lng), bounds = latlng.toBounds(pos.coords.accuracy * 2), options2 = this._locateOptions;
+        if (options2.setView) {
           var zoom2 = this.getBoundsZoom(bounds);
-          this.setView(latlng, options.maxZoom ? Math.min(zoom2, options.maxZoom) : zoom2);
+          this.setView(latlng, options2.maxZoom ? Math.min(zoom2, options2.maxZoom) : zoom2);
         }
         var data = {
           latlng,
@@ -2748,12 +3473,12 @@ var leafletSrc = { exports: {} };
         removeClass(this._mapPane, "leaflet-pan-anim");
         this.fire("moveend");
       },
-      _tryAnimatedPan: function(center, options) {
+      _tryAnimatedPan: function(center, options2) {
         var offset = this._getCenterOffset(center)._trunc();
-        if ((options && options.animate) !== true && !this.getSize().contains(offset)) {
+        if ((options2 && options2.animate) !== true && !this.getSize().contains(offset)) {
           return false;
         }
-        this.panBy(offset, options);
+        this.panBy(offset, options2);
         return true;
       },
       _createAnimProxy: function() {
@@ -2786,16 +3511,16 @@ var leafletSrc = { exports: {} };
       _nothingToAnimate: function() {
         return !this._container.getElementsByClassName("leaflet-zoom-animated").length;
       },
-      _tryAnimatedZoom: function(center, zoom2, options) {
+      _tryAnimatedZoom: function(center, zoom2, options2) {
         if (this._animatingZoom) {
           return true;
         }
-        options = options || {};
-        if (!this._zoomAnimated || options.animate === false || this._nothingToAnimate() || Math.abs(zoom2 - this._zoom) > this.options.zoomAnimationThreshold) {
+        options2 = options2 || {};
+        if (!this._zoomAnimated || options2.animate === false || this._nothingToAnimate() || Math.abs(zoom2 - this._zoom) > this.options.zoomAnimationThreshold) {
           return false;
         }
         var scale2 = this.getZoomScale(zoom2), offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale2);
-        if (options.animate !== true && !this.getSize().contains(offset)) {
+        if (options2.animate !== true && !this.getSize().contains(offset)) {
           return false;
         }
         requestAnimFrame(function() {
@@ -2841,15 +3566,15 @@ var leafletSrc = { exports: {} };
         this._moveEnd(true);
       }
     });
-    function createMap(id, options) {
-      return new Map(id, options);
+    function createMap(id, options2) {
+      return new Map(id, options2);
     }
     var Control = Class.extend({
       options: {
         position: "topright"
       },
-      initialize: function(options) {
-        setOptions(this, options);
+      initialize: function(options2) {
+        setOptions(this, options2);
       },
       getPosition: function() {
         return this.options.position;
@@ -2899,8 +3624,8 @@ var leafletSrc = { exports: {} };
         }
       }
     });
-    var control = function(options) {
-      return new Control(options);
+    var control = function(options2) {
+      return new Control(options2);
     };
     Map.include({
       addControl: function(control2) {
@@ -2931,7 +3656,7 @@ var leafletSrc = { exports: {} };
         delete this._controlContainer;
       }
     });
-    var Layers = Control.extend({
+    var Layers2 = Control.extend({
       options: {
         collapsed: true,
         position: "topright",
@@ -2942,8 +3667,8 @@ var leafletSrc = { exports: {} };
           return nameA < nameB ? -1 : nameB < nameA ? 1 : 0;
         }
       },
-      initialize: function(baseLayers, overlays, options) {
-        setOptions(this, options);
+      initialize: function(baseLayers, overlays, options2) {
+        setOptions(this, options2);
         this._layerControlInputs = [];
         this._layers = [];
         this._lastZIndex = 0;
@@ -3182,8 +3907,8 @@ var leafletSrc = { exports: {} };
         });
       }
     });
-    var layers = function(baseLayers, overlays, options) {
-      return new Layers(baseLayers, overlays, options);
+    var layers = function(baseLayers, overlays, options2) {
+      return new Layers2(baseLayers, overlays, options2);
     };
     var Zoom = Control.extend({
       options: {
@@ -3194,9 +3919,9 @@ var leafletSrc = { exports: {} };
         zoomOutTitle: "Zoom out"
       },
       onAdd: function(map) {
-        var zoomName = "leaflet-control-zoom", container = create$1("div", zoomName + " leaflet-bar"), options = this.options;
-        this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle, zoomName + "-in", container, this._zoomIn);
-        this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle, zoomName + "-out", container, this._zoomOut);
+        var zoomName = "leaflet-control-zoom", container = create$1("div", zoomName + " leaflet-bar"), options2 = this.options;
+        this._zoomInButton = this._createButton(options2.zoomInText, options2.zoomInTitle, zoomName + "-in", container, this._zoomIn);
+        this._zoomOutButton = this._createButton(options2.zoomOutText, options2.zoomOutTitle, zoomName + "-out", container, this._zoomOut);
         this._updateDisabled();
         map.on("zoomend zoomlevelschange", this._updateDisabled, this);
         return container;
@@ -3262,8 +3987,8 @@ var leafletSrc = { exports: {} };
         this.addControl(this.zoomControl);
       }
     });
-    var zoom = function(options) {
-      return new Zoom(options);
+    var zoom = function(options2) {
+      return new Zoom(options2);
     };
     var Scale = Control.extend({
       options: {
@@ -3273,20 +3998,20 @@ var leafletSrc = { exports: {} };
         imperial: true
       },
       onAdd: function(map) {
-        var className = "leaflet-control-scale", container = create$1("div", className), options = this.options;
-        this._addScales(options, className + "-line", container);
-        map.on(options.updateWhenIdle ? "moveend" : "move", this._update, this);
+        var className = "leaflet-control-scale", container = create$1("div", className), options2 = this.options;
+        this._addScales(options2, className + "-line", container);
+        map.on(options2.updateWhenIdle ? "moveend" : "move", this._update, this);
         map.whenReady(this._update, this);
         return container;
       },
       onRemove: function(map) {
         map.off(this.options.updateWhenIdle ? "moveend" : "move", this._update, this);
       },
-      _addScales: function(options, className, container) {
-        if (options.metric) {
+      _addScales: function(options2, className, container) {
+        if (options2.metric) {
           this._mScale = create$1("div", className, container);
         }
-        if (options.imperial) {
+        if (options2.imperial) {
           this._iScale = create$1("div", className, container);
         }
       },
@@ -3328,8 +4053,8 @@ var leafletSrc = { exports: {} };
         return pow10 * d;
       }
     });
-    var scale = function(options) {
-      return new Scale(options);
+    var scale = function(options2) {
+      return new Scale(options2);
     };
     var ukrainianFlag = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>';
     var Attribution = Control.extend({
@@ -3337,8 +4062,8 @@ var leafletSrc = { exports: {} };
         position: "bottomright",
         prefix: '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">' + (Browser.inlineSvg ? ukrainianFlag + " " : "") + "Leaflet</a>"
       },
-      initialize: function(options) {
-        setOptions(this, options);
+      initialize: function(options2) {
+        setOptions(this, options2);
         this._attributions = {};
       },
       onAdd: function(map) {
@@ -3419,10 +4144,10 @@ var leafletSrc = { exports: {} };
         new Attribution().addTo(this);
       }
     });
-    var attribution = function(options) {
-      return new Attribution(options);
+    var attribution = function(options2) {
+      return new Attribution(options2);
     };
-    Control.Layers = Layers;
+    Control.Layers = Layers2;
     Control.Zoom = Zoom;
     Control.Scale = Scale;
     Control.Attribution = Attribution;
@@ -3464,8 +4189,8 @@ var leafletSrc = { exports: {} };
       options: {
         clickTolerance: 3
       },
-      initialize: function(element, dragStartTarget, preventOutline2, options) {
-        setOptions(this, options);
+      initialize: function(element, dragStartTarget, preventOutline2, options2) {
+        setOptions(this, options2);
         this._element = element;
         this._dragStartTarget = dragStartTarget || element;
         this._preventOutline = preventOutline2;
@@ -4023,9 +4748,9 @@ var leafletSrc = { exports: {} };
       _updateZoomLevels: function() {
         var minZoom = Infinity, maxZoom = -Infinity, oldZoomSpan = this._getZoomSpan();
         for (var i in this._zoomBoundLayers) {
-          var options = this._zoomBoundLayers[i].options;
-          minZoom = options.minZoom === void 0 ? minZoom : Math.min(minZoom, options.minZoom);
-          maxZoom = options.maxZoom === void 0 ? maxZoom : Math.max(maxZoom, options.maxZoom);
+          var options2 = this._zoomBoundLayers[i].options;
+          minZoom = options2.minZoom === void 0 ? minZoom : Math.min(minZoom, options2.minZoom);
+          maxZoom = options2.maxZoom === void 0 ? maxZoom : Math.max(maxZoom, options2.maxZoom);
         }
         this._layersMaxZoom = maxZoom === -Infinity ? void 0 : maxZoom;
         this._layersMinZoom = minZoom === Infinity ? void 0 : minZoom;
@@ -4041,8 +4766,8 @@ var leafletSrc = { exports: {} };
       }
     });
     var LayerGroup = Layer.extend({
-      initialize: function(layers2, options) {
-        setOptions(this, options);
+      initialize: function(layers2, options2) {
+        setOptions(this, options2);
         this._layers = {};
         var i, len;
         if (layers2) {
@@ -4111,8 +4836,8 @@ var leafletSrc = { exports: {} };
         return stamp(layer);
       }
     });
-    var layerGroup = function(layers2, options) {
-      return new LayerGroup(layers2, options);
+    var layerGroup = function(layers2, options2) {
+      return new LayerGroup(layers2, options2);
     };
     var FeatureGroup = LayerGroup.extend({
       addLayer: function(layer) {
@@ -4152,8 +4877,8 @@ var leafletSrc = { exports: {} };
         return bounds;
       }
     });
-    var featureGroup = function(layers2, options) {
-      return new FeatureGroup(layers2, options);
+    var featureGroup = function(layers2, options2) {
+      return new FeatureGroup(layers2, options2);
     };
     var Icon = Class.extend({
       options: {
@@ -4161,8 +4886,8 @@ var leafletSrc = { exports: {} };
         tooltipAnchor: [0, 0],
         crossOrigin: false
       },
-      initialize: function(options) {
-        setOptions(this, options);
+      initialize: function(options2) {
+        setOptions(this, options2);
       },
       createIcon: function(oldIcon) {
         return this._createIcon("icon", oldIcon);
@@ -4186,13 +4911,13 @@ var leafletSrc = { exports: {} };
         return img;
       },
       _setIconStyles: function(img, name) {
-        var options = this.options;
-        var sizeOption = options[name + "Size"];
+        var options2 = this.options;
+        var sizeOption = options2[name + "Size"];
         if (typeof sizeOption === "number") {
           sizeOption = [sizeOption, sizeOption];
         }
-        var size = toPoint(sizeOption), anchor = toPoint(name === "shadow" && options.shadowAnchor || options.iconAnchor || size && size.divideBy(2, true));
-        img.className = "leaflet-marker-" + name + " " + (options.className || "");
+        var size = toPoint(sizeOption), anchor = toPoint(name === "shadow" && options2.shadowAnchor || options2.iconAnchor || size && size.divideBy(2, true));
+        img.className = "leaflet-marker-" + name + " " + (options2.className || "");
         if (anchor) {
           img.style.marginLeft = -anchor.x + "px";
           img.style.marginTop = -anchor.y + "px";
@@ -4211,8 +4936,8 @@ var leafletSrc = { exports: {} };
         return Browser.retina && this.options[name + "RetinaUrl"] || this.options[name + "Url"];
       }
     });
-    function icon(options) {
-      return new Icon(options);
+    function icon(options2) {
+      return new Icon(options2);
     }
     var IconDefault = Icon.extend({
       options: {
@@ -4345,8 +5070,8 @@ var leafletSrc = { exports: {} };
         autoPanPadding: [50, 50],
         autoPanSpeed: 10
       },
-      initialize: function(latlng, options) {
-        setOptions(this, options);
+      initialize: function(latlng, options2) {
+        setOptions(this, options2);
         this._latlng = toLatLng(latlng);
       },
       onAdd: function(map) {
@@ -4413,27 +5138,27 @@ var leafletSrc = { exports: {} };
         return this;
       },
       _initIcon: function() {
-        var options = this.options, classToAdd = "leaflet-zoom-" + (this._zoomAnimated ? "animated" : "hide");
-        var icon2 = options.icon.createIcon(this._icon), addIcon = false;
+        var options2 = this.options, classToAdd = "leaflet-zoom-" + (this._zoomAnimated ? "animated" : "hide");
+        var icon2 = options2.icon.createIcon(this._icon), addIcon = false;
         if (icon2 !== this._icon) {
           if (this._icon) {
             this._removeIcon();
           }
           addIcon = true;
-          if (options.title) {
-            icon2.title = options.title;
+          if (options2.title) {
+            icon2.title = options2.title;
           }
           if (icon2.tagName === "IMG") {
-            icon2.alt = options.alt || "";
+            icon2.alt = options2.alt || "";
           }
         }
         addClass(icon2, classToAdd);
-        if (options.keyboard) {
+        if (options2.keyboard) {
           icon2.tabIndex = "0";
           icon2.setAttribute("role", "button");
         }
         this._icon = icon2;
-        if (options.riseOnHover) {
+        if (options2.riseOnHover) {
           this.on({
             mouseover: this._bringToFront,
             mouseout: this._resetZIndex
@@ -4442,7 +5167,7 @@ var leafletSrc = { exports: {} };
         if (this.options.autoPanOnFocus) {
           on(icon2, "focus", this._panOnFocus, this);
         }
-        var newShadow = options.icon.createShadow(this._shadow), addShadow = false;
+        var newShadow = options2.icon.createShadow(this._shadow), addShadow = false;
         if (newShadow !== this._shadow) {
           this._removeShadow();
           addShadow = true;
@@ -4452,7 +5177,7 @@ var leafletSrc = { exports: {} };
           newShadow.alt = "";
         }
         this._shadow = newShadow;
-        if (options.opacity < 1) {
+        if (options2.opacity < 1) {
           this._updateOpacity();
         }
         if (addIcon) {
@@ -4460,7 +5185,7 @@ var leafletSrc = { exports: {} };
         }
         this._initInteraction();
         if (newShadow && addShadow) {
-          this.getPane(options.shadowPane).appendChild(this._shadow);
+          this.getPane(options2.shadowPane).appendChild(this._shadow);
         }
       },
       _removeIcon: function() {
@@ -4562,8 +5287,8 @@ var leafletSrc = { exports: {} };
         return this.options.icon.options.tooltipAnchor;
       }
     });
-    function marker(latlng, options) {
-      return new Marker(latlng, options);
+    function marker(latlng, options2) {
+      return new Marker(latlng, options2);
     }
     var Path = Layer.extend({
       options: {
@@ -4637,8 +5362,8 @@ var leafletSrc = { exports: {} };
         fill: true,
         radius: 10
       },
-      initialize: function(latlng, options) {
-        setOptions(this, options);
+      initialize: function(latlng, options2) {
+        setOptions(this, options2);
         this._latlng = toLatLng(latlng);
         this._radius = this.options.radius;
       },
@@ -4658,9 +5383,9 @@ var leafletSrc = { exports: {} };
       getRadius: function() {
         return this._radius;
       },
-      setStyle: function(options) {
-        var radius = options && options.radius || this._radius;
-        Path.prototype.setStyle.call(this, options);
+      setStyle: function(options2) {
+        var radius = options2 && options2.radius || this._radius;
+        Path.prototype.setStyle.call(this, options2);
         this.setRadius(radius);
         return this;
       },
@@ -4687,15 +5412,15 @@ var leafletSrc = { exports: {} };
         return p.distanceTo(this._point) <= this._radius + this._clickTolerance();
       }
     });
-    function circleMarker(latlng, options) {
-      return new CircleMarker(latlng, options);
+    function circleMarker(latlng, options2) {
+      return new CircleMarker(latlng, options2);
     }
     var Circle = CircleMarker.extend({
-      initialize: function(latlng, options, legacyOptions) {
-        if (typeof options === "number") {
-          options = extend({}, legacyOptions, { radius: options });
+      initialize: function(latlng, options2, legacyOptions) {
+        if (typeof options2 === "number") {
+          options2 = extend({}, legacyOptions, { radius: options2 });
         }
-        setOptions(this, options);
+        setOptions(this, options2);
         this._latlng = toLatLng(latlng);
         if (isNaN(this.options.radius)) {
           throw new Error("Circle radius cannot be NaN");
@@ -4732,16 +5457,16 @@ var leafletSrc = { exports: {} };
         this._updateBounds();
       }
     });
-    function circle(latlng, options, legacyOptions) {
-      return new Circle(latlng, options, legacyOptions);
+    function circle(latlng, options2, legacyOptions) {
+      return new Circle(latlng, options2, legacyOptions);
     }
     var Polyline = Path.extend({
       options: {
         smoothFactor: 1,
         noClip: false
       },
-      initialize: function(latlngs, options) {
-        setOptions(this, options);
+      initialize: function(latlngs, options2) {
+        setOptions(this, options2);
         this._setLatLngs(latlngs);
       },
       getLatLngs: function() {
@@ -4905,8 +5630,8 @@ var leafletSrc = { exports: {} };
         return false;
       }
     });
-    function polyline(latlngs, options) {
-      return new Polyline(latlngs, options);
+    function polyline(latlngs, options2) {
+      return new Polyline(latlngs, options2);
     }
     Polyline._flat = _flat;
     var Polygon = Polyline.extend({
@@ -4977,12 +5702,12 @@ var leafletSrc = { exports: {} };
         return inside || Polyline.prototype._containsPoint.call(this, p, true);
       }
     });
-    function polygon(latlngs, options) {
-      return new Polygon(latlngs, options);
+    function polygon(latlngs, options2) {
+      return new Polygon(latlngs, options2);
     }
     var GeoJSON = FeatureGroup.extend({
-      initialize: function(geojson, options) {
-        setOptions(this, options);
+      initialize: function(geojson, options2) {
+        setOptions(this, options2);
         this._layers = {};
         if (geojson) {
           this.addData(geojson);
@@ -4999,19 +5724,19 @@ var leafletSrc = { exports: {} };
           }
           return this;
         }
-        var options = this.options;
-        if (options.filter && !options.filter(geojson)) {
+        var options2 = this.options;
+        if (options2.filter && !options2.filter(geojson)) {
           return this;
         }
-        var layer = geometryToLayer(geojson, options);
+        var layer = geometryToLayer(geojson, options2);
         if (!layer) {
           return this;
         }
         layer.feature = asFeature(geojson);
         layer.defaultOptions = layer.options;
         this.resetStyle(layer);
-        if (options.onEachFeature) {
-          options.onEachFeature(geojson, layer);
+        if (options2.onEachFeature) {
+          options2.onEachFeature(geojson, layer);
         }
         return this.addLayer(layer);
       },
@@ -5037,36 +5762,36 @@ var leafletSrc = { exports: {} };
         }
       }
     });
-    function geometryToLayer(geojson, options) {
-      var geometry = geojson.type === "Feature" ? geojson.geometry : geojson, coords = geometry ? geometry.coordinates : null, layers2 = [], pointToLayer = options && options.pointToLayer, _coordsToLatLng = options && options.coordsToLatLng || coordsToLatLng, latlng, latlngs, i, len;
+    function geometryToLayer(geojson, options2) {
+      var geometry = geojson.type === "Feature" ? geojson.geometry : geojson, coords = geometry ? geometry.coordinates : null, layers2 = [], pointToLayer = options2 && options2.pointToLayer, _coordsToLatLng = options2 && options2.coordsToLatLng || coordsToLatLng, latlng, latlngs, i, len;
       if (!coords && !geometry) {
         return null;
       }
       switch (geometry.type) {
         case "Point":
           latlng = _coordsToLatLng(coords);
-          return _pointToLayer(pointToLayer, geojson, latlng, options);
+          return _pointToLayer(pointToLayer, geojson, latlng, options2);
         case "MultiPoint":
           for (i = 0, len = coords.length; i < len; i++) {
             latlng = _coordsToLatLng(coords[i]);
-            layers2.push(_pointToLayer(pointToLayer, geojson, latlng, options));
+            layers2.push(_pointToLayer(pointToLayer, geojson, latlng, options2));
           }
           return new FeatureGroup(layers2);
         case "LineString":
         case "MultiLineString":
           latlngs = coordsToLatLngs(coords, geometry.type === "LineString" ? 0 : 1, _coordsToLatLng);
-          return new Polyline(latlngs, options);
+          return new Polyline(latlngs, options2);
         case "Polygon":
         case "MultiPolygon":
           latlngs = coordsToLatLngs(coords, geometry.type === "Polygon" ? 1 : 2, _coordsToLatLng);
-          return new Polygon(latlngs, options);
+          return new Polygon(latlngs, options2);
         case "GeometryCollection":
           for (i = 0, len = geometry.geometries.length; i < len; i++) {
             var geoLayer = geometryToLayer({
               geometry: geometry.geometries[i],
               type: "Feature",
               properties: geojson.properties
-            }, options);
+            }, options2);
             if (geoLayer) {
               layers2.push(geoLayer);
             }
@@ -5074,7 +5799,7 @@ var leafletSrc = { exports: {} };
           return new FeatureGroup(layers2);
         case "FeatureCollection":
           for (i = 0, len = geometry.features.length; i < len; i++) {
-            var featureLayer = geometryToLayer(geometry.features[i], options);
+            var featureLayer = geometryToLayer(geometry.features[i], options2);
             if (featureLayer) {
               layers2.push(featureLayer);
             }
@@ -5084,8 +5809,8 @@ var leafletSrc = { exports: {} };
           throw new Error("Invalid GeoJSON object.");
       }
     }
-    function _pointToLayer(pointToLayerFn, geojson, latlng, options) {
-      return pointToLayerFn ? pointToLayerFn(geojson, latlng) : new Marker(latlng, options && options.markersInheritOptions && options);
+    function _pointToLayer(pointToLayerFn, geojson, latlng, options2) {
+      return pointToLayerFn ? pointToLayerFn(geojson, latlng) : new Marker(latlng, options2 && options2.markersInheritOptions && options2);
     }
     function coordsToLatLng(coords) {
       return new LatLng(coords[1], coords[0], coords[2]);
@@ -5203,8 +5928,8 @@ var leafletSrc = { exports: {} };
         };
       }
     });
-    function geoJSON(geojson, options) {
-      return new GeoJSON(geojson, options);
+    function geoJSON(geojson, options2) {
+      return new GeoJSON(geojson, options2);
     }
     var geoJson = geoJSON;
     var ImageOverlay = Layer.extend({
@@ -5217,10 +5942,10 @@ var leafletSrc = { exports: {} };
         zIndex: 1,
         className: ""
       },
-      initialize: function(url, bounds, options) {
+      initialize: function(url, bounds, options2) {
         this._url = url;
         this._bounds = toLatLngBounds(bounds);
-        setOptions(this, options);
+        setOptions(this, options2);
       },
       onAdd: function() {
         if (!this._image) {
@@ -5359,8 +6084,8 @@ var leafletSrc = { exports: {} };
         return this._bounds.getCenter();
       }
     });
-    var imageOverlay = function(url, bounds, options) {
-      return new ImageOverlay(url, bounds, options);
+    var imageOverlay = function(url, bounds, options2) {
+      return new ImageOverlay(url, bounds, options2);
     };
     var VideoOverlay = ImageOverlay.extend({
       options: {
@@ -5409,8 +6134,8 @@ var leafletSrc = { exports: {} };
         }
       }
     });
-    function videoOverlay(video, bounds, options) {
-      return new VideoOverlay(video, bounds, options);
+    function videoOverlay(video, bounds, options2) {
+      return new VideoOverlay(video, bounds, options2);
     }
     var SVGOverlay = ImageOverlay.extend({
       _initImage: function() {
@@ -5426,8 +6151,8 @@ var leafletSrc = { exports: {} };
         el.onmousemove = falseFn;
       }
     });
-    function svgOverlay(el, bounds, options) {
-      return new SVGOverlay(el, bounds, options);
+    function svgOverlay(el, bounds, options2) {
+      return new SVGOverlay(el, bounds, options2);
     }
     var DivOverlay = Layer.extend({
       options: {
@@ -5437,12 +6162,12 @@ var leafletSrc = { exports: {} };
         pane: void 0,
         content: ""
       },
-      initialize: function(options, source) {
-        if (options && (options instanceof LatLng || isArray(options))) {
-          this._latlng = toLatLng(options);
+      initialize: function(options2, source) {
+        if (options2 && (options2 instanceof LatLng || isArray(options2))) {
+          this._latlng = toLatLng(options2);
           setOptions(this, source);
         } else {
-          setOptions(this, options);
+          setOptions(this, options2);
           this._source = source;
         }
         if (this.options.content) {
@@ -5637,10 +6362,10 @@ var leafletSrc = { exports: {} };
       }
     });
     Map.include({
-      _initOverlay: function(OverlayClass, content, latlng, options) {
+      _initOverlay: function(OverlayClass, content, latlng, options2) {
         var overlay = content;
         if (!(overlay instanceof OverlayClass)) {
-          overlay = new OverlayClass(options).setContent(content);
+          overlay = new OverlayClass(options2).setContent(content);
         }
         if (latlng) {
           overlay.setLatLng(latlng);
@@ -5649,13 +6374,13 @@ var leafletSrc = { exports: {} };
       }
     });
     Layer.include({
-      _initOverlay: function(OverlayClass, old, content, options) {
+      _initOverlay: function(OverlayClass, old, content, options2) {
         var overlay = content;
         if (overlay instanceof OverlayClass) {
-          setOptions(overlay, options);
+          setOptions(overlay, options2);
           overlay._source = this;
         } else {
-          overlay = old && !options ? old : new OverlayClass(options, this);
+          overlay = old && !options2 ? old : new OverlayClass(options2, this);
           overlay.setContent(content);
         }
         return overlay;
@@ -5797,15 +6522,15 @@ var leafletSrc = { exports: {} };
         return toPoint(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
       }
     });
-    var popup = function(options, source) {
-      return new Popup(options, source);
+    var popup = function(options2, source) {
+      return new Popup(options2, source);
     };
     Map.mergeOptions({
       closePopupOnClick: true
     });
     Map.include({
-      openPopup: function(popup2, latlng, options) {
-        this._initOverlay(Popup, popup2, latlng, options).openOn(this);
+      openPopup: function(popup2, latlng, options2) {
+        this._initOverlay(Popup, popup2, latlng, options2).openOn(this);
         return this;
       },
       closePopup: function(popup2) {
@@ -5817,8 +6542,8 @@ var leafletSrc = { exports: {} };
       }
     });
     Layer.include({
-      bindPopup: function(content, options) {
-        this._popup = this._initOverlay(Popup, this._popup, content, options);
+      bindPopup: function(content, options2) {
+        this._popup = this._initOverlay(Popup, this._popup, content, options2);
         if (!this._popupHandlersAdded) {
           this.on({
             click: this._openPopup,
@@ -5999,12 +6724,12 @@ var leafletSrc = { exports: {} };
         return toPoint(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
       }
     });
-    var tooltip = function(options, source) {
-      return new Tooltip2(options, source);
+    var tooltip = function(options2, source) {
+      return new Tooltip2(options2, source);
     };
     Map.include({
-      openTooltip: function(tooltip2, latlng, options) {
-        this._initOverlay(Tooltip2, tooltip2, latlng, options).openOn(this);
+      openTooltip: function(tooltip2, latlng, options2) {
+        this._initOverlay(Tooltip2, tooltip2, latlng, options2).openOn(this);
         return this;
       },
       closeTooltip: function(tooltip2) {
@@ -6013,11 +6738,11 @@ var leafletSrc = { exports: {} };
       }
     });
     Layer.include({
-      bindTooltip: function(content, options) {
+      bindTooltip: function(content, options2) {
         if (this._tooltip && this.isTooltipOpen()) {
           this.unbindTooltip();
         }
-        this._tooltip = this._initOverlay(Tooltip2, this._tooltip, content, options);
+        this._tooltip = this._initOverlay(Tooltip2, this._tooltip, content, options2);
         this._initTooltipInteractions();
         if (this._tooltip.options.permanent && this._map && this._map.hasLayer(this)) {
           this.openTooltip();
@@ -6145,15 +6870,15 @@ var leafletSrc = { exports: {} };
         className: "leaflet-div-icon"
       },
       createIcon: function(oldIcon) {
-        var div = oldIcon && oldIcon.tagName === "DIV" ? oldIcon : document.createElement("div"), options = this.options;
-        if (options.html instanceof Element) {
+        var div = oldIcon && oldIcon.tagName === "DIV" ? oldIcon : document.createElement("div"), options2 = this.options;
+        if (options2.html instanceof Element) {
           empty(div);
-          div.appendChild(options.html);
+          div.appendChild(options2.html);
         } else {
-          div.innerHTML = options.html !== false ? options.html : "";
+          div.innerHTML = options2.html !== false ? options2.html : "";
         }
-        if (options.bgPos) {
-          var bgPos = toPoint(options.bgPos);
+        if (options2.bgPos) {
+          var bgPos = toPoint(options2.bgPos);
           div.style.backgroundPosition = -bgPos.x + "px " + -bgPos.y + "px";
         }
         this._setIconStyles(div, "icon");
@@ -6163,8 +6888,8 @@ var leafletSrc = { exports: {} };
         return null;
       }
     });
-    function divIcon(options) {
-      return new DivIcon(options);
+    function divIcon(options2) {
+      return new DivIcon(options2);
     }
     Icon.Default = IconDefault;
     var GridLayer = Layer.extend({
@@ -6185,8 +6910,8 @@ var leafletSrc = { exports: {} };
         className: "",
         keepBuffer: 2
       },
-      initialize: function(options) {
-        setOptions(this, options);
+      initialize: function(options2) {
+        setOptions(this, options2);
       },
       onAdd: function() {
         this._initContainer();
@@ -6462,12 +7187,12 @@ var leafletSrc = { exports: {} };
         this._setView(e.center, e.zoom, true, e.noUpdate);
       },
       _clampZoom: function(zoom2) {
-        var options = this.options;
-        if (options.minNativeZoom !== void 0 && zoom2 < options.minNativeZoom) {
-          return options.minNativeZoom;
+        var options2 = this.options;
+        if (options2.minNativeZoom !== void 0 && zoom2 < options2.minNativeZoom) {
+          return options2.minNativeZoom;
         }
-        if (options.maxNativeZoom !== void 0 && options.maxNativeZoom < zoom2) {
-          return options.maxNativeZoom;
+        if (options2.maxNativeZoom !== void 0 && options2.maxNativeZoom < zoom2) {
+          return options2.maxNativeZoom;
         }
         return zoom2;
       },
@@ -6728,8 +7453,8 @@ var leafletSrc = { exports: {} };
         return true;
       }
     });
-    function gridLayer(options) {
-      return new GridLayer(options);
+    function gridLayer(options2) {
+      return new GridLayer(options2);
     }
     var TileLayer = GridLayer.extend({
       options: {
@@ -6744,26 +7469,26 @@ var leafletSrc = { exports: {} };
         crossOrigin: false,
         referrerPolicy: false
       },
-      initialize: function(url, options) {
+      initialize: function(url, options2) {
         this._url = url;
-        options = setOptions(this, options);
-        if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
-          options.tileSize = Math.floor(options.tileSize / 2);
-          if (!options.zoomReverse) {
-            options.zoomOffset++;
-            options.maxZoom = Math.max(options.minZoom, options.maxZoom - 1);
+        options2 = setOptions(this, options2);
+        if (options2.detectRetina && Browser.retina && options2.maxZoom > 0) {
+          options2.tileSize = Math.floor(options2.tileSize / 2);
+          if (!options2.zoomReverse) {
+            options2.zoomOffset++;
+            options2.maxZoom = Math.max(options2.minZoom, options2.maxZoom - 1);
           } else {
-            options.zoomOffset--;
-            options.minZoom = Math.min(options.maxZoom, options.minZoom + 1);
+            options2.zoomOffset--;
+            options2.minZoom = Math.min(options2.maxZoom, options2.minZoom + 1);
           }
-          options.minZoom = Math.max(0, options.minZoom);
-        } else if (!options.zoomReverse) {
-          options.maxZoom = Math.max(options.minZoom, options.maxZoom);
+          options2.minZoom = Math.max(0, options2.minZoom);
+        } else if (!options2.zoomReverse) {
+          options2.maxZoom = Math.max(options2.minZoom, options2.maxZoom);
         } else {
-          options.minZoom = Math.min(options.maxZoom, options.minZoom);
+          options2.minZoom = Math.min(options2.maxZoom, options2.minZoom);
         }
-        if (typeof options.subdomains === "string") {
-          options.subdomains = options.subdomains.split("");
+        if (typeof options2.subdomains === "string") {
+          options2.subdomains = options2.subdomains.split("");
         }
         this.on("tileunload", this._onTileRemove);
       },
@@ -6871,8 +7596,8 @@ var leafletSrc = { exports: {} };
         return GridLayer.prototype._tileReady.call(this, coords, err, tile);
       }
     });
-    function tileLayer(url, options) {
-      return new TileLayer(url, options);
+    function tileLayer(url, options2) {
+      return new TileLayer(url, options2);
     }
     var TileLayerWMS = TileLayer.extend({
       defaultWmsParams: {
@@ -6888,16 +7613,16 @@ var leafletSrc = { exports: {} };
         crs: null,
         uppercase: false
       },
-      initialize: function(url, options) {
+      initialize: function(url, options2) {
         this._url = url;
         var wmsParams = extend({}, this.defaultWmsParams);
-        for (var i in options) {
+        for (var i in options2) {
           if (!(i in this.options)) {
-            wmsParams[i] = options[i];
+            wmsParams[i] = options2[i];
           }
         }
-        options = setOptions(this, options);
-        var realRetina = options.detectRetina && Browser.retina ? 2 : 1;
+        options2 = setOptions(this, options2);
+        var realRetina = options2.detectRetina && Browser.retina ? 2 : 1;
         var tileSize = this.getTileSize();
         wmsParams.width = tileSize.x * realRetina;
         wmsParams.height = tileSize.y * realRetina;
@@ -6922,8 +7647,8 @@ var leafletSrc = { exports: {} };
         return this;
       }
     });
-    function tileLayerWMS(url, options) {
-      return new TileLayerWMS(url, options);
+    function tileLayerWMS(url, options2) {
+      return new TileLayerWMS(url, options2);
     }
     TileLayer.WMS = TileLayerWMS;
     tileLayer.wms = tileLayerWMS;
@@ -6931,8 +7656,8 @@ var leafletSrc = { exports: {} };
       options: {
         padding: 0.1
       },
-      initialize: function(options) {
-        setOptions(this, options);
+      initialize: function(options2) {
+        setOptions(this, options2);
         stamp(this);
         this._layers = this._layers || {};
       },
@@ -7221,21 +7946,21 @@ var leafletSrc = { exports: {} };
         this._fillStroke(ctx, layer);
       },
       _fillStroke: function(ctx, layer) {
-        var options = layer.options;
-        if (options.fill) {
-          ctx.globalAlpha = options.fillOpacity;
-          ctx.fillStyle = options.fillColor || options.color;
-          ctx.fill(options.fillRule || "evenodd");
+        var options2 = layer.options;
+        if (options2.fill) {
+          ctx.globalAlpha = options2.fillOpacity;
+          ctx.fillStyle = options2.fillColor || options2.color;
+          ctx.fill(options2.fillRule || "evenodd");
         }
-        if (options.stroke && options.weight !== 0) {
+        if (options2.stroke && options2.weight !== 0) {
           if (ctx.setLineDash) {
             ctx.setLineDash(layer.options && layer.options._dashArray || []);
           }
-          ctx.globalAlpha = options.opacity;
-          ctx.lineWidth = options.weight;
-          ctx.strokeStyle = options.color;
-          ctx.lineCap = options.lineCap;
-          ctx.lineJoin = options.lineJoin;
+          ctx.globalAlpha = options2.opacity;
+          ctx.lineWidth = options2.weight;
+          ctx.strokeStyle = options2.color;
+          ctx.lineCap = options2.lineCap;
+          ctx.lineJoin = options2.lineJoin;
           ctx.stroke();
         }
       },
@@ -7342,8 +8067,8 @@ var leafletSrc = { exports: {} };
         this._requestRedraw(layer);
       }
     });
-    function canvas(options) {
-      return Browser.canvas ? new Canvas(options) : null;
+    function canvas(options2) {
+      return Browser.canvas ? new Canvas(options2) : null;
     }
     var vmlCreate = function() {
       try {
@@ -7391,35 +8116,35 @@ var leafletSrc = { exports: {} };
         delete this._layers[stamp(layer)];
       },
       _updateStyle: function(layer) {
-        var stroke = layer._stroke, fill = layer._fill, options = layer.options, container = layer._container;
-        container.stroked = !!options.stroke;
-        container.filled = !!options.fill;
-        if (options.stroke) {
+        var stroke = layer._stroke, fill = layer._fill, options2 = layer.options, container = layer._container;
+        container.stroked = !!options2.stroke;
+        container.filled = !!options2.fill;
+        if (options2.stroke) {
           if (!stroke) {
             stroke = layer._stroke = vmlCreate("stroke");
           }
           container.appendChild(stroke);
-          stroke.weight = options.weight + "px";
-          stroke.color = options.color;
-          stroke.opacity = options.opacity;
-          if (options.dashArray) {
-            stroke.dashStyle = isArray(options.dashArray) ? options.dashArray.join(" ") : options.dashArray.replace(/( *, *)/g, " ");
+          stroke.weight = options2.weight + "px";
+          stroke.color = options2.color;
+          stroke.opacity = options2.opacity;
+          if (options2.dashArray) {
+            stroke.dashStyle = isArray(options2.dashArray) ? options2.dashArray.join(" ") : options2.dashArray.replace(/( *, *)/g, " ");
           } else {
             stroke.dashStyle = "";
           }
-          stroke.endcap = options.lineCap.replace("butt", "flat");
-          stroke.joinstyle = options.lineJoin;
+          stroke.endcap = options2.lineCap.replace("butt", "flat");
+          stroke.joinstyle = options2.lineJoin;
         } else if (stroke) {
           container.removeChild(stroke);
           layer._stroke = null;
         }
-        if (options.fill) {
+        if (options2.fill) {
           if (!fill) {
             fill = layer._fill = vmlCreate("fill");
           }
           container.appendChild(fill);
-          fill.color = options.fillColor || options.color;
-          fill.opacity = options.fillOpacity;
+          fill.color = options2.fillColor || options2.color;
+          fill.opacity = options2.fillOpacity;
         } else if (fill) {
           container.removeChild(fill);
           layer._fill = null;
@@ -7497,33 +8222,33 @@ var leafletSrc = { exports: {} };
         layer._update();
       },
       _updateStyle: function(layer) {
-        var path = layer._path, options = layer.options;
+        var path = layer._path, options2 = layer.options;
         if (!path) {
           return;
         }
-        if (options.stroke) {
-          path.setAttribute("stroke", options.color);
-          path.setAttribute("stroke-opacity", options.opacity);
-          path.setAttribute("stroke-width", options.weight);
-          path.setAttribute("stroke-linecap", options.lineCap);
-          path.setAttribute("stroke-linejoin", options.lineJoin);
-          if (options.dashArray) {
-            path.setAttribute("stroke-dasharray", options.dashArray);
+        if (options2.stroke) {
+          path.setAttribute("stroke", options2.color);
+          path.setAttribute("stroke-opacity", options2.opacity);
+          path.setAttribute("stroke-width", options2.weight);
+          path.setAttribute("stroke-linecap", options2.lineCap);
+          path.setAttribute("stroke-linejoin", options2.lineJoin);
+          if (options2.dashArray) {
+            path.setAttribute("stroke-dasharray", options2.dashArray);
           } else {
             path.removeAttribute("stroke-dasharray");
           }
-          if (options.dashOffset) {
-            path.setAttribute("stroke-dashoffset", options.dashOffset);
+          if (options2.dashOffset) {
+            path.setAttribute("stroke-dashoffset", options2.dashOffset);
           } else {
             path.removeAttribute("stroke-dashoffset");
           }
         } else {
           path.setAttribute("stroke", "none");
         }
-        if (options.fill) {
-          path.setAttribute("fill", options.fillColor || options.color);
-          path.setAttribute("fill-opacity", options.fillOpacity);
-          path.setAttribute("fill-rule", options.fillRule || "evenodd");
+        if (options2.fill) {
+          path.setAttribute("fill", options2.fillColor || options2.color);
+          path.setAttribute("fill-opacity", options2.fillOpacity);
+          path.setAttribute("fill-rule", options2.fillRule || "evenodd");
         } else {
           path.setAttribute("fill", "none");
         }
@@ -7549,8 +8274,8 @@ var leafletSrc = { exports: {} };
     if (Browser.vml) {
       SVG.include(vmlMixin);
     }
-    function svg(options) {
-      return Browser.svg || Browser.vml ? new SVG(options) : null;
+    function svg(options2) {
+      return Browser.svg || Browser.vml ? new SVG(options2) : null;
     }
     Map.include({
       getRenderer: function(layer) {
@@ -7574,13 +8299,13 @@ var leafletSrc = { exports: {} };
         }
         return renderer;
       },
-      _createRenderer: function(options) {
-        return this.options.preferCanvas && canvas(options) || svg(options);
+      _createRenderer: function(options2) {
+        return this.options.preferCanvas && canvas(options2) || svg(options2);
       }
     });
     var Rectangle = Polygon.extend({
-      initialize: function(latLngBounds, options) {
-        Polygon.prototype.initialize.call(this, this._boundsToLatLngs(latLngBounds), options);
+      initialize: function(latLngBounds, options2) {
+        Polygon.prototype.initialize.call(this, this._boundsToLatLngs(latLngBounds), options2);
       },
       setBounds: function(latLngBounds) {
         return this.setLatLngs(this._boundsToLatLngs(latLngBounds));
@@ -7595,8 +8320,8 @@ var leafletSrc = { exports: {} };
         ];
       }
     });
-    function rectangle(latLngBounds, options) {
-      return new Rectangle(latLngBounds, options);
+    function rectangle(latLngBounds, options2) {
+      return new Rectangle(latLngBounds, options2);
     }
     SVG.create = create;
     SVG.pointsToPath = pointsToPath;
@@ -7833,13 +8558,13 @@ var leafletSrc = { exports: {} };
         this._draggable._newPos.x = newX;
       },
       _onDragEnd: function(e) {
-        var map = this._map, options = map.options, noInertia = !options.inertia || e.noInertia || this._times.length < 2;
+        var map = this._map, options2 = map.options, noInertia = !options2.inertia || e.noInertia || this._times.length < 2;
         map.fire("dragend", e);
         if (noInertia) {
           map.fire("moveend");
         } else {
           this._prunePositions(+new Date());
-          var direction = this._lastPos.subtract(this._positions[0]), duration = (this._lastTime - this._times[0]) / 1e3, ease = options.easeLinearity, speedVector = direction.multiplyBy(ease / duration), speed = speedVector.distanceTo([0, 0]), limitedSpeed = Math.min(options.inertiaMaxSpeed, speed), limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed), decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease), offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
+          var direction = this._lastPos.subtract(this._positions[0]), duration = (this._lastTime - this._times[0]) / 1e3, ease = options2.easeLinearity, speedVector = direction.multiplyBy(ease / duration), speed = speedVector.distanceTo([0, 0]), limitedSpeed = Math.min(options2.inertiaMaxSpeed, speed), limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed), decelerationDuration = limitedSpeed / (options2.inertiaDeceleration * ease), offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
           if (!offset.x && !offset.y) {
             map.fire("moveend");
           } else {
@@ -8497,6 +9222,11 @@ const TABLES = {
     }
   }
 };
+const MAP_STATES = {
+  CHECKING: "CHECKING",
+  COMPLETE: "COMPLETE",
+  WIP: "WIP"
+};
 const state = reactive({
   db: void 0,
   maps: []
@@ -8504,7 +9234,20 @@ const state = reactive({
 (async () => {
   try {
     state.db = await openDB(DB_NAME, 2, mainDBUpdate);
-    state.maps = await readAllDB(state.db, TABLES.MAPS.name);
+    state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => __spreadProps(__spreadValues({}, map), {
+      state: MAP_STATES.CHECKING
+    }));
+    for (const map of state.maps) {
+      const tilesUrls = await checkMap(map);
+      if (tilesUrls.length === 0) {
+        map.state = MAP_STATES.COMPLETE;
+        continue;
+      }
+      map.state = MAP_STATES.WIP;
+      await saveTileUrls(tilesUrls, map.normalizedName, () => {
+      });
+      map.state = MAP_STATES.COMPLETE;
+    }
   } catch (e) {
     console.error("fail open db", e);
   }
@@ -8557,7 +9300,7 @@ function getTilePoints(area, tileSize) {
   }
   return points;
 }
-function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
+function getTileUrls(templateUrl, bounds, zoom, tileSize, options2) {
   const tiles = [];
   const tilePoints = getTilePoints(bounds, tileSize);
   for (let index = 0; index < tilePoints.length; index += 1) {
@@ -8567,13 +9310,47 @@ function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
       y: tilePoint.y,
       z: zoom
     };
-    const url = getTileUrl(templateUrl, __spreadValues(__spreadValues({}, options), data));
+    const url = getTileUrl(templateUrl, __spreadValues(__spreadValues({}, options2), data));
     tiles.push(url);
   }
   return tiles;
 }
 function getTileUrl(urlTemplate, data) {
   return leafletSrc.exports.Util.template(urlTemplate, data);
+}
+async function saveTileUrls(tileUrls, mapName, progressHandler) {
+  let nbSaved = 0;
+  for (const urls of arraySplit(tileUrls, 20)) {
+    const data = [];
+    await Promise.all(urls.map(async (tileUrl) => {
+      try {
+        const response = await fetch(tileUrl);
+        if (response.ok) {
+          data.push({
+            key: tileUrl,
+            value: { map: mapName, tile: await response.blob() }
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        nbSaved++;
+      }
+    }));
+    await storeArrayDB(state.db, TABLES.TILES.name, data);
+    progressHandler(nbSaved, tileUrls.length);
+  }
+}
+async function checkMap(map) {
+  var _a;
+  const options2 = merge(getOptions(map.provider), map.options);
+  const tileSize = (_a = options2.tileSize) != null ? _a : 256;
+  const urls = ZOOM_LEVELS.map((zoomLevel) => {
+    const area = leafletSrc.exports.bounds(leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel), leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel));
+    return getTileUrls(LayerUrls[map.provider](map.type), area, zoomLevel, tileSize instanceof leafletSrc.exports.Point ? tileSize : new leafletSrc.exports.Point(tileSize, tileSize), map.options);
+  }).flat();
+  const savedUrls = await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName));
+  return urls.filter((url) => !savedUrls.includes(url));
 }
 function getMaps() {
   return computed(() => state.maps);
@@ -8588,8 +9365,8 @@ async function deleteMap(mapName) {
   }
 }
 class TileLayerOffline extends leafletSrc.exports.TileLayer {
-  constructor(provider, type, url, options) {
-    super(url, options);
+  constructor(provider, type, options2) {
+    super(LayerUrls[provider](type), merge(getOptions(provider), options2));
     __publicField(this, "provider");
     __publicField(this, "type");
     this.provider = provider;
@@ -8632,6 +9409,7 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     };
     await waitForDefined(() => state.db);
     await storeDB(state.db, "maps", map);
+    map.state = MAP_STATES.WIP;
     state.maps.push(map);
     const tileUrls = [];
     for (let i = 0; i < ZOOM_LEVELS.length; i += 1) {
@@ -8639,27 +9417,8 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
       const area = leafletSrc.exports.bounds(this._map.project(latlngBounds.getNorthWest(), zoomLevel), this._map.project(latlngBounds.getSouthEast(), zoomLevel));
       tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
     }
-    let nbSaved = 0;
-    for (const urls of arraySplit(tileUrls, 20)) {
-      const data = [];
-      await Promise.all(urls.map(async (tileUrl) => {
-        try {
-          const response = await fetch(tileUrl);
-          if (response.ok) {
-            data.push({
-              key: tileUrl,
-              value: { map: map.normalizedName, tile: await response.blob() }
-            });
-          }
-        } catch (e) {
-          console.error(e);
-        } finally {
-          nbSaved++;
-        }
-      }));
-      await storeArrayDB(state.db, TABLES.TILES.name, data);
-      progressHandler(nbSaved, tileUrls.length);
-    }
+    await saveTileUrls(tileUrls, map.normalizedName, progressHandler);
+    map.state = MAP_STATES.COMPLETE;
     console.timeEnd("saveTiles");
   }
 }
@@ -8679,10 +9438,6 @@ var Offline = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
 const _sfc_main$a = {
   __name: "OpenStreetMap",
   props: {
-    url: {
-      type: String,
-      default: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-    },
     attribution: {
       type: String,
       default: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -8696,9 +9451,8 @@ const _sfc_main$a = {
   setup(__props) {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
-      attribution: props.attribution,
-      maxZoom: 19
+    const layer = new TileLayerOffline(Layers.OPEN_STREET_MAP, props.type, LayerUrls.OPEN_STREET_MAP(), {
+      attribution: props.attribution
     });
     provide("layer", ref(layer));
     whenever($layerGroup, (layerGroup) => {
@@ -8713,25 +9467,9 @@ const _sfc_main$a = {
 const _sfc_main$9 = {
   __name: "Mapbox",
   props: {
-    url: {
-      type: String,
-      default: "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}"
-    },
-    apiKey: {
-      type: String,
-      required: true
-    },
     attribution: {
       type: String,
       default: '&copy <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
-    },
-    tileSize: {
-      type: Number,
-      default: 256
-    },
-    zoomOffset: {
-      type: Number,
-      default: -1
     },
     type: {
       type: String,
@@ -8744,14 +9482,9 @@ const _sfc_main$9 = {
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     const $layerGroup = inject(LayerGroups.TILE);
-    const options = reactive({
-      apiKey: props.apiKey,
-      attribution: props.attribution,
-      tileSize: props.tileSize,
-      zoomOffset: props.zoomOffset,
-      maxZoom: 19
+    const layer = new TileLayerOffline(Layers.MAPBOX, props.type, {
+      attribution: props.attribution
     });
-    const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (layerGroup) => {
       toRaw(layerGroup).clearLayers();
@@ -8762,13 +9495,6 @@ const _sfc_main$9 = {
     };
   }
 };
-var mapTypes = {
-  roadmap: "roadmap",
-  satellite: "satellite",
-  terrain: "terrain",
-  hybrid: "hybrid",
-  cadastral: "cadastral"
-};
 const _sfc_main$8 = {
   __name: "IGN",
   props: {
@@ -8778,38 +9504,25 @@ const _sfc_main$8 = {
     },
     type: {
       type: String,
-      default: mapTypes.roadmap,
-      validator: (type) => [mapTypes.satellite, mapTypes.roadmap, mapTypes.cadastral].includes(type)
+      default: MapTypes.ROADMAP,
+      validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type)
     }
   },
   setup(__props) {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = ref(getLayer(props.type, props.attribution));
+    const layer = ref(getLayer(props.type));
     provide("layer", layer);
     watch(props, (props2) => {
       var _a, _b;
-      set(layer, getLayer(props2.type, props2.attribution));
+      set(layer, getLayer(props2.type));
       (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
       (_b = toRaw(get($layerGroup))) == null ? void 0 : _b.addLayer(get(layer));
     }, { deep: true, immediate: true });
-    function getLayer(type, attribution) {
-      const options = {
-        minZoom: 0,
-        maxZoom: 19,
-        attribution,
-        tileSize: 256
-      };
-      let url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
-      switch (type) {
-        case mapTypes.satellite:
-          url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
-          break;
-        case mapTypes.cadastral:
-          url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
-          break;
-      }
-      return new TileLayerOffline(LayerNames.IGN, type, url, options);
+    function getLayer(type) {
+      return new TileLayerOffline(Layers.IGN, type, {
+        attribution: props.attribution
+      });
     }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
@@ -8828,14 +9541,6 @@ async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
 const _sfc_main$7 = {
   __name: "GoogleMaps",
   props: {
-    url: {
-      type: String,
-      default: "https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-    },
-    apiKey: {
-      type: String,
-      required: true
-    },
     type: {
       type: String,
       default: "roadmap",
@@ -8854,16 +9559,16 @@ const _sfc_main$7 = {
     const { type } = toRefs(props);
     const defaultOptions = reactive({ type });
     const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-      const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
-      const load = async (layerGroup, options = defaultOptions) => {
+      const mount = (layerGroup, options2) => L.gridLayer.googleMutant(options2).addTo(layerGroup);
+      const load = async (layerGroup, options2 = defaultOptions) => {
         await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-        mount(layerGroup, options);
+        mount(layerGroup, options2);
         return {};
       };
       return { load };
     };
     const $layerGroup = inject(LayerGroups.TILE);
-    const gmaps = useGoogleMutant(props.apiKey);
+    const gmaps = useGoogleMutant(getOptions(Layers.GOOGLE_MAPS).apiKey);
     const mutant = ref();
     watch(type, () => setMutant(unref($layerGroup)));
     async function setMutant(layerGroup) {
@@ -8953,7 +9658,7 @@ const _sfc_main$5 = {
       this._setPos(pos);
     };
     const { position, title, alt, opacity, tooltip } = toRefs(props);
-    const options = reactive({
+    const options2 = reactive({
       title,
       alt,
       opacity
@@ -8975,7 +9680,7 @@ const _sfc_main$5 = {
       }
     });
     function updateOptions(marker2) {
-      L.setOptions(marker2, clean(options));
+      L.setOptions(marker2, clean(options2));
       silently(() => {
         marker2._removeIcon();
         marker2._initIcon();
@@ -8987,14 +9692,14 @@ const _sfc_main$5 = {
     provide("marker", $marker);
     provide("layer", $marker);
     const layerGroup = toRaw(get($layerGroup));
-    const marker = L.marker(props.position, clean(options));
+    const marker = L.marker(props.position, clean(options2));
     marker.on("click", () => emit("click", get($marker)));
     layerGroup.addLayer(marker);
     set($marker, marker);
     emit("load", get($marker));
     whenever(position, (position2) => get($marker).setLatLng(position2));
     whenever(icon, (icon2) => silently(() => toRaw(get($marker)).setIcon(icon2), MUTE_ERRORS), { immediate: true });
-    whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
+    whenever(options2, () => updateOptions(get($marker)), { deep: true, immediate: true });
     whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
     onUnmounted(() => {
       silently(() => {
@@ -9190,7 +9895,7 @@ var Tooltip = renderless({
       L.DomUtil.setPosition(this._container, pos.add(anchor));
     };
     const { position, text } = toRefs(props);
-    const options = reactive({
+    const options2 = reactive({
       direction: props.direction,
       offset: (_a = props.offset) != null ? _a : new L.Point(0, 0),
       permanent: props.permanent,
@@ -9203,7 +9908,7 @@ var Tooltip = renderless({
       tooltip.setLatLng(props.position).addTo(map2);
       watch(position, (position2) => tooltip.setLatLng(position2));
       watch(text, (text2) => tooltip.setContent(text2), { immediate: true });
-      watch(options, (options2) => L.setOptions(tooltip, options2), { immediate: true });
+      watch(options2, (options3) => L.setOptions(tooltip, options3), { immediate: true });
     };
     whenever(map, mount, { immediate: true });
   }
@@ -9239,7 +9944,7 @@ const _sfc_main$2 = {
     const { center, radius, color, weight, opacity, fillColor } = toRefs(props);
     const stroke = computed(() => props.color != null);
     const fill = computed(() => props.fillColor != null);
-    const options = reactive({
+    const options2 = reactive({
       radius,
       stroke,
       color,
@@ -9249,10 +9954,10 @@ const _sfc_main$2 = {
       fillColor
     });
     const $layerGroup = inject(LayerGroups.PIN);
-    const circle = L.circle(props.center, clean(options));
+    const circle = L.circle(props.center, clean(options2));
     provide("layer", circle);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(circle), { immediate: true });
-    whenever(options, (options2) => L.setOptions(circle, clean(options2), { deep: true, immediate: true }));
+    whenever(options2, (options3) => L.setOptions(circle, clean(options3), { deep: true, immediate: true }));
     whenever(center, (position) => circle.setLatLng(position));
     onUnmounted(() => circle.remove());
     return (_ctx, _cache) => {
@@ -9285,7 +9990,7 @@ const _sfc_main$1 = {
     const { positions, color, weight, opacity, fillColor } = toRefs(props);
     const stroke = computed(() => props.color != null);
     const fill = computed(() => props.fillColor != null);
-    const options = reactive({
+    const options2 = reactive({
       stroke,
       color,
       weight,
@@ -9294,7 +9999,7 @@ const _sfc_main$1 = {
       fillColor
     });
     const $layerGroup = inject(LayerGroups.PIN);
-    const polyline = L.polyline(props.positions, clean(options));
+    const polyline = L.polyline(props.positions, clean(options2));
     provide("layer", polyline);
     onUnmounted(() => polyline.remove());
     if (props.arrows) {
@@ -9302,7 +10007,7 @@ const _sfc_main$1 = {
       polyline.arrowheads(props.arrows);
     }
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polyline), { immediate: true });
-    whenever(options, (options2) => L.setOptions(polyline, clean(options2), { deep: true, immediate: true }));
+    whenever(options2, (options3) => L.setOptions(polyline, clean(options3), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polyline.setLatLngs(positions2));
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
@@ -9322,7 +10027,7 @@ const _sfc_main = {
     const { positions, color, weight, opacity, fillColor } = toRefs(props);
     const stroke = computed(() => props.color != null);
     const fill = computed(() => props.fillColor != null);
-    const options = reactive({
+    const options2 = reactive({
       stroke,
       color,
       weight,
@@ -9331,10 +10036,10 @@ const _sfc_main = {
       fillColor
     });
     const $layerGroup = inject(LayerGroups.PIN);
-    const polygon = L.polygon(props.positions, clean(options));
+    const polygon = L.polygon(props.positions, clean(options2));
     provide("layer", polygon);
     whenever($layerGroup, (layerGroup) => layerGroup.addLayer(polygon), { immediate: true });
-    whenever(options, (options2) => L.setOptions(polygon, clean(options2), { deep: true, immediate: true }));
+    whenever(options2, (options3) => L.setOptions(polygon, clean(options3), { deep: true, immediate: true }));
     whenever(positions, (positions2) => polygon.setLatLngs(positions2));
     onUnmounted(() => polygon.remove());
     return (_ctx, _cache) => {
@@ -9470,14 +10175,14 @@ var FullScreenControl = renderless({
     const map = inject("map");
     await importLeaflet(inject("leaflet.version"));
     await importLeafletFullScreen(props.version);
-    const options = reactive({
+    const options2 = reactive({
       position: props.position,
       title: {
         false: props.viewText,
         true: props.exitText
       }
     });
-    const control = new L.Control.Fullscreen(clean(options));
+    const control = new L.Control.Fullscreen(clean(options2));
     whenever(map, (map2) => map2.addControl(control), { immediate: true });
   }
 });
@@ -9512,16 +10217,16 @@ var LocateControl = renderless({
 });
 var DownloadIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iY3VycmVudENvbG9yIgogICAgY2xhc3M9InctNiBoLTYiPgogICAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIgogICAgICAgIGQ9Ik0zIDE2LjV2Mi4yNUEyLjI1IDIuMjUgMCAwMDUuMjUgMjFoMTMuNUEyLjI1IDIuMjUgMCAwMDIxIDE4Ljc1VjE2LjVNMTYuNSAxMkwxMiAxNi41bTAgMEw3LjUgMTJtNC41IDQuNVYzIiAvPgo8L3N2Zz4=";
 class OfflineControl extends leafletSrc.exports.Control {
-  constructor(options) {
-    super(options);
+  constructor(options2) {
+    super(options2);
     __publicField(this, "onProgress", null);
     __publicField(this, "onGetName", null);
     __publicField(this, "onMaxSize", null);
     __publicField(this, "onError", null);
-    this.onProgress = options.onProgress;
-    this.onGetName = options.onGetName;
-    this.onMaxSize = options.onMaxSize;
-    this.onError = options.onError;
+    this.onProgress = options2.onProgress;
+    this.onGetName = options2.onGetName;
+    this.onMaxSize = options2.onMaxSize;
+    this.onError = options2.onError;
   }
   onAdd(map) {
     const image = document.createElement("img");
@@ -9728,4 +10433,4 @@ async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
 async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LayerNames, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, mapTypes, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LayerNames, LayerUrls, Layers, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, getOptions, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, useVue3Leaflet, Bounceable as vBounce };
