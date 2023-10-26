@@ -1,8 +1,9 @@
 import { whenever } from '@vueuse/core';
 import { inject } from 'vue';
+import { importGoogleMapsApi } from '../utils/gmaps-api-loader.js';
 import { importLeaflet } from '../utils/leaflet-loader.js';
 import { importLeafletPegman } from '../utils/leaflet-pegman-loader.js';
-import { loadGmapsApi, renderless } from '../utils/utils.js';
+import { renderless } from '../utils/utils.js';
 
 export default renderless({
 	emits: ['openstreetview', 'closestreetview'],
@@ -28,7 +29,7 @@ export default renderless({
 		const map = inject('map');
 
 		if (props.apiKey) {
-			await loadGmapsApi(props.apiKey);
+			importGoogleMapsApi(props.apiKey);
 		}
 
 		await importLeaflet();

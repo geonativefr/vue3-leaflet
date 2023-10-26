@@ -752,22 +752,6 @@ function clean(object) {
   });
   return object;
 }
-async function loadGmapsApi(GOOGLE_MAPS_API_KEY) {
-  var _a;
-  window.gmapsApi = (_a = window.gmapsApi) != null ? _a : new Promise((resolve, reject) => {
-    const el = document.createElement("script");
-    el.type = "text/javascript";
-    el.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY;
-    el.async = true;
-    el.addEventListener("error", (event) => reject(event));
-    el.addEventListener("abort", (event) => reject(event));
-    el.addEventListener("load", () => {
-      resolve(true);
-    });
-    document.head.appendChild(el);
-  });
-  return window.gmapsApi;
-}
 async function loadJSFromCDN(url) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src='${url}']`);
@@ -10340,7 +10324,7 @@ var PegmanControl = renderless({
   async setup(props, { emit }) {
     const map = inject("map");
     if (props.apiKey) {
-      await loadGmapsApi(props.apiKey);
+      importGoogleMapsApi(props.apiKey);
     }
     await importLeaflet();
     await importLeafletPegman(props.version);
