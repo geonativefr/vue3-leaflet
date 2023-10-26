@@ -9516,11 +9516,11 @@ const _sfc_main$8 = {
 async function importLeafletGoogleMutant(version = LEAFLET_GOOGLE_MUTANT_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.gridlayer.googlemutant@${version}/dist/Leaflet.GoogleMutant.js`);
 }
-async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
+async function importGoogleMapsApi() {
   if (window.gmapsApi) {
     return true;
   }
-  return loadJSFromCDN(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`);
+  return loadJSFromCDN(`https://maps.googleapis.com/maps/api/js?key=${getProviderOptions$1(Providers.GOOGLE_MAPS).apiKey}&callback=console.debug`);
 }
 const _sfc_main$7 = {
   __name: "GoogleMaps",
@@ -9542,17 +9542,17 @@ const _sfc_main$7 = {
     [__temp, __restore] = withAsyncContext(() => importLeafletGoogleMutant(props.version)), await __temp, __restore();
     const { type } = toRefs(props);
     const defaultOptions = reactive({ type });
-    const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
+    const useGoogleMutant = () => {
       const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
       const load = async (layerGroup, options = defaultOptions) => {
-        await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
+        await importGoogleMapsApi();
         mount(layerGroup, options);
         return {};
       };
       return { load };
     };
     const $layerGroup = inject(LayerGroups.TILE);
-    const gmaps = useGoogleMutant(getProviderOptions$1(Providers.GOOGLE_MAPS).apiKey);
+    const gmaps = useGoogleMutant();
     const mutant = ref();
     watch(type, () => setMutant(unref($layerGroup)));
     async function setMutant(layerGroup) {
@@ -10304,10 +10304,6 @@ async function importLeafletPegman(version = LEAFLET_PEGMAN_VERSION) {
 var PegmanControl = renderless({
   emits: ["openstreetview", "closestreetview"],
   props: {
-    apiKey: {
-      type: String,
-      default: void 0
-    },
     position: {
       type: String,
       default: "bottomright"
@@ -10324,7 +10320,7 @@ var PegmanControl = renderless({
   async setup(props, { emit }) {
     const map = inject("map");
     if (props.apiKey) {
-      importGoogleMapsApi(props.apiKey);
+      importGoogleMapsApi();
     }
     await importLeaflet();
     await importLeafletPegman(props.version);

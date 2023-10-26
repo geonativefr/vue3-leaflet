@@ -8,10 +8,6 @@ import { renderless } from '../utils/utils.js';
 export default renderless({
 	emits: ['openstreetview', 'closestreetview'],
 	props: {
-		apiKey: {
-			type: String,
-			default: undefined,
-		},
 		position: {
 			type: String,
 			default: 'bottomright',
@@ -29,7 +25,7 @@ export default renderless({
 		const map = inject('map');
 
 		if (props.apiKey) {
-			importGoogleMapsApi(props.apiKey);
+			importGoogleMapsApi();
 		}
 
 		await importLeaflet();

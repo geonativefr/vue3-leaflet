@@ -8,8 +8,7 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import { LayerGroups, Providers } from '../../constants';
-	import { getProviderOptions } from '../../utils/options';
+	import { LayerGroups } from '../../constants';
 
 	const props = defineProps({
 		type: {
@@ -29,10 +28,10 @@
 	const { type } = toRefs(props);
 	const defaultOptions = reactive({ type });
 
-	const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
+	const useGoogleMutant = () => {
 		const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
 		const load = async (layerGroup, options = defaultOptions) => {
-			await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
+			await importGoogleMapsApi();
 			mount(layerGroup, options);
 			return {};
 		};
@@ -41,7 +40,7 @@
 	};
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const gmaps = useGoogleMutant(getProviderOptions(Providers.GOOGLE_MAPS).apiKey);
+	const gmaps = useGoogleMutant();
 	const mutant = ref();
 	watch(type, () => setMutant(unref($layerGroup)));
 
