@@ -14,7 +14,7 @@ let providerOptions = {
 };
 
 export function getProviderOptions(layer) {
-	return providerOptions[layer];
+	return providerOptions[layer] ?? {};
 }
 
 export function setProviderOptions(_providerOptions) {

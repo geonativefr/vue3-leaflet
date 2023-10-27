@@ -711,7 +711,8 @@ let providerOptions = {
   }
 };
 function getProviderOptions$1(layer) {
-  return providerOptions[layer];
+  var _a;
+  return (_a = providerOptions[layer]) != null ? _a : {};
 }
 function setProviderOptions(_providerOptions) {
   providerOptions = merge(providerOptions, _providerOptions);
