@@ -13,7 +13,7 @@ export const MapTypes = {
 	CADASTRAL: 'cadastral',
 };
 
-export const ProviderrNames = {
+export const ProvidersNames = {
 	GOOGLE_MAPS: 'Google Maps',
 	IGN: 'IGN',
 	MAPBOX: 'Mapbox',

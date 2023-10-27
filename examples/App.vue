@@ -44,7 +44,7 @@
 			<div class="app_saved-maps_list">
 				<div v-for="savedMap of savedMaps" :key="savedMap.normalizedName" class="app_saved-maps_list_map">
 					<span class="app_saved-maps_list_map_name">{{ savedMap.name }}</span>
-					<span class="app_saved-maps_list_map_provider">{{ ProviderrNames[savedMap.provider] }}</span>
+					<span class="app_saved-maps_list_map_provider">{{ ProvidersNames[savedMap.provider] }}</span>
 					<span class="app_saved-maps_list_map_type">{{ savedMap.type }}</span>
 					<span class="app_saved-maps_list_map_missing-tiles">{{ savedMap.state }}</span>
 					<button class="app_saved-maps_list_map_destroy-button" @click="deleteMap(savedMap)">Delete</button>
@@ -69,7 +69,7 @@
 		MapTypes,
 		Marker,
 		Offline,
-		ProviderrNames,
+		ProvidersNames,
 		Providers,
 	} from '../src';
 	import positions from './positions.json';
