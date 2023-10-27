@@ -22,7 +22,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, computed, inject, toRaw, withAsyncContext, unref, onUnmounted, Teleport, nextTick } from "vue";
+import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, computed, inject, toRaw, withAsyncContext, onUnmounted, Teleport, nextTick } from "vue";
 import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var lodash_merge = { exports: {} };
@@ -9538,32 +9538,18 @@ const _sfc_main$7 = {
   async setup(__props) {
     let __temp, __restore;
     const props = __props;
+    [__temp, __restore] = withAsyncContext(() => importGoogleMapsApi()), await __temp, __restore();
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     [__temp, __restore] = withAsyncContext(() => importLeafletGoogleMutant(props.version)), await __temp, __restore();
-    const { type } = toRefs(props);
-    const defaultOptions = reactive({ type });
-    const useGoogleMutant = () => {
-      const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
-      const load = async (layerGroup, options = defaultOptions) => {
-        await importGoogleMapsApi();
-        mount(layerGroup, options);
-        return {};
-      };
-      return { load };
-    };
     const $layerGroup = inject(LayerGroups.TILE);
-    const gmaps = useGoogleMutant();
-    const mutant = ref();
-    watch(type, () => setMutant(unref($layerGroup)));
-    async function setMutant(layerGroup) {
-      set(mutant, await gmaps.load(layerGroup, defaultOptions));
-    }
-    whenever($layerGroup, (layerGroup) => {
-      toRaw(layerGroup).clearLayers();
-      setMutant(layerGroup);
+    watch([$layerGroup, props], ([layerGroup, props2]) => {
+      if (!layerGroup)
+        return;
+      layerGroup.clearLayers();
+      L.gridLayer.googleMutant({ type: props2.type }).addTo(layerGroup);
     }, { immediate: true });
     return (_ctx, _cache) => {
-      return mutant.value ? renderSlot(_ctx.$slots, "default", { key: 0 }) : createCommentVNode("", true);
+      return renderSlot(_ctx.$slots, "default");
     };
   }
 };
