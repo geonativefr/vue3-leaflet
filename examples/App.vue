@@ -44,7 +44,7 @@
 			<div class="app_saved-maps_list">
 				<div v-for="savedMap of savedMaps" :key="savedMap.normalizedName" class="app_saved-maps_list_map">
 					<span class="app_saved-maps_list_map_name">{{ savedMap.name }}</span>
-					<span class="app_saved-maps_list_map_provider">{{ LayerNames[savedMap.provider] }}</span>
+					<span class="app_saved-maps_list_map_provider">{{ ProviderrNames[savedMap.provider] }}</span>
 					<span class="app_saved-maps_list_map_type">{{ savedMap.type }}</span>
 					<span class="app_saved-maps_list_map_missing-tiles">{{ savedMap.state }}</span>
 					<button class="app_saved-maps_list_map_destroy-button" @click="deleteMap(savedMap)">Delete</button>
@@ -56,7 +56,7 @@
 
 <script setup>
 	import { ref } from 'vue';
-	import {
+	import Vue3Leaflet, {
 		GoogleMaps,
 		Mapbox,
 		IGN,
@@ -69,20 +69,19 @@
 		MapTypes,
 		Marker,
 		Offline,
-		useVue3Leaflet,
-		LayerNames,
-		Layers,
+		ProviderrNames,
+		Providers,
 	} from '../src';
 	import positions from './positions.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
 	const provider = ref('ign');
 
-	useVue3Leaflet({
-		[Layers.GOOGLE_MAPS]: {
+	Vue3Leaflet({
+		[Providers.GOOGLE_MAPS]: {
 			apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 		},
-		[Layers.MAPBOX]: {
+		[Providers.MAPBOX]: {
 			apiKey: import.meta.env.VITE_MAPBOX_API_KEY,
 		},
 	});

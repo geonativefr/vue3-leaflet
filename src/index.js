@@ -1,3 +1,5 @@
+import * as Options from './utils/options.js';
+
 export { default as MapContainer } from './MapContainer.vue';
 export { default as OpenStreetMap } from './layers/tiles/OpenStreetMap.vue';
 export { default as Mapbox } from './layers/tiles/Mapbox.vue';
@@ -19,6 +21,7 @@ export { default as OfflineControl } from './controls/OfflineControl.js';
 export { default as PegmanControl } from './controls/PegmanControl.js';
 export { default as ScaleControl } from './controls/ScaleControl.js';
 export { default as ZoomControl } from './controls/ZoomControl.js';
+export * from './constants.js';
 export * from './utils/gmaps-api-loader.js';
 export * from './utils/leaflet-fullscreen-loader.js';
 export * from './utils/leaflet-geoman-loader.js';
@@ -30,4 +33,9 @@ export * from './utils/leaflet-loader.js';
 export * from './utils/leaflet-locatecontrol-loader.js';
 export * from './utils/leaflet-markercluster-loader.js';
 export * from './utils/leaflet-pegman-loader.js';
-export * from './constants.js';
+export * from './utils/urls.js';
+export const getProviderOptions = Options.getProviderOptions;
+
+export default function (options) {
+	Options.setProviderOptions(options);
+}

@@ -7,7 +7,7 @@
 	import { inject, provide, reactive, ref, toRaw } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, Layers } from '../../constants';
+	import { LayerGroups, Providers } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -24,7 +24,7 @@
 
 	await importLeaflet(inject('leaflet.version'));
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = new TileLayerOffline(Layers.MAPBOX, props.type, {
+	const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
 		attribution: props.attribution,
 	});
 

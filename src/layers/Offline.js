@@ -13,7 +13,8 @@ import {
 	readAllKeysIndex,
 } from '../utils/indexed-db.js';
 import { waitForDefined } from '../utils/utils.js';
-import { LayerUrls, getOptions } from '../constants.js';
+import { getProviderOptions } from '../utils/options.js';
+import { getProviderUrl } from '../utils/urls.js';
 import merge from 'lodash.merge';
 
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
@@ -164,7 +165,7 @@ async function saveTileUrls(tileUrls, mapName, progressHandler) {
 }
 
 async function checkMap(map) {
-	const options = merge(getOptions(map.provider), map.options);
+	const options = merge(getProviderOptions(map.provider), map.options);
 	const tileSize = options.tileSize ?? 256;
 	const urls = ZOOM_LEVELS.map((zoomLevel) => {
 		const area = bounds(
@@ -172,7 +173,7 @@ async function checkMap(map) {
 			CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel)
 		);
 		return getTileUrls(
-			LayerUrls[map.provider](map.type),
+			getProviderUrl(map.provider, map.type),
 			area,
 			zoomLevel,
 			tileSize instanceof Point ? tileSize : new Point(tileSize, tileSize),
@@ -214,7 +215,7 @@ export default class TileLayerOffline extends TileLayer {
 	type;
 
 	constructor(provider, type, options) {
-		super(LayerUrls[provider](type), merge(getOptions(provider), options));
+		super(getProviderUrl(provider, type), merge(getProviderOptions(provider), options));
 		this.provider = provider;
 		this.type = type;
 	}

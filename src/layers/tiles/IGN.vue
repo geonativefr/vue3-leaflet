@@ -6,7 +6,7 @@
 	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, Layers, MapTypes } from '../../constants';
+	import { LayerGroups, MapTypes, Providers } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -37,7 +37,7 @@
 	);
 
 	function getLayer(type) {
-		return new TileLayerOffline(Layers.IGN, type, {
+		return new TileLayerOffline(Providers.IGN, type, {
 			attribution: props.attribution,
 		});
 	}
