@@ -1,10 +1,9 @@
 <template>
-	<slot v-if="mutant" />
+	<slot />
 </template>
 
 <script setup>
-	import { set, whenever } from '@vueuse/core';
-	import { inject, reactive, ref, toRefs, unref, toRaw, watch } from 'vue';
+	import { inject, watch } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
@@ -22,37 +21,19 @@
 		},
 	});
 
+	await importGoogleMapsApi();
 	await importLeaflet(inject('leaflet.version'));
 	await importLeafletGoogleMutant(props.version);
 
-	const { type } = toRefs(props);
-	const defaultOptions = reactive({ type });
-
-	const useGoogleMutant = () => {
-		const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
-		const load = async (layerGroup, options = defaultOptions) => {
-			await importGoogleMapsApi();
-			mount(layerGroup, options);
-			return {};
-		};
-
-		return { load };
-	};
-
 	const $layerGroup = inject(LayerGroups.TILE);
-	const gmaps = useGoogleMutant();
-	const mutant = ref();
-	watch(type, () => setMutant(unref($layerGroup)));
 
-	async function setMutant(layerGroup) {
-		set(mutant, await gmaps.load(layerGroup, defaultOptions));
-	}
+	watch(
+		[$layerGroup, props],
+		([layerGroup, props]) => {
+			if (!layerGroup) return;
 
-	whenever(
-		$layerGroup,
-		(layerGroup) => {
-			toRaw(layerGroup).clearLayers();
-			setMutant(layerGroup);
+			layerGroup.clearLayers();
+			L.gridLayer.googleMutant({ type: props.type }).addTo(layerGroup);
 		},
 		{ immediate: true }
 	);
