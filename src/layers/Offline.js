@@ -165,7 +165,7 @@ async function saveTileUrls(tileUrls, mapName, progressHandler) {
 }
 
 async function checkMap(map) {
-	const options = merge(getProviderOptions(map.provider), map.options);
+	const options = getProviderOptions(map.provider);
 	const tileSize = options.tileSize ?? 256;
 	const urls = ZOOM_LEVELS.map((zoomLevel) => {
 		const area = bounds(
@@ -177,7 +177,7 @@ async function checkMap(map) {
 			area,
 			zoomLevel,
 			tileSize instanceof Point ? tileSize : new Point(tileSize, tileSize),
-			map.options
+			options
 		);
 	}).flat();
 

@@ -831,7 +831,7 @@ const MapTypes = {
   HYBRID: "hybrid",
   CADASTRAL: "cadastral"
 };
-const ProviderrNames = {
+const ProvidersNames = {
   GOOGLE_MAPS: "Google Maps",
   IGN: "IGN",
   MAPBOX: "Mapbox",
@@ -9203,8 +9203,7 @@ function getProviderUrl(provider, mapType) {
           return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
       }
     case Providers.MAPBOX:
-      const options = getProviderOptions$1(Providers.MAPBOX);
-      return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}".replace("{apiKey}", options.apiKey);
+      return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}";
     case Providers.OPEN_STREET_MAP:
       return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   }
@@ -9343,11 +9342,11 @@ async function saveTileUrls(tileUrls, mapName, progressHandler) {
 }
 async function checkMap(map) {
   var _a;
-  const options = merge(getProviderOptions$1(map.provider), map.options);
+  const options = getProviderOptions$1(map.provider);
   const tileSize = (_a = options.tileSize) != null ? _a : 256;
   const urls = ZOOM_LEVELS.map((zoomLevel) => {
     const area = leafletSrc.exports.bounds(leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel), leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel));
-    return getTileUrls(getProviderUrl(map.provider, map.type), area, zoomLevel, tileSize instanceof leafletSrc.exports.Point ? tileSize : new leafletSrc.exports.Point(tileSize, tileSize), map.options);
+    return getTileUrls(getProviderUrl(map.provider, map.type), area, zoomLevel, tileSize instanceof leafletSrc.exports.Point ? tileSize : new leafletSrc.exports.Point(tileSize, tileSize), options);
   }).flat();
   const savedUrls = await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName));
   return urls.filter((url) => !savedUrls.includes(url));
@@ -10437,4 +10436,4 @@ const getProviderOptions = getProviderOptions$1;
 function index(options) {
   setProviderOptions(options);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ProviderrNames, Providers, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
