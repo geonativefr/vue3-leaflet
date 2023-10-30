@@ -208,6 +208,9 @@ async function checkMap(map) {
 		IDBKeyRange.only(map.normalizedName)
 	);
 
+	// avoid freeze interface, if there is the good amount of tiles, deem it's good enought
+	if (urls.length === savedUrls.length) return [];
+
 	return urls.filter((url) => !savedUrls.includes(url));
 }
 
