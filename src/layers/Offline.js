@@ -201,17 +201,16 @@ async function checkMap(map) {
 		);
 	}).flat();
 
-	const savedUrls = await readAllKeysIndex(
-		state.db,
-		TABLES.TILES.name,
-		TABLES.TILES.indexes.MAP,
-		IDBKeyRange.only(map.normalizedName)
+	const savedUrls = new Set(
+		await readAllKeysIndex(
+			state.db,
+			TABLES.TILES.name,
+			TABLES.TILES.indexes.MAP,
+			IDBKeyRange.only(map.normalizedName)
+		)
 	);
 
-	// avoid freeze interface, if there is the good amount of tiles, deem it's good enought
-	if (urls.length === savedUrls.length) return [];
-
-	return urls.filter((url) => !savedUrls.includes(url));
+	return urls.filter((url) => !savedUrls.has(url));
 }
 
 export function getMaps() {
