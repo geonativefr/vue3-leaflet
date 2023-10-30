@@ -15,6 +15,7 @@ import {
 import { waitForDefined } from '../utils/utils.js';
 import { getProviderOptions } from '../utils/options.js';
 import { getProviderUrl } from '../utils/urls.js';
+import { ProvidersNames } from '../constants.js';
 import merge from 'lodash.merge';
 
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
@@ -45,7 +46,7 @@ const state = reactive({
 
 (async () => {
 	try {
-		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
+		state.db = await openDB(DB_NAME, 3, mainDBUpdate);
 		state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => ({
 			...map,
 			state: MAP_STATES.CHECKING,
@@ -72,7 +73,10 @@ async function mainDBUpdate(db, oldVersion, newVersion) {
 	if (oldVersion < 2 && newVersion >= 2) {
 		const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
 		tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, 'map', { unique: false });
-		migrateV1Maps();
+		await migrateV1Maps();
+	}
+	if (oldVersion < 3 && newVersion >= 3) {
+		await migrateV2Maps();
 	}
 }
 
@@ -95,6 +99,22 @@ async function migrateV1Maps() {
 		}
 		subDb.close();
 		await deleteDB(subDbName);
+	}
+}
+async function migrateV2Maps() {
+	await waitForDefined(() => state.db);
+	const maps = await readAllDB(state.db, TABLES.MAPS.name);
+	for (const map of maps) {
+		const providerEntry = Object.entries(ProvidersNames).find(
+			([provider, providerName]) => providerName === map.provider
+		);
+		if (providerEntry) {
+			const [provider] = providerEntry;
+			if (provider !== map.provider) {
+				map.provider = provider;
+				storeDB(state.db, TABLES.MAPS.name, map, map.normalizedName);
+			}
+		}
 	}
 }
 
