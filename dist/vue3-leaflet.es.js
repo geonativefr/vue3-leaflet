@@ -9233,7 +9233,7 @@ const state = reactive({
 });
 (async () => {
   try {
-    state.db = await openDB(DB_NAME, 2, mainDBUpdate);
+    state.db = await openDB(DB_NAME, 3, mainDBUpdate);
     state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => __spreadProps(__spreadValues({}, map), {
       state: MAP_STATES.CHECKING
     }));
@@ -9259,7 +9259,10 @@ async function mainDBUpdate(db, oldVersion, newVersion) {
   if (oldVersion < 2 && newVersion >= 2) {
     const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
     tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, "map", { unique: false });
-    migrateV1Maps();
+    await migrateV1Maps();
+  }
+  if (oldVersion < 3 && newVersion >= 3) {
+    await migrateV2Maps();
   }
 }
 async function migrateV1Maps() {
@@ -9281,6 +9284,20 @@ async function migrateV1Maps() {
     }
     subDb.close();
     await deleteDB(subDbName);
+  }
+}
+async function migrateV2Maps() {
+  await waitForDefined(() => state.db);
+  const maps = await readAllDB(state.db, TABLES.MAPS.name);
+  for (const map of maps) {
+    const providerEntry = Object.entries(ProvidersNames).find(([provider, providerName]) => providerName === map.provider);
+    if (providerEntry) {
+      const [provider] = providerEntry;
+      if (provider !== map.provider) {
+        map.provider = provider;
+        storeDB(state.db, TABLES.MAPS.name, map, map.normalizedName);
+      }
+    }
   }
 }
 async function subDBUpdate(db) {
@@ -9349,8 +9366,8 @@ async function checkMap(map) {
     const area = leafletSrc.exports.bounds(leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel), leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel));
     return getTileUrls(getProviderUrl(map.provider, map.type), area, zoomLevel, tileSize instanceof leafletSrc.exports.Point ? tileSize : new leafletSrc.exports.Point(tileSize, tileSize), options);
   }).flat();
-  const savedUrls = await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName));
-  return urls.filter((url) => !savedUrls.includes(url));
+  const savedUrls = new Set(await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName)));
+  return urls.filter((url) => !savedUrls.has(url));
 }
 function getMaps() {
   return computed(() => state.maps);
