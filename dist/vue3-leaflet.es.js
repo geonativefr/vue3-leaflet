@@ -9011,7 +9011,7 @@ function deleteEntry(db, tableName, id, transaction = null) {
       transaction.commit();
   });
 }
-function storeDB(db, tableName, data, key, transaction = null) {
+function storeDB(db, tableName, data, key = null, transaction = null) {
   return new Promise(async (resolve, reject) => {
     let commit = false;
     if (!transaction)
@@ -9019,22 +9019,9 @@ function storeDB(db, tableName, data, key, transaction = null) {
     const store = transaction.objectStore(tableName);
     let request;
     if (key) {
-      const old = await new Promise((res, rej) => {
-        const req = store.get(key);
-        req.addEventListener("success", () => {
-          res(req.result);
-        });
-        req.addEventListener("error", () => {
-          rej("Failed to read the data");
-        });
-      });
-      if (old) {
-        request = store.put(data, key);
-      } else {
-        request = store.add(data, key);
-      }
+      request = store.put(data, key);
     } else {
-      request = store.add(data);
+      request = store.put(data);
     }
     request.addEventListener("success", () => {
       resolve();
@@ -9055,22 +9042,9 @@ async function storeArrayDB(db, tableName, datas, transaction = null) {
   let requests = datas.map(async (data) => {
     let request;
     if (data.key) {
-      const old = await new Promise((res, rej) => {
-        const req = store.get(data.key);
-        req.addEventListener("success", () => {
-          res(req.result);
-        });
-        req.addEventListener("error", () => {
-          rej("Failed to read the data");
-        });
-      });
-      if (old) {
-        request = store.put(data.value, data.key);
-      } else {
-        request = store.add(data.value, data.key);
-      }
+      request = store.put(data.value, data.key);
     } else {
-      request = store.add(data);
+      request = store.put(data);
     }
     return await new Promise((res, rej) => {
       request.addEventListener("success", () => {
@@ -9231,9 +9205,11 @@ const state = reactive({
   db: void 0,
   maps: []
 });
+const pendingMigration = ref(false);
 (async () => {
   try {
     state.db = await openDB(DB_NAME, 3, mainDBUpdate);
+    await isDatabaseReady();
     state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => __spreadProps(__spreadValues({}, map), {
       state: MAP_STATES.CHECKING
     }));
@@ -9252,7 +9228,13 @@ const state = reactive({
     console.error("fail open db", e);
   }
 })();
+async function isDatabaseReady() {
+  return new Promise((resolve) => {
+    whenever(computed(() => !get(pendingMigration)), () => resolve(), { immediate: true });
+  });
+}
 async function mainDBUpdate(db, oldVersion, newVersion) {
+  set(pendingMigration, true);
   if (oldVersion < 1 && newVersion >= 1) {
     db.createObjectStore(TABLES.MAPS.name, { keyPath: "normalizedName" });
   }
@@ -9264,6 +9246,7 @@ async function mainDBUpdate(db, oldVersion, newVersion) {
   if (oldVersion < 3 && newVersion >= 3) {
     await migrateV2Maps();
   }
+  set(pendingMigration, false);
 }
 async function migrateV1Maps() {
   await waitForDefined(() => state.db);
@@ -9295,7 +9278,7 @@ async function migrateV2Maps() {
       const [provider] = providerEntry;
       if (provider !== map.provider) {
         map.provider = provider;
-        storeDB(state.db, TABLES.MAPS.name, map, map.normalizedName);
+        await storeDB(state.db, TABLES.MAPS.name, map);
       }
     }
   }

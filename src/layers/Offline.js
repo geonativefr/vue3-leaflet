@@ -1,4 +1,5 @@
-import { reactive, computed } from 'vue';
+import { get, set, whenever } from '@vueuse/core';
+import { reactive, computed, ref } from 'vue';
 import { bounds, DomEvent, CRS, Point, TileLayer, Util } from 'leaflet';
 import {
 	deleteDB,
@@ -44,13 +45,19 @@ const state = reactive({
 	maps: [],
 });
 
+const pendingMigration = ref(false);
+
 (async () => {
 	try {
 		state.db = await openDB(DB_NAME, 3, mainDBUpdate);
+
+		await isDatabaseReady();
+
 		state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => ({
 			...map,
 			state: MAP_STATES.CHECKING,
 		}));
+
 		for (const map of state.maps) {
 			const tilesUrls = await checkMap(map);
 			if (tilesUrls.length === 0) {
@@ -66,7 +73,19 @@ const state = reactive({
 	}
 })();
 
+async function isDatabaseReady() {
+	return new Promise((resolve) => {
+		whenever(
+			computed(() => !get(pendingMigration)),
+			() => resolve(),
+			{ immediate: true }
+		);
+	});
+}
+
 async function mainDBUpdate(db, oldVersion, newVersion) {
+	set(pendingMigration, true);
+
 	if (oldVersion < 1 && newVersion >= 1) {
 		db.createObjectStore(TABLES.MAPS.name, { keyPath: 'normalizedName' });
 	}
@@ -78,6 +97,8 @@ async function mainDBUpdate(db, oldVersion, newVersion) {
 	if (oldVersion < 3 && newVersion >= 3) {
 		await migrateV2Maps();
 	}
+
+	set(pendingMigration, false);
 }
 
 async function migrateV1Maps() {
@@ -112,7 +133,7 @@ async function migrateV2Maps() {
 			const [provider] = providerEntry;
 			if (provider !== map.provider) {
 				map.provider = provider;
-				storeDB(state.db, TABLES.MAPS.name, map, map.normalizedName);
+				await storeDB(state.db, TABLES.MAPS.name, map);
 			}
 		}
 	}
