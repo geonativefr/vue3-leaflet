@@ -44,7 +44,7 @@ export function deleteEntry(db, tableName, id, transaction = null) {
 	});
 }
 
-export function storeDB(db, tableName, data, key, transaction = null) {
+export function storeDB(db, tableName, data, key = null, transaction = null) {
 	return new Promise(async (resolve, reject) => {
 		let commit = false;
 		if (!transaction) [transaction, commit] = [db.transaction([tableName], 'readwrite'), true];
@@ -53,23 +53,9 @@ export function storeDB(db, tableName, data, key, transaction = null) {
 		let request;
 
 		if (key) {
-			const old = await new Promise((res, rej) => {
-				const req = store.get(key);
-				req.addEventListener('success', () => {
-					res(req.result);
-				});
-				req.addEventListener('error', () => {
-					rej('Failed to read the data');
-				});
-			});
-
-			if (old) {
-				request = store.put(data, key);
-			} else {
-				request = store.add(data, key);
-			}
+			request = store.put(data, key);
 		} else {
-			request = store.add(data);
+			request = store.put(data);
 		}
 		request.addEventListener('success', () => {
 			resolve();
@@ -90,23 +76,9 @@ export async function storeArrayDB(db, tableName, datas, transaction = null) {
 	let requests = datas.map(async (data) => {
 		let request;
 		if (data.key) {
-			const old = await new Promise((res, rej) => {
-				const req = store.get(data.key);
-				req.addEventListener('success', () => {
-					res(req.result);
-				});
-				req.addEventListener('error', () => {
-					rej('Failed to read the data');
-				});
-			});
-
-			if (old) {
-				request = store.put(data.value, data.key);
-			} else {
-				request = store.add(data.value, data.key);
-			}
+			request = store.put(data.value, data.key);
 		} else {
-			request = store.add(data);
+			request = store.put(data);
 		}
 		return await new Promise((res, rej) => {
 			request.addEventListener('success', () => {

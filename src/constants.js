@@ -1,4 +1,19 @@
-export const LayerNames = {
+export const Providers = {
+	GOOGLE_MAPS: 'GOOGLE_MAPS',
+	IGN: 'IGN',
+	MAPBOX: 'MAPBOX',
+	OPEN_STREET_MAP: 'OPEN_STREET_MAP',
+};
+
+export const MapTypes = {
+	ROADMAP: 'roadmap',
+	SATELLITE: 'satellite',
+	TERRAIN: 'terrain',
+	HYBRID: 'hybrid',
+	CADASTRAL: 'cadastral',
+};
+
+export const ProvidersNames = {
 	GOOGLE_MAPS: 'Google Maps',
 	IGN: 'IGN',
 	MAPBOX: 'Mapbox',

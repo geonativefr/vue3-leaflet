@@ -1,5 +1,6 @@
-import { reactive, computed } from 'vue';
-import { bounds, DomEvent, Point, TileLayer, Util } from 'leaflet';
+import { get, set, whenever } from '@vueuse/core';
+import { reactive, computed, ref } from 'vue';
+import { bounds, DomEvent, CRS, Point, TileLayer, Util } from 'leaflet';
 import {
 	deleteDB,
 	deleteEntry,
@@ -13,6 +14,10 @@ import {
 	readAllKeysIndex,
 } from '../utils/indexed-db.js';
 import { waitForDefined } from '../utils/utils.js';
+import { getProviderOptions } from '../utils/options.js';
+import { getProviderUrl } from '../utils/urls.js';
+import { ProvidersNames } from '../constants.js';
+import merge from 'lodash.merge';
 
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 
@@ -29,30 +34,71 @@ const TABLES = {
 		},
 	},
 };
+const MAP_STATES = {
+	CHECKING: 'CHECKING',
+	COMPLETE: 'COMPLETE',
+	WIP: 'WIP',
+};
 
 const state = reactive({
 	db: undefined,
 	maps: [],
 });
 
+const pendingMigration = ref(false);
+
 (async () => {
 	try {
-		state.db = await openDB(DB_NAME, 2, mainDBUpdate);
-		state.maps = await readAllDB(state.db, TABLES.MAPS.name);
+		state.db = await openDB(DB_NAME, 3, mainDBUpdate);
+
+		await isDatabaseReady();
+
+		state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => ({
+			...map,
+			state: MAP_STATES.CHECKING,
+		}));
+
+		for (const map of state.maps) {
+			const tilesUrls = await checkMap(map);
+			if (tilesUrls.length === 0) {
+				map.state = MAP_STATES.COMPLETE;
+				continue;
+			}
+			map.state = MAP_STATES.WIP;
+			await saveTileUrls(tilesUrls, map.normalizedName, () => {});
+			map.state = MAP_STATES.COMPLETE;
+		}
 	} catch (e) {
 		console.error('fail open db', e);
 	}
 })();
 
+async function isDatabaseReady() {
+	return new Promise((resolve) => {
+		whenever(
+			computed(() => !get(pendingMigration)),
+			() => resolve(),
+			{ immediate: true }
+		);
+	});
+}
+
 async function mainDBUpdate(db, oldVersion, newVersion) {
+	set(pendingMigration, true);
+
 	if (oldVersion < 1 && newVersion >= 1) {
 		db.createObjectStore(TABLES.MAPS.name, { keyPath: 'normalizedName' });
 	}
 	if (oldVersion < 2 && newVersion >= 2) {
 		const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
 		tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, 'map', { unique: false });
-		migrateV1Maps();
+		await migrateV1Maps();
 	}
+	if (oldVersion < 3 && newVersion >= 3) {
+		await migrateV2Maps();
+	}
+
+	set(pendingMigration, false);
 }
 
 async function migrateV1Maps() {
@@ -74,6 +120,22 @@ async function migrateV1Maps() {
 		}
 		subDb.close();
 		await deleteDB(subDbName);
+	}
+}
+async function migrateV2Maps() {
+	await waitForDefined(() => state.db);
+	const maps = await readAllDB(state.db, TABLES.MAPS.name);
+	for (const map of maps) {
+		const providerEntry = Object.entries(ProvidersNames).find(
+			([provider, providerName]) => providerName === map.provider
+		);
+		if (providerEntry) {
+			const [provider] = providerEntry;
+			if (provider !== map.provider) {
+				map.provider = provider;
+				await storeDB(state.db, TABLES.MAPS.name, map);
+			}
+		}
 	}
 }
 
@@ -117,6 +179,61 @@ function getTileUrl(urlTemplate, data) {
 	return Util.template(urlTemplate, data);
 }
 
+async function saveTileUrls(tileUrls, mapName, progressHandler) {
+	let nbSaved = 0;
+	for (const urls of arraySplit(tileUrls, 20)) {
+		const data = [];
+		await Promise.all(
+			urls.map(async (tileUrl) => {
+				try {
+					const response = await fetch(tileUrl);
+					if (response.ok) {
+						data.push({
+							key: tileUrl,
+							value: { map: mapName, tile: await response.blob() },
+						});
+					}
+				} catch (e) {
+					console.error(e);
+				} finally {
+					nbSaved++;
+				}
+			})
+		);
+		await storeArrayDB(state.db, TABLES.TILES.name, data);
+		progressHandler(nbSaved, tileUrls.length);
+	}
+}
+
+async function checkMap(map) {
+	const options = getProviderOptions(map.provider);
+	const tileSize = options.tileSize ?? 256;
+	const urls = ZOOM_LEVELS.map((zoomLevel) => {
+		const area = bounds(
+			CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel),
+			CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel)
+		);
+		return getTileUrls(
+			getProviderUrl(map.provider, map.type),
+			area,
+			zoomLevel,
+			tileSize instanceof Point ? tileSize : new Point(tileSize, tileSize),
+			options
+		);
+	}).flat();
+
+	const savedUrls = new Set(
+		await readAllKeysIndex(
+			state.db,
+			TABLES.TILES.name,
+			TABLES.TILES.indexes.MAP,
+			IDBKeyRange.only(map.normalizedName)
+		)
+	);
+
+	return urls.filter((url) => !savedUrls.has(url));
+}
+
 export function getMaps() {
 	return computed(() => state.maps);
 }
@@ -140,8 +257,8 @@ export default class TileLayerOffline extends TileLayer {
 	provider;
 	type;
 
-	constructor(provider, type, url, options) {
-		super(url, options);
+	constructor(provider, type, options) {
+		super(getProviderUrl(provider, type), merge(getProviderOptions(provider), options));
 		this.provider = provider;
 		this.type = type;
 	}
@@ -191,6 +308,7 @@ export default class TileLayerOffline extends TileLayer {
 		};
 		await waitForDefined(() => state.db);
 		await storeDB(state.db, 'maps', map);
+		map.state = MAP_STATES.WIP;
 		state.maps.push(map);
 
 		const tileUrls = [];
@@ -203,29 +321,8 @@ export default class TileLayerOffline extends TileLayer {
 			tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
 		}
 
-		let nbSaved = 0;
-		for (const urls of arraySplit(tileUrls, 20)) {
-			const data = [];
-			await Promise.all(
-				urls.map(async (tileUrl) => {
-					try {
-						const response = await fetch(tileUrl);
-						if (response.ok) {
-							data.push({
-								key: tileUrl,
-								value: { map: map.normalizedName, tile: await response.blob() },
-							});
-						}
-					} catch (e) {
-						console.error(e);
-					} finally {
-						nbSaved++;
-					}
-				})
-			);
-			await storeArrayDB(state.db, TABLES.TILES.name, data);
-			progressHandler(nbSaved, tileUrls.length);
-		}
+		await saveTileUrls(tileUrls, map.normalizedName, progressHandler);
+		map.state = MAP_STATES.COMPLETE;
 		console.timeEnd('saveTiles');
 	}
 }

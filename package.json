@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^9.6.0",
+    "lodash.merge": "^4.6.2",
     "vue": "^3.2.25"
   },
   "devDependencies": {

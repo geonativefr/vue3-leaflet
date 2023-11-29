@@ -1,5 +1,7 @@
 (function(){"use strict";try{if(typeof document!="undefined"){var e=document.createElement("style");e.appendChild(document.createTextNode(".map-container{height:250px}.map-container_map{height:100%}")),document.head.appendChild(e)}}catch(t){console.error("vite-plugin-css-injected-by-js",t)}})();
 var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -15,12 +17,706 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 import { toRefs, reactive, ref, provide, onMounted, watch, openBlock, createElementBlock, createBlock, Suspense, withCtx, createElementVNode, mergeProps, renderSlot, createCommentVNode, computed, inject, toRaw, withAsyncContext, unref, onUnmounted, Teleport, nextTick } from "vue";
 import { templateRef, get, set, whenever, useMounted, useMutationObserver } from "@vueuse/core";
+var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+var lodash_merge = { exports: {} };
+(function(module, exports) {
+  var LARGE_ARRAY_SIZE = 200;
+  var HASH_UNDEFINED = "__lodash_hash_undefined__";
+  var HOT_COUNT = 800, HOT_SPAN = 16;
+  var MAX_SAFE_INTEGER = 9007199254740991;
+  var argsTag = "[object Arguments]", arrayTag = "[object Array]", asyncTag = "[object AsyncFunction]", boolTag = "[object Boolean]", dateTag = "[object Date]", errorTag = "[object Error]", funcTag = "[object Function]", genTag = "[object GeneratorFunction]", mapTag = "[object Map]", numberTag = "[object Number]", nullTag = "[object Null]", objectTag = "[object Object]", proxyTag = "[object Proxy]", regexpTag = "[object RegExp]", setTag = "[object Set]", stringTag = "[object String]", undefinedTag = "[object Undefined]", weakMapTag = "[object WeakMap]";
+  var arrayBufferTag = "[object ArrayBuffer]", dataViewTag = "[object DataView]", float32Tag = "[object Float32Array]", float64Tag = "[object Float64Array]", int8Tag = "[object Int8Array]", int16Tag = "[object Int16Array]", int32Tag = "[object Int32Array]", uint8Tag = "[object Uint8Array]", uint8ClampedTag = "[object Uint8ClampedArray]", uint16Tag = "[object Uint16Array]", uint32Tag = "[object Uint32Array]";
+  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+  var reIsUint = /^(?:0|[1-9]\d*)$/;
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+  var freeGlobal = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+  var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+  var root = freeGlobal || freeSelf || Function("return this")();
+  var freeExports = exports && !exports.nodeType && exports;
+  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var freeProcess = moduleExports && freeGlobal.process;
+  var nodeUtil = function() {
+    try {
+      var types = freeModule && freeModule.require && freeModule.require("util").types;
+      if (types) {
+        return types;
+      }
+      return freeProcess && freeProcess.binding && freeProcess.binding("util");
+    } catch (e) {
+    }
+  }();
+  var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+  function apply(func, thisArg, args) {
+    switch (args.length) {
+      case 0:
+        return func.call(thisArg);
+      case 1:
+        return func.call(thisArg, args[0]);
+      case 2:
+        return func.call(thisArg, args[0], args[1]);
+      case 3:
+        return func.call(thisArg, args[0], args[1], args[2]);
+    }
+    return func.apply(thisArg, args);
+  }
+  function baseTimes(n, iteratee) {
+    var index2 = -1, result = Array(n);
+    while (++index2 < n) {
+      result[index2] = iteratee(index2);
+    }
+    return result;
+  }
+  function baseUnary(func) {
+    return function(value) {
+      return func(value);
+    };
+  }
+  function getValue(object, key) {
+    return object == null ? void 0 : object[key];
+  }
+  function overArg(func, transform) {
+    return function(arg) {
+      return func(transform(arg));
+    };
+  }
+  var arrayProto = Array.prototype, funcProto = Function.prototype, objectProto = Object.prototype;
+  var coreJsData = root["__core-js_shared__"];
+  var funcToString = funcProto.toString;
+  var hasOwnProperty = objectProto.hasOwnProperty;
+  var maskSrcKey = function() {
+    var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || "");
+    return uid ? "Symbol(src)_1." + uid : "";
+  }();
+  var nativeObjectToString = objectProto.toString;
+  var objectCtorString = funcToString.call(Object);
+  var reIsNative = RegExp("^" + funcToString.call(hasOwnProperty).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
+  var Buffer2 = moduleExports ? root.Buffer : void 0, Symbol2 = root.Symbol, Uint8Array2 = root.Uint8Array, allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0, getPrototype = overArg(Object.getPrototypeOf, Object), objectCreate = Object.create, propertyIsEnumerable = objectProto.propertyIsEnumerable, splice = arrayProto.splice, symToStringTag = Symbol2 ? Symbol2.toStringTag : void 0;
+  var defineProperty = function() {
+    try {
+      var func = getNative(Object, "defineProperty");
+      func({}, "", {});
+      return func;
+    } catch (e) {
+    }
+  }();
+  var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0, nativeMax = Math.max, nativeNow = Date.now;
+  var Map = getNative(root, "Map"), nativeCreate = getNative(Object, "create");
+  var baseCreate = function() {
+    function object() {
+    }
+    return function(proto) {
+      if (!isObject(proto)) {
+        return {};
+      }
+      if (objectCreate) {
+        return objectCreate(proto);
+      }
+      object.prototype = proto;
+      var result = new object();
+      object.prototype = void 0;
+      return result;
+    };
+  }();
+  function Hash(entries) {
+    var index2 = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index2 < length) {
+      var entry = entries[index2];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function hashClear() {
+    this.__data__ = nativeCreate ? nativeCreate(null) : {};
+    this.size = 0;
+  }
+  function hashDelete(key) {
+    var result = this.has(key) && delete this.__data__[key];
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  function hashGet(key) {
+    var data = this.__data__;
+    if (nativeCreate) {
+      var result = data[key];
+      return result === HASH_UNDEFINED ? void 0 : result;
+    }
+    return hasOwnProperty.call(data, key) ? data[key] : void 0;
+  }
+  function hashHas(key) {
+    var data = this.__data__;
+    return nativeCreate ? data[key] !== void 0 : hasOwnProperty.call(data, key);
+  }
+  function hashSet(key, value) {
+    var data = this.__data__;
+    this.size += this.has(key) ? 0 : 1;
+    data[key] = nativeCreate && value === void 0 ? HASH_UNDEFINED : value;
+    return this;
+  }
+  Hash.prototype.clear = hashClear;
+  Hash.prototype["delete"] = hashDelete;
+  Hash.prototype.get = hashGet;
+  Hash.prototype.has = hashHas;
+  Hash.prototype.set = hashSet;
+  function ListCache(entries) {
+    var index2 = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index2 < length) {
+      var entry = entries[index2];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function listCacheClear() {
+    this.__data__ = [];
+    this.size = 0;
+  }
+  function listCacheDelete(key) {
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    if (index2 < 0) {
+      return false;
+    }
+    var lastIndex = data.length - 1;
+    if (index2 == lastIndex) {
+      data.pop();
+    } else {
+      splice.call(data, index2, 1);
+    }
+    --this.size;
+    return true;
+  }
+  function listCacheGet(key) {
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    return index2 < 0 ? void 0 : data[index2][1];
+  }
+  function listCacheHas(key) {
+    return assocIndexOf(this.__data__, key) > -1;
+  }
+  function listCacheSet(key, value) {
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    if (index2 < 0) {
+      ++this.size;
+      data.push([key, value]);
+    } else {
+      data[index2][1] = value;
+    }
+    return this;
+  }
+  ListCache.prototype.clear = listCacheClear;
+  ListCache.prototype["delete"] = listCacheDelete;
+  ListCache.prototype.get = listCacheGet;
+  ListCache.prototype.has = listCacheHas;
+  ListCache.prototype.set = listCacheSet;
+  function MapCache(entries) {
+    var index2 = -1, length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index2 < length) {
+      var entry = entries[index2];
+      this.set(entry[0], entry[1]);
+    }
+  }
+  function mapCacheClear() {
+    this.size = 0;
+    this.__data__ = {
+      "hash": new Hash(),
+      "map": new (Map || ListCache)(),
+      "string": new Hash()
+    };
+  }
+  function mapCacheDelete(key) {
+    var result = getMapData(this, key)["delete"](key);
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+  function mapCacheGet(key) {
+    return getMapData(this, key).get(key);
+  }
+  function mapCacheHas(key) {
+    return getMapData(this, key).has(key);
+  }
+  function mapCacheSet(key, value) {
+    var data = getMapData(this, key), size = data.size;
+    data.set(key, value);
+    this.size += data.size == size ? 0 : 1;
+    return this;
+  }
+  MapCache.prototype.clear = mapCacheClear;
+  MapCache.prototype["delete"] = mapCacheDelete;
+  MapCache.prototype.get = mapCacheGet;
+  MapCache.prototype.has = mapCacheHas;
+  MapCache.prototype.set = mapCacheSet;
+  function Stack(entries) {
+    var data = this.__data__ = new ListCache(entries);
+    this.size = data.size;
+  }
+  function stackClear() {
+    this.__data__ = new ListCache();
+    this.size = 0;
+  }
+  function stackDelete(key) {
+    var data = this.__data__, result = data["delete"](key);
+    this.size = data.size;
+    return result;
+  }
+  function stackGet(key) {
+    return this.__data__.get(key);
+  }
+  function stackHas(key) {
+    return this.__data__.has(key);
+  }
+  function stackSet(key, value) {
+    var data = this.__data__;
+    if (data instanceof ListCache) {
+      var pairs = data.__data__;
+      if (!Map || pairs.length < LARGE_ARRAY_SIZE - 1) {
+        pairs.push([key, value]);
+        this.size = ++data.size;
+        return this;
+      }
+      data = this.__data__ = new MapCache(pairs);
+    }
+    data.set(key, value);
+    this.size = data.size;
+    return this;
+  }
+  Stack.prototype.clear = stackClear;
+  Stack.prototype["delete"] = stackDelete;
+  Stack.prototype.get = stackGet;
+  Stack.prototype.has = stackHas;
+  Stack.prototype.set = stackSet;
+  function arrayLikeKeys(value, inherited) {
+    var isArr = isArray(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer(value), isType = !isArr && !isArg && !isBuff && isTypedArray(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes(value.length, String) : [], length = result.length;
+    for (var key in value) {
+      if ((inherited || hasOwnProperty.call(value, key)) && !(skipIndexes && (key == "length" || isBuff && (key == "offset" || key == "parent") || isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || isIndex(key, length)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function assignMergeValue(object, key, value) {
+    if (value !== void 0 && !eq(object[key], value) || value === void 0 && !(key in object)) {
+      baseAssignValue(object, key, value);
+    }
+  }
+  function assignValue(object, key, value) {
+    var objValue = object[key];
+    if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) || value === void 0 && !(key in object)) {
+      baseAssignValue(object, key, value);
+    }
+  }
+  function assocIndexOf(array, key) {
+    var length = array.length;
+    while (length--) {
+      if (eq(array[length][0], key)) {
+        return length;
+      }
+    }
+    return -1;
+  }
+  function baseAssignValue(object, key, value) {
+    if (key == "__proto__" && defineProperty) {
+      defineProperty(object, key, {
+        "configurable": true,
+        "enumerable": true,
+        "value": value,
+        "writable": true
+      });
+    } else {
+      object[key] = value;
+    }
+  }
+  var baseFor = createBaseFor();
+  function baseGetTag(value) {
+    if (value == null) {
+      return value === void 0 ? undefinedTag : nullTag;
+    }
+    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+  }
+  function baseIsArguments(value) {
+    return isObjectLike(value) && baseGetTag(value) == argsTag;
+  }
+  function baseIsNative(value) {
+    if (!isObject(value) || isMasked(value)) {
+      return false;
+    }
+    var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
+    return pattern.test(toSource(value));
+  }
+  function baseIsTypedArray(value) {
+    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
+  }
+  function baseKeysIn(object) {
+    if (!isObject(object)) {
+      return nativeKeysIn(object);
+    }
+    var isProto = isPrototype(object), result = [];
+    for (var key in object) {
+      if (!(key == "constructor" && (isProto || !hasOwnProperty.call(object, key)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function baseMerge(object, source, srcIndex, customizer, stack) {
+    if (object === source) {
+      return;
+    }
+    baseFor(source, function(srcValue, key) {
+      stack || (stack = new Stack());
+      if (isObject(srcValue)) {
+        baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
+      } else {
+        var newValue = customizer ? customizer(safeGet(object, key), srcValue, key + "", object, source, stack) : void 0;
+        if (newValue === void 0) {
+          newValue = srcValue;
+        }
+        assignMergeValue(object, key, newValue);
+      }
+    }, keysIn);
+  }
+  function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
+    var objValue = safeGet(object, key), srcValue = safeGet(source, key), stacked = stack.get(srcValue);
+    if (stacked) {
+      assignMergeValue(object, key, stacked);
+      return;
+    }
+    var newValue = customizer ? customizer(objValue, srcValue, key + "", object, source, stack) : void 0;
+    var isCommon = newValue === void 0;
+    if (isCommon) {
+      var isArr = isArray(srcValue), isBuff = !isArr && isBuffer(srcValue), isTyped = !isArr && !isBuff && isTypedArray(srcValue);
+      newValue = srcValue;
+      if (isArr || isBuff || isTyped) {
+        if (isArray(objValue)) {
+          newValue = objValue;
+        } else if (isArrayLikeObject(objValue)) {
+          newValue = copyArray(objValue);
+        } else if (isBuff) {
+          isCommon = false;
+          newValue = cloneBuffer(srcValue, true);
+        } else if (isTyped) {
+          isCommon = false;
+          newValue = cloneTypedArray(srcValue, true);
+        } else {
+          newValue = [];
+        }
+      } else if (isPlainObject(srcValue) || isArguments(srcValue)) {
+        newValue = objValue;
+        if (isArguments(objValue)) {
+          newValue = toPlainObject(objValue);
+        } else if (!isObject(objValue) || isFunction(objValue)) {
+          newValue = initCloneObject(srcValue);
+        }
+      } else {
+        isCommon = false;
+      }
+    }
+    if (isCommon) {
+      stack.set(srcValue, newValue);
+      mergeFunc(newValue, srcValue, srcIndex, customizer, stack);
+      stack["delete"](srcValue);
+    }
+    assignMergeValue(object, key, newValue);
+  }
+  function baseRest(func, start) {
+    return setToString(overRest(func, start, identity), func + "");
+  }
+  var baseSetToString = !defineProperty ? identity : function(func, string) {
+    return defineProperty(func, "toString", {
+      "configurable": true,
+      "enumerable": false,
+      "value": constant(string),
+      "writable": true
+    });
+  };
+  function cloneBuffer(buffer, isDeep) {
+    if (isDeep) {
+      return buffer.slice();
+    }
+    var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+    buffer.copy(result);
+    return result;
+  }
+  function cloneArrayBuffer(arrayBuffer) {
+    var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+    new Uint8Array2(result).set(new Uint8Array2(arrayBuffer));
+    return result;
+  }
+  function cloneTypedArray(typedArray, isDeep) {
+    var buffer = isDeep ? cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
+    return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+  }
+  function copyArray(source, array) {
+    var index2 = -1, length = source.length;
+    array || (array = Array(length));
+    while (++index2 < length) {
+      array[index2] = source[index2];
+    }
+    return array;
+  }
+  function copyObject(source, props, object, customizer) {
+    var isNew = !object;
+    object || (object = {});
+    var index2 = -1, length = props.length;
+    while (++index2 < length) {
+      var key = props[index2];
+      var newValue = customizer ? customizer(object[key], source[key], key, object, source) : void 0;
+      if (newValue === void 0) {
+        newValue = source[key];
+      }
+      if (isNew) {
+        baseAssignValue(object, key, newValue);
+      } else {
+        assignValue(object, key, newValue);
+      }
+    }
+    return object;
+  }
+  function createAssigner(assigner) {
+    return baseRest(function(object, sources) {
+      var index2 = -1, length = sources.length, customizer = length > 1 ? sources[length - 1] : void 0, guard = length > 2 ? sources[2] : void 0;
+      customizer = assigner.length > 3 && typeof customizer == "function" ? (length--, customizer) : void 0;
+      if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+        customizer = length < 3 ? void 0 : customizer;
+        length = 1;
+      }
+      object = Object(object);
+      while (++index2 < length) {
+        var source = sources[index2];
+        if (source) {
+          assigner(object, source, index2, customizer);
+        }
+      }
+      return object;
+    });
+  }
+  function createBaseFor(fromRight) {
+    return function(object, iteratee, keysFunc) {
+      var index2 = -1, iterable = Object(object), props = keysFunc(object), length = props.length;
+      while (length--) {
+        var key = props[fromRight ? length : ++index2];
+        if (iteratee(iterable[key], key, iterable) === false) {
+          break;
+        }
+      }
+      return object;
+    };
+  }
+  function getMapData(map, key) {
+    var data = map.__data__;
+    return isKeyable(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
+  }
+  function getNative(object, key) {
+    var value = getValue(object, key);
+    return baseIsNative(value) ? value : void 0;
+  }
+  function getRawTag(value) {
+    var isOwn = hasOwnProperty.call(value, symToStringTag), tag = value[symToStringTag];
+    try {
+      value[symToStringTag] = void 0;
+      var unmasked = true;
+    } catch (e) {
+    }
+    var result = nativeObjectToString.call(value);
+    if (unmasked) {
+      if (isOwn) {
+        value[symToStringTag] = tag;
+      } else {
+        delete value[symToStringTag];
+      }
+    }
+    return result;
+  }
+  function initCloneObject(object) {
+    return typeof object.constructor == "function" && !isPrototype(object) ? baseCreate(getPrototype(object)) : {};
+  }
+  function isIndex(value, length) {
+    var type = typeof value;
+    length = length == null ? MAX_SAFE_INTEGER : length;
+    return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+  }
+  function isIterateeCall(value, index2, object) {
+    if (!isObject(object)) {
+      return false;
+    }
+    var type = typeof index2;
+    if (type == "number" ? isArrayLike(object) && isIndex(index2, object.length) : type == "string" && index2 in object) {
+      return eq(object[index2], value);
+    }
+    return false;
+  }
+  function isKeyable(value) {
+    var type = typeof value;
+    return type == "string" || type == "number" || type == "symbol" || type == "boolean" ? value !== "__proto__" : value === null;
+  }
+  function isMasked(func) {
+    return !!maskSrcKey && maskSrcKey in func;
+  }
+  function isPrototype(value) {
+    var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto;
+    return value === proto;
+  }
+  function nativeKeysIn(object) {
+    var result = [];
+    if (object != null) {
+      for (var key in Object(object)) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  function objectToString(value) {
+    return nativeObjectToString.call(value);
+  }
+  function overRest(func, start, transform) {
+    start = nativeMax(start === void 0 ? func.length - 1 : start, 0);
+    return function() {
+      var args = arguments, index2 = -1, length = nativeMax(args.length - start, 0), array = Array(length);
+      while (++index2 < length) {
+        array[index2] = args[start + index2];
+      }
+      index2 = -1;
+      var otherArgs = Array(start + 1);
+      while (++index2 < start) {
+        otherArgs[index2] = args[index2];
+      }
+      otherArgs[start] = transform(array);
+      return apply(func, this, otherArgs);
+    };
+  }
+  function safeGet(object, key) {
+    if (key === "constructor" && typeof object[key] === "function") {
+      return;
+    }
+    if (key == "__proto__") {
+      return;
+    }
+    return object[key];
+  }
+  var setToString = shortOut(baseSetToString);
+  function shortOut(func) {
+    var count = 0, lastCalled = 0;
+    return function() {
+      var stamp = nativeNow(), remaining = HOT_SPAN - (stamp - lastCalled);
+      lastCalled = stamp;
+      if (remaining > 0) {
+        if (++count >= HOT_COUNT) {
+          return arguments[0];
+        }
+      } else {
+        count = 0;
+      }
+      return func.apply(void 0, arguments);
+    };
+  }
+  function toSource(func) {
+    if (func != null) {
+      try {
+        return funcToString.call(func);
+      } catch (e) {
+      }
+      try {
+        return func + "";
+      } catch (e) {
+      }
+    }
+    return "";
+  }
+  function eq(value, other) {
+    return value === other || value !== value && other !== other;
+  }
+  var isArguments = baseIsArguments(function() {
+    return arguments;
+  }()) ? baseIsArguments : function(value) {
+    return isObjectLike(value) && hasOwnProperty.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
+  };
+  var isArray = Array.isArray;
+  function isArrayLike(value) {
+    return value != null && isLength(value.length) && !isFunction(value);
+  }
+  function isArrayLikeObject(value) {
+    return isObjectLike(value) && isArrayLike(value);
+  }
+  var isBuffer = nativeIsBuffer || stubFalse;
+  function isFunction(value) {
+    if (!isObject(value)) {
+      return false;
+    }
+    var tag = baseGetTag(value);
+    return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
+  }
+  function isLength(value) {
+    return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+  }
+  function isObject(value) {
+    var type = typeof value;
+    return value != null && (type == "object" || type == "function");
+  }
+  function isObjectLike(value) {
+    return value != null && typeof value == "object";
+  }
+  function isPlainObject(value) {
+    if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
+      return false;
+    }
+    var proto = getPrototype(value);
+    if (proto === null) {
+      return true;
+    }
+    var Ctor = hasOwnProperty.call(proto, "constructor") && proto.constructor;
+    return typeof Ctor == "function" && Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString;
+  }
+  var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+  function toPlainObject(value) {
+    return copyObject(value, keysIn(value));
+  }
+  function keysIn(object) {
+    return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
+  }
+  var merge2 = createAssigner(function(object, source, srcIndex) {
+    baseMerge(object, source, srcIndex);
+  });
+  function constant(value) {
+    return function() {
+      return value;
+    };
+  }
+  function identity(value) {
+    return value;
+  }
+  function stubFalse() {
+    return false;
+  }
+  module.exports = merge2;
+})(lodash_merge, lodash_merge.exports);
+var merge = lodash_merge.exports;
+let providerOptions = {
+  IGN: {
+    maxZoom: 19
+  },
+  MAPBOX: {
+    maxZoom: 19,
+    zoomOffset: -1
+  },
+  OPEN_STREET_MAP: {
+    maxZoom: 19
+  }
+};
+function getProviderOptions$1(layer) {
+  var _a;
+  return (_a = providerOptions[layer]) != null ? _a : {};
+}
+function setProviderOptions(_providerOptions) {
+  providerOptions = merge(providerOptions, _providerOptions);
+}
 const LEAFLET_VERSION = "1.9.4";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.79.0";
 const LEAFLET_GOOGLE_MUTANT_VERSION = "0.14.0";
@@ -123,7 +819,20 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
-const LayerNames = {
+const Providers = {
+  GOOGLE_MAPS: "GOOGLE_MAPS",
+  IGN: "IGN",
+  MAPBOX: "MAPBOX",
+  OPEN_STREET_MAP: "OPEN_STREET_MAP"
+};
+const MapTypes = {
+  ROADMAP: "roadmap",
+  SATELLITE: "satellite",
+  TERRAIN: "terrain",
+  HYBRID: "hybrid",
+  CADASTRAL: "cadastral"
+};
+const ProvidersNames = {
   GOOGLE_MAPS: "Google Maps",
   IGN: "IGN",
   MAPBOX: "Mapbox",
@@ -232,7 +941,6 @@ const _sfc_main$b = {
     };
   }
 };
-var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var leafletSrc = { exports: {} };
 /* @preserve
  * Leaflet 1.9.3, a JS library for interactive maps. https://leafletjs.com
@@ -565,14 +1273,14 @@ var leafletSrc = { exports: {} };
           console.warn("wrong listener type: " + typeof fn);
           return;
         }
-        var index2 = this._listens(type, fn, context);
-        if (index2 !== false) {
-          var listener = listeners[index2];
+        var index3 = this._listens(type, fn, context);
+        if (index3 !== false) {
+          var listener = listeners[index3];
           if (this._firingCount) {
             listener.fn = falseFn;
             this._events[type] = listeners = listeners.slice();
           }
-          listeners.splice(index2, 1);
+          listeners.splice(index3, 1);
         }
       },
       fire: function(type, data, propagate) {
@@ -3616,18 +4324,18 @@ var leafletSrc = { exports: {} };
       return newPoints;
     }
     function _simplifyDPStep(points, markers, sqTolerance, first, last) {
-      var maxSqDist = 0, index2, i, sqDist;
+      var maxSqDist = 0, index3, i, sqDist;
       for (i = first + 1; i <= last - 1; i++) {
         sqDist = _sqClosestPointOnSegment(points[i], points[first], points[last], true);
         if (sqDist > maxSqDist) {
-          index2 = i;
+          index3 = i;
           maxSqDist = sqDist;
         }
       }
       if (maxSqDist > sqTolerance) {
-        markers[index2] = 1;
-        _simplifyDPStep(points, markers, sqTolerance, first, index2);
-        _simplifyDPStep(points, markers, sqTolerance, index2, last);
+        markers[index3] = 1;
+        _simplifyDPStep(points, markers, sqTolerance, first, index3);
+        _simplifyDPStep(points, markers, sqTolerance, index3, last);
       }
     }
     function _reducePoints(points, sqTolerance) {
@@ -3867,7 +4575,7 @@ var leafletSrc = { exports: {} };
         return new LatLng(phi * d, point.x * d / r);
       }
     };
-    var index = {
+    var index2 = {
       __proto__: null,
       LonLat,
       Mercator,
@@ -6833,8 +7541,8 @@ var leafletSrc = { exports: {} };
         return zoom2 + zoomOffset;
       },
       _getSubdomain: function(tilePoint) {
-        var index2 = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
-        return this.options.subdomains[index2];
+        var index3 = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
+        return this.options.subdomains[index3];
       },
       _abortLoading: function() {
         var i, tile;
@@ -8207,7 +8915,7 @@ var leafletSrc = { exports: {} };
     exports2.Polyline = Polyline;
     exports2.Popup = Popup;
     exports2.PosAnimation = PosAnimation;
-    exports2.Projection = index;
+    exports2.Projection = index2;
     exports2.Rectangle = Rectangle;
     exports2.Renderer = Renderer;
     exports2.SVG = SVG;
@@ -8303,7 +9011,7 @@ function deleteEntry(db, tableName, id, transaction = null) {
       transaction.commit();
   });
 }
-function storeDB(db, tableName, data, key, transaction = null) {
+function storeDB(db, tableName, data, key = null, transaction = null) {
   return new Promise(async (resolve, reject) => {
     let commit = false;
     if (!transaction)
@@ -8311,22 +9019,9 @@ function storeDB(db, tableName, data, key, transaction = null) {
     const store = transaction.objectStore(tableName);
     let request;
     if (key) {
-      const old = await new Promise((res, rej) => {
-        const req = store.get(key);
-        req.addEventListener("success", () => {
-          res(req.result);
-        });
-        req.addEventListener("error", () => {
-          rej("Failed to read the data");
-        });
-      });
-      if (old) {
-        request = store.put(data, key);
-      } else {
-        request = store.add(data, key);
-      }
+      request = store.put(data, key);
     } else {
-      request = store.add(data);
+      request = store.put(data);
     }
     request.addEventListener("success", () => {
       resolve();
@@ -8347,22 +9042,9 @@ async function storeArrayDB(db, tableName, datas, transaction = null) {
   let requests = datas.map(async (data) => {
     let request;
     if (data.key) {
-      const old = await new Promise((res, rej) => {
-        const req = store.get(data.key);
-        req.addEventListener("success", () => {
-          res(req.result);
-        });
-        req.addEventListener("error", () => {
-          rej("Failed to read the data");
-        });
-      });
-      if (old) {
-        request = store.put(data.value, data.key);
-      } else {
-        request = store.add(data.value, data.key);
-      }
+      request = store.put(data.value, data.key);
     } else {
-      request = store.add(data);
+      request = store.put(data);
     }
     return await new Promise((res, rej) => {
       request.addEventListener("success", () => {
@@ -8419,8 +9101,8 @@ function readAllKeysIndex(db, tableName, indexName, keyRange = null, transaction
     if (!transaction)
       [transaction, commit] = [db.transaction([tableName]), true];
     const store = transaction.objectStore(tableName);
-    const index = store.index(indexName);
-    const request = index.getAllKeys(keyRange);
+    const index2 = store.index(indexName);
+    const request = index2.getAllKeys(keyRange);
     request.addEventListener("success", () => {
       resolve(request.result);
     });
@@ -8484,6 +9166,23 @@ async function readQueue(queue) {
   }
   setTimeout(() => readQueue(queue), 100);
 }
+function getProviderUrl(provider, mapType) {
+  switch (provider) {
+    case Providers.IGN:
+      switch (mapType) {
+        case MapTypes.SATELLITE:
+          return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
+        case MapTypes.CADASTRAL:
+          return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+        default:
+          return "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+      }
+    case Providers.MAPBOX:
+      return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}";
+    case Providers.OPEN_STREET_MAP:
+      return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  }
+}
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
 const DB_NAME = "leaflet-offline";
 const TABLES = {
@@ -8497,27 +9196,57 @@ const TABLES = {
     }
   }
 };
+const MAP_STATES = {
+  CHECKING: "CHECKING",
+  COMPLETE: "COMPLETE",
+  WIP: "WIP"
+};
 const state = reactive({
   db: void 0,
   maps: []
 });
+const pendingMigration = ref(false);
 (async () => {
   try {
-    state.db = await openDB(DB_NAME, 2, mainDBUpdate);
-    state.maps = await readAllDB(state.db, TABLES.MAPS.name);
+    state.db = await openDB(DB_NAME, 3, mainDBUpdate);
+    await isDatabaseReady();
+    state.maps = (await readAllDB(state.db, TABLES.MAPS.name)).map((map) => __spreadProps(__spreadValues({}, map), {
+      state: MAP_STATES.CHECKING
+    }));
+    for (const map of state.maps) {
+      const tilesUrls = await checkMap(map);
+      if (tilesUrls.length === 0) {
+        map.state = MAP_STATES.COMPLETE;
+        continue;
+      }
+      map.state = MAP_STATES.WIP;
+      await saveTileUrls(tilesUrls, map.normalizedName, () => {
+      });
+      map.state = MAP_STATES.COMPLETE;
+    }
   } catch (e) {
     console.error("fail open db", e);
   }
 })();
+async function isDatabaseReady() {
+  return new Promise((resolve) => {
+    whenever(computed(() => !get(pendingMigration)), () => resolve(), { immediate: true });
+  });
+}
 async function mainDBUpdate(db, oldVersion, newVersion) {
+  set(pendingMigration, true);
   if (oldVersion < 1 && newVersion >= 1) {
     db.createObjectStore(TABLES.MAPS.name, { keyPath: "normalizedName" });
   }
   if (oldVersion < 2 && newVersion >= 2) {
     const tileObjectStore = db.createObjectStore(TABLES.TILES.name);
     tileObjectStore.createIndex(TABLES.TILES.indexes.MAP, "map", { unique: false });
-    migrateV1Maps();
+    await migrateV1Maps();
   }
+  if (oldVersion < 3 && newVersion >= 3) {
+    await migrateV2Maps();
+  }
+  set(pendingMigration, false);
 }
 async function migrateV1Maps() {
   await waitForDefined(() => state.db);
@@ -8540,6 +9269,20 @@ async function migrateV1Maps() {
     await deleteDB(subDbName);
   }
 }
+async function migrateV2Maps() {
+  await waitForDefined(() => state.db);
+  const maps = await readAllDB(state.db, TABLES.MAPS.name);
+  for (const map of maps) {
+    const providerEntry = Object.entries(ProvidersNames).find(([provider, providerName]) => providerName === map.provider);
+    if (providerEntry) {
+      const [provider] = providerEntry;
+      if (provider !== map.provider) {
+        map.provider = provider;
+        await storeDB(state.db, TABLES.MAPS.name, map);
+      }
+    }
+  }
+}
 async function subDBUpdate(db) {
   ZOOM_LEVELS.forEach((zoomLevel) => db.createObjectStore("tiles-" + zoomLevel));
 }
@@ -8560,8 +9303,8 @@ function getTilePoints(area, tileSize) {
 function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
   const tiles = [];
   const tilePoints = getTilePoints(bounds, tileSize);
-  for (let index = 0; index < tilePoints.length; index += 1) {
-    const tilePoint = tilePoints[index];
+  for (let index2 = 0; index2 < tilePoints.length; index2 += 1) {
+    const tilePoint = tilePoints[index2];
     const data = {
       x: tilePoint.x,
       y: tilePoint.y,
@@ -8574,6 +9317,40 @@ function getTileUrls(templateUrl, bounds, zoom, tileSize, options) {
 }
 function getTileUrl(urlTemplate, data) {
   return leafletSrc.exports.Util.template(urlTemplate, data);
+}
+async function saveTileUrls(tileUrls, mapName, progressHandler) {
+  let nbSaved = 0;
+  for (const urls of arraySplit(tileUrls, 20)) {
+    const data = [];
+    await Promise.all(urls.map(async (tileUrl) => {
+      try {
+        const response = await fetch(tileUrl);
+        if (response.ok) {
+          data.push({
+            key: tileUrl,
+            value: { map: mapName, tile: await response.blob() }
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        nbSaved++;
+      }
+    }));
+    await storeArrayDB(state.db, TABLES.TILES.name, data);
+    progressHandler(nbSaved, tileUrls.length);
+  }
+}
+async function checkMap(map) {
+  var _a;
+  const options = getProviderOptions$1(map.provider);
+  const tileSize = (_a = options.tileSize) != null ? _a : 256;
+  const urls = ZOOM_LEVELS.map((zoomLevel) => {
+    const area = leafletSrc.exports.bounds(leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.NE, zoomLevel), leafletSrc.exports.CRS.EPSG3857.latLngToPoint(map.SW, zoomLevel));
+    return getTileUrls(getProviderUrl(map.provider, map.type), area, zoomLevel, tileSize instanceof leafletSrc.exports.Point ? tileSize : new leafletSrc.exports.Point(tileSize, tileSize), options);
+  }).flat();
+  const savedUrls = new Set(await readAllKeysIndex(state.db, TABLES.TILES.name, TABLES.TILES.indexes.MAP, IDBKeyRange.only(map.normalizedName)));
+  return urls.filter((url) => !savedUrls.has(url));
 }
 function getMaps() {
   return computed(() => state.maps);
@@ -8588,8 +9365,8 @@ async function deleteMap(mapName) {
   }
 }
 class TileLayerOffline extends leafletSrc.exports.TileLayer {
-  constructor(provider, type, url, options) {
-    super(url, options);
+  constructor(provider, type, options) {
+    super(getProviderUrl(provider, type), merge(getProviderOptions$1(provider), options));
     __publicField(this, "provider");
     __publicField(this, "type");
     this.provider = provider;
@@ -8632,6 +9409,7 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
     };
     await waitForDefined(() => state.db);
     await storeDB(state.db, "maps", map);
+    map.state = MAP_STATES.WIP;
     state.maps.push(map);
     const tileUrls = [];
     for (let i = 0; i < ZOOM_LEVELS.length; i += 1) {
@@ -8639,27 +9417,8 @@ class TileLayerOffline extends leafletSrc.exports.TileLayer {
       const area = leafletSrc.exports.bounds(this._map.project(latlngBounds.getNorthWest(), zoomLevel), this._map.project(latlngBounds.getSouthEast(), zoomLevel));
       tileUrls.push(...getTileUrls(this._url, area, zoomLevel, this.getTileSize(), this.options));
     }
-    let nbSaved = 0;
-    for (const urls of arraySplit(tileUrls, 20)) {
-      const data = [];
-      await Promise.all(urls.map(async (tileUrl) => {
-        try {
-          const response = await fetch(tileUrl);
-          if (response.ok) {
-            data.push({
-              key: tileUrl,
-              value: { map: map.normalizedName, tile: await response.blob() }
-            });
-          }
-        } catch (e) {
-          console.error(e);
-        } finally {
-          nbSaved++;
-        }
-      }));
-      await storeArrayDB(state.db, TABLES.TILES.name, data);
-      progressHandler(nbSaved, tileUrls.length);
-    }
+    await saveTileUrls(tileUrls, map.normalizedName, progressHandler);
+    map.state = MAP_STATES.COMPLETE;
     console.timeEnd("saveTiles");
   }
 }
@@ -8679,10 +9438,6 @@ var Offline = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
 const _sfc_main$a = {
   __name: "OpenStreetMap",
   props: {
-    url: {
-      type: String,
-      default: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-    },
     attribution: {
       type: String,
       default: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -8696,9 +9451,8 @@ const _sfc_main$a = {
   setup(__props) {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = new TileLayerOffline(LayerNames.OPEN_STREET_MAP, props.type, props.url, {
-      attribution: props.attribution,
-      maxZoom: 19
+    const layer = new TileLayerOffline(Providers.OPEN_STREET_MAP, props.type, {
+      attribution: props.attribution
     });
     provide("layer", ref(layer));
     whenever($layerGroup, (layerGroup) => {
@@ -8713,25 +9467,9 @@ const _sfc_main$a = {
 const _sfc_main$9 = {
   __name: "Mapbox",
   props: {
-    url: {
-      type: String,
-      default: "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}"
-    },
-    apiKey: {
-      type: String,
-      required: true
-    },
     attribution: {
       type: String,
       default: '&copy <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
-    },
-    tileSize: {
-      type: Number,
-      default: 256
-    },
-    zoomOffset: {
-      type: Number,
-      default: -1
     },
     type: {
       type: String,
@@ -8744,14 +9482,9 @@ const _sfc_main$9 = {
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     const $layerGroup = inject(LayerGroups.TILE);
-    const options = reactive({
-      apiKey: props.apiKey,
-      attribution: props.attribution,
-      tileSize: props.tileSize,
-      zoomOffset: props.zoomOffset,
-      maxZoom: 19
+    const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
+      attribution: props.attribution
     });
-    const layer = new TileLayerOffline(LayerNames.MAPBOX, props.type, props.url, options);
     provide("layer", ref(layer));
     whenever($layerGroup, (layerGroup) => {
       toRaw(layerGroup).clearLayers();
@@ -8762,13 +9495,6 @@ const _sfc_main$9 = {
     };
   }
 };
-var mapTypes = {
-  roadmap: "roadmap",
-  satellite: "satellite",
-  terrain: "terrain",
-  hybrid: "hybrid",
-  cadastral: "cadastral"
-};
 const _sfc_main$8 = {
   __name: "IGN",
   props: {
@@ -8778,38 +9504,25 @@ const _sfc_main$8 = {
     },
     type: {
       type: String,
-      default: mapTypes.roadmap,
-      validator: (type) => [mapTypes.satellite, mapTypes.roadmap, mapTypes.cadastral].includes(type)
+      default: MapTypes.ROADMAP,
+      validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type)
     }
   },
   setup(__props) {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = ref(getLayer(props.type, props.attribution));
+    const layer = ref(getLayer(props.type));
     provide("layer", layer);
     watch(props, (props2) => {
       var _a, _b;
-      set(layer, getLayer(props2.type, props2.attribution));
+      set(layer, getLayer(props2.type));
       (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
       (_b = toRaw(get($layerGroup))) == null ? void 0 : _b.addLayer(get(layer));
     }, { deep: true, immediate: true });
-    function getLayer(type, attribution) {
-      const options = {
-        minZoom: 0,
-        maxZoom: 19,
-        attribution,
-        tileSize: 256
-      };
-      let url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
-      switch (type) {
-        case mapTypes.satellite:
-          url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
-          break;
-        case mapTypes.cadastral:
-          url = "https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
-          break;
-      }
-      return new TileLayerOffline(LayerNames.IGN, type, url, options);
+    function getLayer(type) {
+      return new TileLayerOffline(Providers.IGN, type, {
+        attribution: props.attribution
+      });
     }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
@@ -8828,14 +9541,6 @@ async function importGoogleMapsApi(GOOGLE_MAPS_API_KEY) {
 const _sfc_main$7 = {
   __name: "GoogleMaps",
   props: {
-    url: {
-      type: String,
-      default: "https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-    },
-    apiKey: {
-      type: String,
-      required: true
-    },
     type: {
       type: String,
       default: "roadmap",
@@ -8863,7 +9568,7 @@ const _sfc_main$7 = {
       return { load };
     };
     const $layerGroup = inject(LayerGroups.TILE);
-    const gmaps = useGoogleMutant(props.apiKey);
+    const gmaps = useGoogleMutant(getProviderOptions$1(Providers.GOOGLE_MAPS).apiKey);
     const mutant = ref();
     watch(type, () => setMutant(unref($layerGroup)));
     async function setMutant(layerGroup) {
@@ -9728,4 +10433,8 @@ async function importLeafletGeoman(version = LEAFLET_GEOMAN_VERSION) {
 async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {
   return loadJSFromCDN(`https://unpkg.com/leaflet.smooth_marker_bouncing@${version}/dist/bundle.js`);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LayerNames, LocateControl, _sfc_main$b as MapContainer, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, ScaleControl, Tooltip, ZoomControl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, mapTypes, Bounceable as vBounce };
+const getProviderOptions = getProviderOptions$1;
+function index(options) {
+  setProviderOptions(options);
+}
+export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
