@@ -24,9 +24,7 @@ export default renderless({
 	async setup(props, { emit }) {
 		const map = inject('map');
 
-		if (props.apiKey) {
-			importGoogleMapsApi();
-		}
+		await importGoogleMapsApi();
 
 		await importLeaflet();
 		await importLeafletPegman(props.version);
