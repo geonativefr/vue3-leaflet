@@ -11,11 +11,7 @@
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
 			<Polygon v-for="(zone, name, index) of zones"  :positions="zone" :color="'#3388ff'" :fillColor="'#3388ff'">
-				<Popup>
-					<div>
-						<h2>Zone {{ name }}</h2>
-					</div>
-				</Popup>
+				<Popup>Zone {{ name }}</Popup>
 			</Polygon>
 		</MapContainer>
 		<div>
