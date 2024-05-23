@@ -3,7 +3,7 @@
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
 			<GoogleMaps v-if="provider === 'gmaps'" :type="mapType" />
 			<IGN v-if="provider === 'ign'" :type="mapType" />
-			<Mapbox v-if="provider === 'mapbox'" />
+			<Mapbox v-if="provider === 'mapbox'" :type="mapType"  />
 			<OpenStreetMap v-if="provider === 'osm'" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
