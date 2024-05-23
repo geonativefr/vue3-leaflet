@@ -14,17 +14,24 @@
 				<Popup>Zone {{ name }}</Popup>
 			</Polygon>
 		</MapContainer>
+
 		<div>
-			<label v-for="mapTypeName in MapTypes">
-				<input type="radio" :value="mapTypeName" v-model="mapType" />
-				{{ mapTypeName }}
-			</label>
+			<label>Map provider :</label>
+			<fieldset>
+				<span v-for="providerKey in Providers">
+					<input type="radio" :value="providerKey" v-model="provider" />
+					{{ ProvidersNames[providerKey] }}
+				</span>
+			</fieldset>
 		</div>
 		<div>
-			<label v-for="providerName in ProvidersNames">
-				<input type="radio" :value="providerName" v-model="provider" />
-				{{ providerName }}
-			</label>
+			<label>Map types :</label>
+			<fieldset>
+				<span v-for="mapTypeName in ProvidersMapTypes[provider]">
+					<input type="radio" :value="mapTypeName" v-model="mapType" />
+					{{ mapTypeName }}
+				</span>
+			</fieldset>
 		</div>
 		<div class="app_saved-maps">
 			<h2 class="app_saved-maps_title">Saved maps</h2>
@@ -58,13 +65,13 @@
 		Offline,
 		ProvidersNames,
 		Providers,
-		Polygon, Popup,
+		Polygon, Popup, ProvidersMapTypes,
 	} from '../src';
 	import positions from './positions.json';
 	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
-	const provider = ref('osm');
+	const provider = ref(Providers.OPEN_STREET_MAP);
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {
@@ -109,6 +116,18 @@
 	.app {
 		.map-container {
 			height: 600px;
+		}
+
+		label {
+			display: block;
+			margin: 0.5rem;
+			font-weight: bold;
+		}
+
+		fieldset {
+			display: flex;
+			gap: 1rem;
+			border: none;
 		}
 
 		&_saved-maps {

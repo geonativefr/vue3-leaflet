@@ -13,8 +13,15 @@ export const MapTypes = {
 	CADASTRAL: 'cadastral',
 };
 
+export const ProvidersMapTypes = {
+	GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.TERRAIN, MapTypes.HYBRID],
+	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL],
+	MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE],
+	OPEN_STREET_MAP: [MapTypes.ROADMAP, MapTypes.SATELLITE],
+};
+
 export const ProvidersNames = {
-	GOOGLE_MAPS: 'Google Maps',
+	GOOGLE_MAPS: 'GoogleMaps',
 	IGN: 'IGN',
 	MAPBOX: 'Mapbox',
 	OPEN_STREET_MAP: 'OpenStreetMap',
