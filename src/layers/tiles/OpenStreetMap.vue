@@ -3,10 +3,10 @@
 </template>
 
 <script setup>
-	import { whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref, toRaw } from 'vue';
+	import { get, set } from '@vueuse/core';
+	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -15,23 +15,29 @@
 		},
 		type: {
 			type: String,
-			default: 'roadmap',
-			validator: (type) => ['roadmap'].includes(type),
+			default: MapTypes.ROADMAP,
+			validator: (type) => [MapTypes.ROADMAP, MapTypes.SATELLITE].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = new TileLayerOffline(Providers.OPEN_STREET_MAP, props.type, {
-		attribution: props.attribution,
-	});
+	const layer = ref(getLayer(props.type));
 
-	provide('layer', ref(layer));
-	whenever(
-		$layerGroup,
-		(layerGroup) => {
-			toRaw(layerGroup).clearLayers();
-			toRaw(layerGroup).addLayer(layer);
+	provide('layer', layer);
+
+	watch(
+		props,
+		(props) => {
+			set(layer, getLayer(props.type));
+			toRaw(get($layerGroup))?.clearLayers();
+			toRaw(get($layerGroup))?.addLayer(get(layer));
 		},
-		{ immediate: true }
+		{ deep: true, immediate: true }
 	);
+
+	function getLayer(type) {
+		return new TileLayerOffline(Providers.OPEN_STREET_MAP, type, {
+			attribution: props.attribution,
+		});
+	}
 </script>

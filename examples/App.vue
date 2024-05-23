@@ -1,10 +1,10 @@
 <template>
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
-			<GoogleMaps v-if="provider === 'gmaps'" :type="mapType" />
-			<IGN v-if="provider === 'ign'" :type="mapType" />
-			<Mapbox v-if="provider === 'mapbox'" :type="mapType"  />
-			<OpenStreetMap v-if="provider === 'osm'" />
+			<GoogleMaps v-if="provider === ProvidersNames.GOOGLE_MAPS" :type="mapType" />
+			<IGN v-if="provider === ProvidersNames.IGN" :type="mapType" />
+			<Mapbox v-if="provider === ProvidersNames.MAPBOX" :type="mapType" />
+			<OpenStreetMap v-if="provider === ProvidersNames.OPEN_STREET_MAP" :type="mapType" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
@@ -12,31 +12,15 @@
 			<Marker v-for="position of positions" :position="position"></Marker>
 		</MapContainer>
 		<div>
-			<label>
-				<input type="radio" :value="MapTypes.SATELLITE" v-model="mapType" />
-				{{ MapTypes.SATELLITE }}
-			</label>
-			<label>
-				<input type="radio" :value="MapTypes.ROADMAP" v-model="mapType" />
-				{{ MapTypes.ROADMAP }}
+			<label v-for="mapTypeName in MapTypes">
+				<input type="radio" :value="mapTypeName" v-model="mapType" />
+				{{ mapTypeName }}
 			</label>
 		</div>
 		<div>
-			<label>
-				<input type="radio" value="gmaps" v-model="provider" />
-				Google Maps
-			</label>
-			<label>
-				<input type="radio" value="ign" v-model="provider" />
-				IGN
-			</label>
-			<label>
-				<input type="radio" value="mapbox" v-model="provider" />
-				Mapbox
-			</label>
-			<label>
-				<input type="radio" value="osm" v-model="provider" />
-				OpenStreetMap
+			<label v-for="providerName in ProvidersNames">
+				<input type="radio" :value="providerName" v-model="provider" />
+				{{ providerName }}
 			</label>
 		</div>
 		<div class="app_saved-maps">
