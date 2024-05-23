@@ -1,7 +1,6 @@
 import { MapTypes, Providers } from '../constants.js';
 
 export function getProviderUrl(provider, mapType) {
-	console.log('getProviderUrl');
 	switch (provider) {
 		case Providers.IGN:
 			switch (mapType) {

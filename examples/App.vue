@@ -1,10 +1,10 @@
 <template>
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
-			<GoogleMaps v-if="provider === ProvidersNames.GOOGLE_MAPS" :type="mapType" />
-			<IGN v-if="provider === ProvidersNames.IGN" :type="mapType" />
-			<Mapbox v-if="provider === ProvidersNames.MAPBOX" :type="mapType" />
-			<OpenStreetMap v-if="provider === ProvidersNames.OPEN_STREET_MAP" :type="mapType" />
+			<GoogleMaps v-if="provider === Providers.GOOGLE_MAPS" :type="mapType" />
+			<IGN v-if="provider === Providers.IGN" :type="mapType" />
+			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
+			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
@@ -25,7 +25,7 @@
 			</fieldset>
 		</div>
 		<div>
-			<label>Map types :</label>
+			<label>Map types : {{ mapType }}</label>
 			<fieldset>
 				<span v-for="mapTypeName in ProvidersMapTypes[provider]">
 					<input type="radio" :value="mapTypeName" v-model="mapType" />
