@@ -14,10 +14,10 @@ export const MapTypes = {
 };
 
 export const ProvidersMapTypes = {
-	GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.TERRAIN, MapTypes.HYBRID],
-	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL],
-	MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE],
-	OPEN_STREET_MAP: [MapTypes.ROADMAP, MapTypes.SATELLITE],
+	GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL, MapTypes.HYBRID],
+	MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+	OPEN_STREET_MAP: [MapTypes.ROADMAP, MapTypes.HYBRID],
 };
 
 export const ProvidersNames = {

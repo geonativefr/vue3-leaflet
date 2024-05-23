@@ -21,23 +21,39 @@
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = ref(getLayer(props.type));
-
-	provide('layer', layer);
+	const layers = ref(getLayers(props.type));
+	provide('layers', layers);
 
 	watch(
 		props,
 		(props) => {
-			set(layer, getLayer(props.type));
+			set(layers, getLayers(props.type));
 			toRaw(get($layerGroup))?.clearLayers();
-			toRaw(get($layerGroup))?.addLayer(get(layer));
+			layers.value.forEach((layer) => toRaw(get($layerGroup))?.addLayer(layer));
 		},
 		{ deep: true, immediate: true }
 	);
 
-	function getLayer(type) {
-		return new TileLayerOffline(Providers.IGN, type, {
-			attribution: props.attribution,
-		});
+	function getLayers(type) {
+		switch(type) {
+			case MapTypes.HYBRID:
+				return [
+					new TileLayerOffline(Providers.IGN, MapTypes.SATELLITE, {
+						attribution: props.attribution,
+						opacity: 1,
+					}),
+					new TileLayerOffline(Providers.IGN, MapTypes.ROADMAP, {
+						attribution: props.attribution,
+						opacity: 0.5,
+					}),
+				];
+			default:
+				return [
+					new TileLayerOffline(Providers.IGN, type, {
+						attribution: props.attribution,
+						opacity: 1,
+					}),
+				];
+		}
 	}
 </script>

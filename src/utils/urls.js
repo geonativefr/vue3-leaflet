@@ -14,10 +14,10 @@ export function getProviderUrl(provider, mapType) {
 		case Providers.MAPBOX:
 			switch (mapType) {
 				case MapTypes.SATELLITE:
-					console.log('SATELLITE');
+					return 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={apiKey}';
+				case MapTypes.HYBRID:
 					return 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/{z}/{x}/{y}?access_token={apiKey}';
 				default:
-					console.log('STREETS');
 					return 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}';
 			}
 		case Providers.OPEN_STREET_MAP:
