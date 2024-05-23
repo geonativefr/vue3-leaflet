@@ -10,6 +10,9 @@
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
+			<Polygon v-for="(zone, name, index) of zones"  :positions="zone" :color="'#3388ff'" :fillColor="'#3388ff'">
+				<Popup>Zone {{ name }}</Popup>
+			</Polygon>
 		</MapContainer>
 		<div>
 			<label v-for="mapTypeName in MapTypes">
@@ -55,11 +58,13 @@
 		Offline,
 		ProvidersNames,
 		Providers,
+		Polygon, Popup,
 	} from '../src';
 	import positions from './positions.json';
+	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
-	const provider = ref('ign');
+	const provider = ref('osm');
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {
