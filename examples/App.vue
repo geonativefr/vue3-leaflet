@@ -65,13 +65,15 @@
 		Offline,
 		ProvidersNames,
 		Providers,
-		Polygon, Popup, ProvidersMapTypes,
+		Polygon,
+		Popup,
+		ProvidersMapTypes,
 	} from '../src';
 	import positions from './positions.json';
 	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
-	const provider = ref(Providers.OPEN_STREET_MAP);
+	const provider = ref(Providers.MAPBOX);
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {

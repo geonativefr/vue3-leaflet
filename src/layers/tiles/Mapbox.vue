@@ -6,7 +6,7 @@
 	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, MapTypes, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -16,14 +16,14 @@
 		type: {
 			type: String,
 			default: MapTypes.ROADMAP,
-			validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP].includes(type),
+			validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
 	const layers = ref(getLayers(props.type));
 	provide('layers', layers);
-
+	
 	watch(
 		props,
 		(props) => {
@@ -40,7 +40,6 @@
 				return [
 					new TileLayerOffline(Providers.MAPBOX, type, {
 						attribution: props.attribution,
-						opacity: 1,
 					}),
 				];
 		}
