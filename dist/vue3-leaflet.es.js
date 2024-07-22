@@ -10202,6 +10202,10 @@ var LocateControl = renderless({
       type: Object,
       default: void 0
     },
+    enableHighAccuracy: {
+      type: Boolean,
+      default: void 0
+    },
     version: {
       type: String,
       default: void 0

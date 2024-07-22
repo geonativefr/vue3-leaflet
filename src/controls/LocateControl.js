@@ -14,6 +14,10 @@ export default renderless({
 			type: Object,
 			default: undefined,
 		},
+		enableHighAccuracy: {
+			type: Boolean,
+			default: undefined,
+		},
 		version: {
 			type: String,
 			default: undefined,
