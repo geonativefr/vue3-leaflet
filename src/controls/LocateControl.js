@@ -18,6 +18,10 @@ export default renderless({
 			type: String,
 			default: undefined,
 		},
+		enableHighAccuracy: {
+			type: Boolean,
+			default: undefined,
+		},
 	},
 	async setup(props) {
 		const map = inject('map');
