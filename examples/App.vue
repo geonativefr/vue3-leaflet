@@ -1,43 +1,37 @@
 <template>
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
-			<GoogleMaps v-if="provider === 'gmaps'" :type="mapType" />
-			<IGN v-if="provider === 'ign'" :type="mapType" />
-			<Mapbox v-if="provider === 'mapbox'" />
-			<OpenStreetMap v-if="provider === 'osm'" />
+			<GoogleMaps v-if="provider === Providers.GOOGLE_MAPS" :type="mapType" />
+			<IGN v-if="provider === Providers.IGN" :type="mapType" />
+			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
+			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
+			<Polygon v-for="(zone, name, index) of zones"  :positions="zone" :color="'#3388ff'" :fillColor="'#3388ff'">
+				<Popup>Zone {{ name }}</Popup>
+			</Polygon>
 		</MapContainer>
+
 		<div>
-			<label>
-				<input type="radio" :value="MapTypes.SATELLITE" v-model="mapType" />
-				{{ MapTypes.SATELLITE }}
-			</label>
-			<label>
-				<input type="radio" :value="MapTypes.ROADMAP" v-model="mapType" />
-				{{ MapTypes.ROADMAP }}
-			</label>
+			<label>Map provider :</label>
+			<fieldset>
+				<span v-for="providerKey in Providers">
+					<input type="radio" :value="providerKey" v-model="provider" />
+					{{ ProvidersNames[providerKey] }}
+				</span>
+			</fieldset>
 		</div>
 		<div>
-			<label>
-				<input type="radio" value="gmaps" v-model="provider" />
-				Google Maps
-			</label>
-			<label>
-				<input type="radio" value="ign" v-model="provider" />
-				IGN
-			</label>
-			<label>
-				<input type="radio" value="mapbox" v-model="provider" />
-				Mapbox
-			</label>
-			<label>
-				<input type="radio" value="osm" v-model="provider" />
-				OpenStreetMap
-			</label>
+			<label>Map types : {{ mapType }}</label>
+			<fieldset>
+				<span v-for="mapTypeName in ProvidersMapTypes[provider]">
+					<input type="radio" :value="mapTypeName" v-model="mapType" />
+					{{ mapTypeName }}
+				</span>
+			</fieldset>
 		</div>
 		<div class="app_saved-maps">
 			<h2 class="app_saved-maps_title">Saved maps</h2>
@@ -71,11 +65,15 @@
 		Offline,
 		ProvidersNames,
 		Providers,
+		Polygon,
+		Popup,
+		ProvidersMapTypes,
 	} from '../src';
 	import positions from './positions.json';
+	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
-	const provider = ref('ign');
+	const provider = ref(Providers.MAPBOX);
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {
@@ -120,6 +118,18 @@
 	.app {
 		.map-container {
 			height: 600px;
+		}
+
+		label {
+			display: block;
+			margin: 0.5rem;
+			font-weight: bold;
+		}
+
+		fieldset {
+			display: flex;
+			gap: 1rem;
+			border: none;
 		}
 
 		&_saved-maps {

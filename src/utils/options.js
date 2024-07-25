@@ -2,14 +2,17 @@ import merge from 'lodash.merge';
 
 let providerOptions = {
 	IGN: {
-		maxZoom: 19,
+		maxZoom: 21,
+		opacity: 1,
 	},
 	MAPBOX: {
-		maxZoom: 19,
+		maxZoom: 21,
+		opacity: 1,
 		zoomOffset: -1,
 	},
 	OPEN_STREET_MAP: {
-		maxZoom: 19,
+		maxZoom: 21,
+		opacity: 1,
 	},
 };
 
