@@ -1,7 +1,11 @@
 <template>
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
-			<GoogleMaps v-if="provider === 'gmaps'" :type="mapType" />
+			<GoogleMaps
+				v-if="provider === 'gmaps'"
+				:type="mapType"
+				:additional-layers="additionalLayers"
+			/>
 			<IGN v-if="provider === 'ign'" :type="mapType" />
 			<Mapbox v-if="provider === 'mapbox'" />
 			<OpenStreetMap v-if="provider === 'osm'" />
@@ -11,17 +15,7 @@
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
 		</MapContainer>
-		<div>
-			<label>
-				<input type="radio" :value="MapTypes.SATELLITE" v-model="mapType" />
-				{{ MapTypes.SATELLITE }}
-			</label>
-			<label>
-				<input type="radio" :value="MapTypes.ROADMAP" v-model="mapType" />
-				{{ MapTypes.ROADMAP }}
-			</label>
-		</div>
-		<div>
+		<div class="selector">
 			<label>
 				<input type="radio" value="gmaps" v-model="provider" />
 				Google Maps
@@ -39,6 +33,23 @@
 				OpenStreetMap
 			</label>
 		</div>
+		<div class="selector">
+			<label>
+				<input type="radio" :value="MapTypes.SATELLITE" v-model="mapType" />
+				{{ MapTypes.SATELLITE }}
+			</label>
+			<label>
+				<input type="radio" :value="MapTypes.ROADMAP" v-model="mapType" />
+				{{ MapTypes.ROADMAP }}
+			</label>
+		</div>
+		<div class="selector">
+			<label v-if="provider === 'gmaps'" v-for="layer in AdditionalGoogleLayers" :key="layer">
+				<input type="checkbox" :value="layer" v-model="additionalLayers" />
+				{{ layer }}
+			</label>
+		</div>
+
 		<div class="app_saved-maps">
 			<h2 class="app_saved-maps_title">Saved maps</h2>
 			<div class="app_saved-maps_list">
@@ -70,12 +81,13 @@
 		Marker,
 		Offline,
 		ProvidersNames,
-		Providers,
+		Providers, AdditionalGoogleLayers,
 	} from '../src';
 	import positions from './positions.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
 	const provider = ref('ign');
+	const additionalLayers = ref([]);
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {
@@ -118,6 +130,9 @@
 
 <style lang="scss">
 	.app {
+		.selector {
+			margin: 1rem 0;
+		}
 		.map-container {
 			height: 600px;
 		}

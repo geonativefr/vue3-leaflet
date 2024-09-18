@@ -11,6 +11,7 @@ export const MapTypes = {
 	TERRAIN: 'terrain',
 	HYBRID: 'hybrid',
 	CADASTRAL: 'cadastral',
+	TRAFFIC: 'traffic',
 };
 
 export const ProvidersNames = {
@@ -24,3 +25,9 @@ export const LayerGroups = {
 	PIN: 'pinLayerGroup',
 	TILE: 'tileLayerGroup',
 };
+
+export const AdditionalGoogleLayers = {
+	TRAFFIC: 'TrafficLayer',
+	TRANSIT: 'TransitLayer',
+	BICYCLING: 'BicyclingLayer',
+}
