@@ -11,7 +11,6 @@ export const MapTypes = {
 	TERRAIN: 'terrain',
 	HYBRID: 'hybrid',
 	CADASTRAL: 'cadastral',
-	TRAFFIC: 'traffic',
 };
 
 export const ProvidersNames = {
