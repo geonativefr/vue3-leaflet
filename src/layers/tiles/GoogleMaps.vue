@@ -38,26 +38,25 @@
 
 	const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
 		const googleLayers = ref();
-		const mount = (layerGroup, options) => {
+		const mount = async (layerGroup, options) => {
+			googleLayers.value = await L.gridLayer.googleMutant(options).addTo(layerGroup);
 			// HACK : Find all div with class leaflet-control-attribution. Remove all except the first one.
 			document.querySelectorAll('.leaflet-control-attribution').forEach((control, index) => {
 				if (index > 0) {
 					control.remove();
 				}
 			});
-			googleLayers.value = L.gridLayer.googleMutant(options).addTo(layerGroup);
-			return googleLayers.value;
 		};
 		const load = async (layerGroup, options = defaultOptions) => {
 			await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-			mount(layerGroup, options);
-			return {};
+			await mount(layerGroup, options);
+			return googleLayers.value;
 		};
 		const addGoogleLayer = (googleLayerName) => {
-			if (googleLayers.value) googleLayers.value.addGoogleLayer(googleLayerName);
+			googleLayers.value.addGoogleLayer(googleLayerName);
 		};
 		const removeGoogleLayer = (googleLayerName) => {
-			if (googleLayers.value) googleLayers.value.removeGoogleLayer(googleLayerName);
+			googleLayers.value.removeGoogleLayer(googleLayerName);
 		};
 		return { load, addGoogleLayer, removeGoogleLayer };
 	};
