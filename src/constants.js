@@ -24,3 +24,9 @@ export const LayerGroups = {
 	PIN: 'pinLayerGroup',
 	TILE: 'tileLayerGroup',
 };
+
+export const AdditionalGoogleLayers = {
+	TRAFFIC: 'TrafficLayer',
+	TRANSIT: 'TransitLayer',
+	BICYCLING: 'BicyclingLayer',
+}

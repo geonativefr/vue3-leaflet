@@ -8,7 +8,7 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import { LayerGroups, Providers } from '../../constants';
+	import { AdditionalGoogleLayers, LayerGroups, Providers } from '../../constants';
 	import { getProviderOptions } from '../../utils/options';
 
 	const props = defineProps({
@@ -16,6 +16,13 @@
 			type: String,
 			default: 'roadmap',
 			validator: (type) => ['roadmap', 'satellite', 'terrain', 'hybrid'].includes(type),
+		},
+		additionalLayers: {
+			type: Array,
+			default: () => [],
+			validator(value) {
+				return value.every((layer) => Object.values(AdditionalGoogleLayers).includes(layer));
+			}
 		},
 		version: {
 			type: String,
@@ -26,44 +33,50 @@
 	await importLeaflet(inject('leaflet.version'));
 	await importLeafletGoogleMutant(props.version);
 
-	const { type } = toRefs(props);
+	const { type, additionalLayers } = toRefs(props);
 	const defaultOptions = reactive({ type });
 
 	const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
+		const googleLayers = ref();
 		const mount = async (layerGroup, options) => {
-			const gmapsLayer = await L.gridLayer.googleMutant(options).addTo(layerGroup);
+			googleLayers.value = await L.gridLayer.googleMutant(options).addTo(layerGroup);
 			// HACK : Find all div with class leaflet-control-attribution. Remove all except the first one.
 			document.querySelectorAll('.leaflet-control-attribution').forEach((control, index) => {
 				if (index > 0) {
 					control.remove();
 				}
 			});
-			return gmapsLayer;
 		};
-
 		const load = async (layerGroup, options = defaultOptions) => {
 			await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-			mount(layerGroup, options);
-			return {};
+			await mount(layerGroup, options);
+			return googleLayers.value;
 		};
-
-		return { load };
+		const addGoogleLayer = (googleLayerName) => {
+			googleLayers.value.addGoogleLayer(googleLayerName);
+		};
+		const removeGoogleLayer = (googleLayerName) => {
+			googleLayers.value.removeGoogleLayer(googleLayerName);
+		};
+		return { load, addGoogleLayer, removeGoogleLayer };
 	};
 
 	const $layerGroup = inject(LayerGroups.TILE);
 	const gmaps = useGoogleMutant(getProviderOptions(Providers.GOOGLE_MAPS).apiKey);
 	const mutant = ref();
-	watch(type, () => setMutant(unref($layerGroup)));
+	watch(type, () => setMutant(unref($layerGroup), unref(additionalLayers)));
+	watch(additionalLayers, () => setMutant(unref($layerGroup), unref(additionalLayers)));
 
-	async function setMutant(layerGroup) {
+	async function setMutant(layerGroup, additionalLayers) {
 		set(mutant, await gmaps.load(layerGroup, defaultOptions));
+		additionalLayers.forEach((layer) => gmaps.addGoogleLayer(layer));
 	}
 
 	whenever(
 		$layerGroup,
 		(layerGroup) => {
 			toRaw(layerGroup).clearLayers();
-			setMutant(layerGroup);
+			setMutant(layerGroup, unref(additionalLayers));
 		},
 		{ immediate: true }
 	);
