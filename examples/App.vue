@@ -81,7 +81,8 @@
 		Marker,
 		Offline,
 		ProvidersNames,
-		Providers, AdditionalGoogleLayers,
+		Providers,
+		AdditionalGoogleLayers,
 	} from '../src';
 	import positions from './positions.json';
 
