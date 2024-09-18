@@ -30,7 +30,17 @@
 	const defaultOptions = reactive({ type });
 
 	const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-		const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
+		const mount = async (layerGroup, options) => {
+			const gmapsLayer = await L.gridLayer.googleMutant(options).addTo(layerGroup);
+			// HACK : Find all div with class leaflet-control-attribution. Remove all except the first one.
+			document.querySelectorAll('.leaflet-control-attribution').forEach((control, index) => {
+				if (index > 0) {
+					control.remove();
+				}
+			});
+			return gmapsLayer;
+		};
+
 		const load = async (layerGroup, options = defaultOptions) => {
 			await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
 			mount(layerGroup, options);
