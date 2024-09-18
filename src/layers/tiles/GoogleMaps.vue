@@ -8,7 +8,7 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import { LayerGroups, Providers } from '../../constants';
+	import { AdditionalGoogleLayers, LayerGroups, Providers } from '../../constants';
 	import { getProviderOptions } from '../../utils/options';
 
 	const props = defineProps({
