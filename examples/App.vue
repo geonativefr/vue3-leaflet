@@ -28,7 +28,7 @@
 				{{ mapTypeKey }}
 			</label>
 		</div>
-		<div class="selector" v-if="provider === Providers.GOOGLE_MAPS && mapType === MapTypes.ROADMAP">
+		<div class="selector" v-if="provider === Providers.GOOGLE_MAPS && mapType !== MapTypes.SATELLITE">
 			<label v-for="layer in AdditionalGoogleLayers" :key="layer">
 				<input type="checkbox" :value="layer" v-model="additionalLayers" />
 				{{ layer }}
