@@ -72,6 +72,7 @@
 		Polygon,
 	} from '../src';
 	import positions from './positions.json';
+	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
 	const provider = ref(Providers.IGN);
