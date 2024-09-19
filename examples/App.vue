@@ -7,8 +7,8 @@
 				:additional-layers="additionalLayers"
 			/>
 			<IGN v-if="provider === Providers.IGN" :type="mapType" />
-			<Mapbox v-if="provider === Providers.MAPBOX" />
-			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" />
+			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
+			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
