@@ -719,7 +719,7 @@ function setProviderOptions(_providerOptions) {
 }
 const LEAFLET_VERSION = "1.9.4";
 const LEAFLET_LOCATE_CONTROL_VERSION = "0.79.0";
-const LEAFLET_GOOGLE_MUTANT_VERSION = "0.14.0";
+const LEAFLET_GOOGLE_MUTANT_VERSION = "0.14.1";
 const LEAFLET_PEGMAN_VERSION = "0.1.6";
 const LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION = "2.0.1";
 const LEAFLET_ARROWHEADS_VERSION = "1.4.0";
@@ -841,6 +841,11 @@ const ProvidersNames = {
 const LayerGroups = {
   PIN: "pinLayerGroup",
   TILE: "tileLayerGroup"
+};
+const AdditionalGoogleLayers = {
+  TRAFFIC: "TrafficLayer",
+  TRANSIT: "TransitLayer",
+  BICYCLING: "BicyclingLayer"
 };
 var MapContainer_vue_vue_type_style_index_0_lang = /* @__PURE__ */ (() => ".map-container{height:250px}.map-container_map{height:100%}\n")();
 const _hoisted_1$2 = { class: "map-container" };
@@ -9546,6 +9551,13 @@ const _sfc_main$7 = {
       default: "roadmap",
       validator: (type) => ["roadmap", "satellite", "terrain", "hybrid"].includes(type)
     },
+    additionalLayers: {
+      type: Array,
+      default: () => [],
+      validator(value) {
+        return value.every((layer) => Object.values(AdditionalGoogleLayers).includes(layer));
+      }
+    },
     version: {
       type: String,
       default: void 0
@@ -9556,27 +9568,43 @@ const _sfc_main$7 = {
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     [__temp, __restore] = withAsyncContext(() => importLeafletGoogleMutant(props.version)), await __temp, __restore();
-    const { type } = toRefs(props);
+    const { type, additionalLayers } = toRefs(props);
     const defaultOptions = reactive({ type });
     const useGoogleMutant = (GOOGLE_MAPS_API_KEY) => {
-      const mount = (layerGroup, options) => L.gridLayer.googleMutant(options).addTo(layerGroup);
+      const googleLayers = ref();
+      const mount = async (layerGroup, options) => {
+        googleLayers.value = await L.gridLayer.googleMutant(options).addTo(layerGroup);
+        document.querySelectorAll(".leaflet-control-attribution").forEach((control, index2) => {
+          if (index2 > 0) {
+            control.remove();
+          }
+        });
+      };
       const load = async (layerGroup, options = defaultOptions) => {
         await importGoogleMapsApi(GOOGLE_MAPS_API_KEY);
-        mount(layerGroup, options);
-        return {};
+        await mount(layerGroup, options);
+        return googleLayers.value;
       };
-      return { load };
+      const addGoogleLayer = (googleLayerName) => {
+        googleLayers.value.addGoogleLayer(googleLayerName);
+      };
+      const removeGoogleLayer = (googleLayerName) => {
+        googleLayers.value.removeGoogleLayer(googleLayerName);
+      };
+      return { load, addGoogleLayer, removeGoogleLayer };
     };
     const $layerGroup = inject(LayerGroups.TILE);
     const gmaps = useGoogleMutant(getProviderOptions$1(Providers.GOOGLE_MAPS).apiKey);
     const mutant = ref();
-    watch(type, () => setMutant(unref($layerGroup)));
-    async function setMutant(layerGroup) {
+    watch(type, () => setMutant(unref($layerGroup), unref(additionalLayers)));
+    watch(additionalLayers, () => setMutant(unref($layerGroup), unref(additionalLayers)));
+    async function setMutant(layerGroup, additionalLayers2) {
       set(mutant, await gmaps.load(layerGroup, defaultOptions));
+      additionalLayers2.forEach((layer) => gmaps.addGoogleLayer(layer));
     }
     whenever($layerGroup, (layerGroup) => {
       toRaw(layerGroup).clearLayers();
-      setMutant(layerGroup);
+      setMutant(layerGroup, unref(additionalLayers));
     }, { immediate: true });
     return (_ctx, _cache) => {
       return mutant.value ? renderSlot(_ctx.$slots, "default", { key: 0 }) : createCommentVNode("", true);
@@ -10441,4 +10469,4 @@ const getProviderOptions = getProviderOptions$1;
 function index(options) {
   setProviderOptions(options);
 }
-export { _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { AdditionalGoogleLayers, _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
