@@ -1,3 +1,8 @@
+export const DefaultOptions = {
+	MAX_ZOOM: 19,
+	OPACITY: 1,
+};
+
 export const Providers = {
 	GOOGLE_MAPS: 'GOOGLE_MAPS',
 	IGN: 'IGN',
