@@ -6,7 +6,7 @@
 	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, MapTypes, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -16,29 +16,42 @@
 		type: {
 			type: String,
 			default: MapTypes.ROADMAP,
-			validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type),
+			validator: (type) => ProvidersMapTypes[Providers.IGN].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-
-	const layer = ref(getLayer(props.type));
-
-	provide('layer', layer);
+	const layers = ref(getLayers(props.type));
+	provide('layers', layers);
 
 	watch(
 		props,
 		(props) => {
-			set(layer, getLayer(props.type));
+			set(layers, getLayers(props.type));
 			toRaw(get($layerGroup))?.clearLayers();
-			toRaw(get($layerGroup))?.addLayer(get(layer));
+			layers.value.forEach((layer) => toRaw(get($layerGroup))?.addLayer(layer));
 		},
 		{ deep: true, immediate: true }
 	);
-
-	function getLayer(type) {
-		return new TileLayerOffline(Providers.IGN, type, {
-			attribution: props.attribution,
-		});
+	
+	function getLayers(type) {
+		switch(type) {
+			case MapTypes.HYBRID:
+				return [
+					new TileLayerOffline(Providers.IGN, MapTypes.SATELLITE, {
+						attribution: props.attribution,
+					}),
+					new TileLayerOffline(Providers.IGN, MapTypes.ROADMAP, {
+						attribution: props.attribution,
+						opacity: 0.5,
+					}),
+				];
+			default:
+				return [
+					new TileLayerOffline(Providers.IGN, type, {
+						attribution: props.attribution,
+					}),
+				];
+		}
 	}
 </script>

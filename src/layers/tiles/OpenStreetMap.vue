@@ -3,10 +3,10 @@
 </template>
 
 <script setup>
-	import { whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref, toRaw } from 'vue';
+	import { get, set, whenever } from '@vueuse/core';
+	import { inject, provide, reactive, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -15,23 +15,43 @@
 		},
 		type: {
 			type: String,
-			default: 'roadmap',
-			validator: (type) => ['roadmap'].includes(type),
+			default: MapTypes.ROADMAP,
+			validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = new TileLayerOffline(Providers.OPEN_STREET_MAP, props.type, {
-		attribution: props.attribution,
-	});
+	const layers = ref(getLayers(props.type));
+	provide('layers', layers);
 
-	provide('layer', ref(layer));
-	whenever(
-		$layerGroup,
-		(layerGroup) => {
-			toRaw(layerGroup).clearLayers();
-			toRaw(layerGroup).addLayer(layer);
+	watch(
+		props,
+		(props) => {
+			set(layers, getLayers(props.type));
+			toRaw(get($layerGroup))?.clearLayers();
+			layers.value.forEach((layer) => toRaw(get($layerGroup))?.addLayer(layer));
 		},
-		{ immediate: true }
+		{ deep: true, immediate: true }
 	);
+
+	function getLayers(type) {
+		switch (type) {
+			case MapTypes.HYBRID:
+				return [
+					new TileLayerOffline(Providers.OPEN_STREET_MAP, MapTypes.SATELLITE, {
+						attribution: props.attribution,
+					}),
+					new TileLayerOffline(Providers.OPEN_STREET_MAP, MapTypes.ROADMAP, {
+						attribution: props.attribution,
+						opacity: 0.5,
+					}),
+				];
+			default:
+				return [
+					new TileLayerOffline(Providers.OPEN_STREET_MAP, type, {
+						attribution: props.attribution,
+					}),
+				];
+		}
+	}
 </script>
