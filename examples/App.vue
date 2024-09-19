@@ -43,8 +43,8 @@
 				{{ MapTypes.ROADMAP }}
 			</label>
 		</div>
-		<div class="selector" v-if="mapType === 'roadmap'">
-			<label v-if="provider === 'gmaps'" v-for="layer in AdditionalGoogleLayers" :key="layer">
+		<div class="selector" v-if="provider === Providers.GOOGLE_MAPS && mapType !== MapTypes.SATELLITE">
+			<label v-for="layer in AdditionalGoogleLayers" :key="layer">
 				<input type="checkbox" :value="layer" v-model="additionalLayers" />
 				{{ layer }}
 			</label>
