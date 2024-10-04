@@ -2,49 +2,34 @@
 	<div class="app">
 		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
 			<GoogleMaps
-				v-if="provider === 'gmaps'"
+				v-if="provider === Providers.GOOGLE_MAPS"
 				:type="mapType"
 				:additional-layers="additionalLayers"
 			/>
-			<IGN v-if="provider === 'ign'" :type="mapType" />
-			<Mapbox v-if="provider === 'mapbox'" />
-			<OpenStreetMap v-if="provider === 'osm'" />
+			<IGN v-if="provider === Providers.IGN" :type="mapType" />
+			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
+			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
+			<Polygon v-for="(zone, name) of zones" :positions="zone" color="#3388ff" fillColor="#3388ff"></Polygon>
 		</MapContainer>
 		<div class="selector">
-			<label>
-				<input type="radio" value="gmaps" v-model="provider" />
-				Google Maps
-			</label>
-			<label>
-				<input type="radio" value="ign" v-model="provider" />
-				IGN
-			</label>
-			<label>
-				<input type="radio" value="mapbox" v-model="provider" />
-				Mapbox
-			</label>
-			<label>
-				<input type="radio" value="osm" v-model="provider" />
-				OpenStreetMap
+			<label v-for="providerKey in Object.keys(ProvidersNames)" :key="providerKey">
+				<input type="radio" :value="providerKey" v-model="provider" />
+				{{ ProvidersNames[providerKey] }}
 			</label>
 		</div>
 		<div class="selector">
-			<label>
-				<input type="radio" :value="MapTypes.SATELLITE" v-model="mapType" />
-				{{ MapTypes.SATELLITE }}
-			</label>
-			<label>
-				<input type="radio" :value="MapTypes.ROADMAP" v-model="mapType" />
-				{{ MapTypes.ROADMAP }}
+			<label v-for="mapTypeKey in ProvidersMapTypes[provider]" :key="mapTypeKey">
+				<input type="radio" :value="mapTypeKey" v-model="mapType" />
+				{{ mapTypeKey }}
 			</label>
 		</div>
-		<div class="selector" v-if="mapType === 'roadmap'">
-			<label v-if="provider === 'gmaps'" v-for="layer in AdditionalGoogleLayers" :key="layer">
+		<div class="selector" v-if="provider === Providers.GOOGLE_MAPS && mapType !== MapTypes.SATELLITE">
+			<label v-for="layer in AdditionalGoogleLayers" :key="layer">
 				<input type="checkbox" :value="layer" v-model="additionalLayers" />
 				{{ layer }}
 			</label>
@@ -66,7 +51,7 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
+	import { ref, watch } from 'vue';
 	import Vue3Leaflet, {
 		GoogleMaps,
 		Mapbox,
@@ -80,15 +65,22 @@
 		MapTypes,
 		Marker,
 		Offline,
+		ProvidersMapTypes,
 		ProvidersNames,
 		Providers,
 		AdditionalGoogleLayers,
+		Polygon,
 	} from '../src';
 	import positions from './positions.json';
+	import zones from './zones.json';
 
 	const mapType = ref(MapTypes.ROADMAP);
-	const provider = ref('ign');
+	const provider = ref(Providers.IGN);
 	const additionalLayers = ref([]);
+
+	watch(provider, () => {
+		mapType.value = ProvidersMapTypes[provider.value][0];
+	});
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {

@@ -4,9 +4,9 @@
 
 <script setup>
 	import { whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref, toRaw } from 'vue';
+	import { inject, provide, ref, toRaw } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -15,8 +15,8 @@
 		},
 		type: {
 			type: String,
-			default: 'roadmap',
-			validator: (type) => ['roadmap'].includes(type),
+			default: MapTypes.ROADMAP,
+			validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type),
 		},
 	});
 

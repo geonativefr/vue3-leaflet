@@ -6,7 +6,7 @@
 	import { get, set } from '@vueuse/core';
 	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
-	import { LayerGroups, MapTypes, Providers } from '../../constants';
+	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
 	const props = defineProps({
 		attribution: {
@@ -16,16 +16,14 @@
 		type: {
 			type: String,
 			default: MapTypes.ROADMAP,
-			validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type),
+			validator: (type) => ProvidersMapTypes[Providers.IGN].includes(type),
 		},
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-
 	const layer = ref(getLayer(props.type));
 
 	provide('layer', layer);
-
 	watch(
 		props,
 		(props) => {

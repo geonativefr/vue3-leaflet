@@ -1,3 +1,7 @@
+export const DefaultOptions = {
+	MAX_ZOOM: 19,
+};
+
 export const Providers = {
 	GOOGLE_MAPS: 'GOOGLE_MAPS',
 	IGN: 'IGN',
@@ -11,6 +15,13 @@ export const MapTypes = {
 	TERRAIN: 'terrain',
 	HYBRID: 'hybrid',
 	CADASTRAL: 'cadastral',
+};
+
+export const ProvidersMapTypes = {
+	GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL],
+	MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+	OPEN_STREET_MAP: [MapTypes.ROADMAP],
 };
 
 export const ProvidersNames = {

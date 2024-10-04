@@ -1,15 +1,16 @@
 import merge from 'lodash.merge';
+import { DefaultOptions } from '../constants.js';
 
 let providerOptions = {
 	IGN: {
-		maxZoom: 19,
+		maxZoom: DefaultOptions.MAX_ZOOM,
 	},
 	MAPBOX: {
-		maxZoom: 19,
+		maxZoom: DefaultOptions.MAX_ZOOM,
 		zoomOffset: -1,
 	},
 	OPEN_STREET_MAP: {
-		maxZoom: 19,
+		maxZoom: DefaultOptions.MAX_ZOOM,
 	},
 };
 
