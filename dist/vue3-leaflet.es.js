@@ -9505,12 +9505,12 @@ const _sfc_main$9 = {
   props: {
     attribution: {
       type: String,
-      default: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
+      default: '&copy <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
     },
     type: {
       type: String,
       default: MapTypes.ROADMAP,
-      validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type)
+      validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type)
     }
   },
   async setup(__props) {
@@ -9518,27 +9518,14 @@ const _sfc_main$9 = {
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     const $layerGroup = inject(LayerGroups.TILE);
-    const layers = ref(getLayers(props.type));
-    provide("layers", layers);
-    watch(props, (props2) => {
-      var _a;
-      set(layers, getLayers(props2.type));
-      (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
-      layers.value.forEach((layer) => {
-        var _a2;
-        return (_a2 = toRaw(get($layerGroup))) == null ? void 0 : _a2.addLayer(layer);
-      });
-    }, { deep: true, immediate: true });
-    function getLayers(type) {
-      switch (type) {
-        default:
-          return [
-            new TileLayerOffline(Providers.MAPBOX, type, {
-              attribution: props.attribution
-            })
-          ];
-      }
-    }
+    const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
+      attribution: props.attribution
+    });
+    provide("layer", ref(layer));
+    whenever($layerGroup, (layerGroup) => {
+      toRaw(layerGroup).clearLayers();
+      toRaw(layerGroup).addLayer(layer);
+    }, { immediate: true });
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
