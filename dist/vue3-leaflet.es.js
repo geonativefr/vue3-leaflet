@@ -699,8 +699,7 @@ var lodash_merge = { exports: {} };
 })(lodash_merge, lodash_merge.exports);
 var merge = lodash_merge.exports;
 const DefaultOptions = {
-  MAX_ZOOM: 19,
-  OPACITY: 1
+  MAX_ZOOM: 19
 };
 const Providers = {
   GOOGLE_MAPS: "GOOGLE_MAPS",
@@ -738,17 +737,14 @@ const AdditionalGoogleLayers = {
 };
 let providerOptions = {
   IGN: {
-    maxZoom: DefaultOptions.MAX_ZOOM,
-    opacity: DefaultOptions.OPACITY
+    maxZoom: DefaultOptions.MAX_ZOOM
   },
   MAPBOX: {
     maxZoom: DefaultOptions.MAX_ZOOM,
-    opacity: DefaultOptions.OPACITY,
     zoomOffset: -1
   },
   OPEN_STREET_MAP: {
-    maxZoom: DefaultOptions.MAX_ZOOM,
-    opacity: DefaultOptions.OPACITY
+    maxZoom: DefaultOptions.MAX_ZOOM
   }
 };
 function getProviderOptions$1(layer) {
@@ -9510,22 +9506,25 @@ const _sfc_main$9 = {
     type: {
       type: String,
       default: MapTypes.ROADMAP,
-      validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type)
+      validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type)
     }
   },
-  async setup(__props) {
-    let __temp, __restore;
+  setup(__props) {
     const props = __props;
-    [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
-      attribution: props.attribution
-    });
+    const layer = ref(getLayer(props.type));
     provide("layer", ref(layer));
-    whenever($layerGroup, (layerGroup) => {
-      toRaw(layerGroup).clearLayers();
-      toRaw(layerGroup).addLayer(layer);
-    }, { immediate: true });
+    watch(props, (props2) => {
+      var _a, _b;
+      set(layer, getLayer(props2.type));
+      (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
+      (_b = toRaw(get($layerGroup))) == null ? void 0 : _b.addLayer(get(layer));
+    }, { deep: true, immediate: true });
+    function getLayer(type) {
+      return new TileLayerOffline(Providers.MAPBOX, type, {
+        attribution: props.attribution
+      });
+    }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -9579,8 +9578,8 @@ const _sfc_main$7 = {
   props: {
     type: {
       type: String,
-      default: "roadmap",
-      validator: (type) => ["roadmap", "satellite", "terrain", "hybrid"].includes(type)
+      default: MapTypes.ROADMAP,
+      validator: (type) => ProvidersMapTypes[Providers.GOOGLE_MAPS].includes(type)
     },
     additionalLayers: {
       type: Array,
