@@ -8,14 +8,14 @@
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
-	import { AdditionalGoogleLayers, LayerGroups, Providers } from '../../constants';
+	import { AdditionalGoogleLayers, MapTypes, ProvidersMapTypes, LayerGroups, Providers } from '../../constants';
 	import { getProviderOptions } from '../../utils/options';
 
 	const props = defineProps({
 		type: {
 			type: String,
-			default: 'roadmap',
-			validator: (type) => ['roadmap', 'satellite', 'terrain', 'hybrid'].includes(type),
+			default: MapTypes.ROADMAP,
+			validator: (type) => ProvidersMapTypes[Providers.GOOGLE_MAPS].includes(type),
 		},
 		additionalLayers: {
 			type: Array,
