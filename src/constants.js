@@ -20,9 +20,9 @@ export const MapTypes = {
 
 export const ProvidersMapTypes = {
 	GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
-	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL, MapTypes.HYBRID],
+	IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL],
 	MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
-	OPEN_STREET_MAP: [MapTypes.ROADMAP, MapTypes.HYBRID],
+	OPEN_STREET_MAP: [MapTypes.ROADMAP],
 };
 
 export const ProvidersNames = {

@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
+	import { ref, watch } from 'vue';
 	import Vue3Leaflet, {
 		GoogleMaps,
 		Mapbox,
@@ -77,6 +77,10 @@
 	const mapType = ref(MapTypes.ROADMAP);
 	const provider = ref(Providers.IGN);
 	const additionalLayers = ref([]);
+
+	watch(provider, () => {
+		mapType.value = ProvidersMapTypes[provider.value][0];
+	});
 
 	Vue3Leaflet({
 		[Providers.GOOGLE_MAPS]: {

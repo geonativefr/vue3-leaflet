@@ -3,46 +3,38 @@
 </template>
 
 <script setup>
-	import { get, set } from '@vueuse/core';
-	import { inject, provide, ref, toRaw, watch } from 'vue';
+	import { whenever } from '@vueuse/core';
+	import { inject, provide, ref, toRaw } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
-	await importLeaflet(inject('leaflet.version'));
 
 	const props = defineProps({
 		attribution: {
 			type: String,
-			default: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>',
+			default:
+				'&copy <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>',
 		},
 		type: {
 			type: String,
 			default: MapTypes.ROADMAP,
-			validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type),
+			validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type),
 		},
 	});
+
+	await importLeaflet(inject('leaflet.version'));
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layers = ref(getLayers(props.type));
+	const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
+		attribution: props.attribution,
+	});
 
-	provide('layers', layers);
-	watch(
-		props,
-		(props) => {
-			set(layers, getLayers(props.type));
-			toRaw(get($layerGroup))?.clearLayers();
-			layers.value.forEach((layer) => toRaw(get($layerGroup))?.addLayer(layer));
+	provide('layer', ref(layer));
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			toRaw(layerGroup).clearLayers();
+			toRaw(layerGroup).addLayer(layer);
 		},
-		{ deep: true, immediate: true }
+		{ immediate: true }
 	);
-
-	function getLayers(type) {
-		switch (type) {
-			default:
-				return [
-					new TileLayerOffline(Providers.MAPBOX, type, {
-						attribution: props.attribution,
-					}),
-				];
-		}
-	}
 </script>

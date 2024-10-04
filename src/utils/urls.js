@@ -11,7 +11,7 @@ export function getProviderUrl(provider, mapType) {
 				case MapTypes.CADASTRAL:
 					return 'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png';
 				default:
-					throw new Error('Map type not supported');
+					throw new Error('Map type ' + mapType + ' not supported for IGN');
 			}
 		case Providers.MAPBOX:
 			switch (mapType) {
@@ -22,18 +22,16 @@ export function getProviderUrl(provider, mapType) {
 				case MapTypes.HYBRID:
 					return 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/{z}/{x}/{y}?access_token={apiKey}';
 				default:
-					throw new Error('Map type not supported');
+					throw new Error('Map type ' + mapType + ' not supported for Mapbox');
 			}
 		case Providers.OPEN_STREET_MAP:
 			switch (mapType) {
 				case MapTypes.ROADMAP:
 					return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-				case MapTypes.SATELLITE:
-					return 'https://wxs.ign.fr/essentiels/geoportail/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg';
 				default:
-					throw new Error('Map type not supported');
+					throw new Error('Map type ' + mapType + ' not supported for OpenStreetMap');
 			}
 		default:
-			throw new Error('Provider not supported');
+			throw new Error('Provider ' + provider + ' not supported');
 	}
 }

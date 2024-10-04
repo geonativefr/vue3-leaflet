@@ -698,16 +698,57 @@ var lodash_merge = { exports: {} };
   module.exports = merge2;
 })(lodash_merge, lodash_merge.exports);
 var merge = lodash_merge.exports;
+const DefaultOptions = {
+  MAX_ZOOM: 19,
+  OPACITY: 1
+};
+const Providers = {
+  GOOGLE_MAPS: "GOOGLE_MAPS",
+  IGN: "IGN",
+  MAPBOX: "MAPBOX",
+  OPEN_STREET_MAP: "OPEN_STREET_MAP"
+};
+const MapTypes = {
+  ROADMAP: "roadmap",
+  SATELLITE: "satellite",
+  TERRAIN: "terrain",
+  HYBRID: "hybrid",
+  CADASTRAL: "cadastral"
+};
+const ProvidersMapTypes = {
+  GOOGLE_MAPS: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+  IGN: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.CADASTRAL],
+  MAPBOX: [MapTypes.ROADMAP, MapTypes.SATELLITE, MapTypes.HYBRID],
+  OPEN_STREET_MAP: [MapTypes.ROADMAP]
+};
+const ProvidersNames = {
+  GOOGLE_MAPS: "Google Maps",
+  IGN: "IGN",
+  MAPBOX: "Mapbox",
+  OPEN_STREET_MAP: "OpenStreetMap"
+};
+const LayerGroups = {
+  PIN: "pinLayerGroup",
+  TILE: "tileLayerGroup"
+};
+const AdditionalGoogleLayers = {
+  TRAFFIC: "TrafficLayer",
+  TRANSIT: "TransitLayer",
+  BICYCLING: "BicyclingLayer"
+};
 let providerOptions = {
   IGN: {
-    maxZoom: 19
+    maxZoom: DefaultOptions.MAX_ZOOM,
+    opacity: DefaultOptions.OPACITY
   },
   MAPBOX: {
-    maxZoom: 19,
+    maxZoom: DefaultOptions.MAX_ZOOM,
+    opacity: DefaultOptions.OPACITY,
     zoomOffset: -1
   },
   OPEN_STREET_MAP: {
-    maxZoom: 19
+    maxZoom: DefaultOptions.MAX_ZOOM,
+    opacity: DefaultOptions.OPACITY
   }
 };
 function getProviderOptions$1(layer) {
@@ -819,34 +860,6 @@ async function importLeaflet(version = LEAFLET_VERSION) {
     loadCSSFromCDN(`https://unpkg.com/leaflet@${version}/dist/leaflet.css`)
   ]);
 }
-const Providers = {
-  GOOGLE_MAPS: "GOOGLE_MAPS",
-  IGN: "IGN",
-  MAPBOX: "MAPBOX",
-  OPEN_STREET_MAP: "OPEN_STREET_MAP"
-};
-const MapTypes = {
-  ROADMAP: "roadmap",
-  SATELLITE: "satellite",
-  TERRAIN: "terrain",
-  HYBRID: "hybrid",
-  CADASTRAL: "cadastral"
-};
-const ProvidersNames = {
-  GOOGLE_MAPS: "Google Maps",
-  IGN: "IGN",
-  MAPBOX: "Mapbox",
-  OPEN_STREET_MAP: "OpenStreetMap"
-};
-const LayerGroups = {
-  PIN: "pinLayerGroup",
-  TILE: "tileLayerGroup"
-};
-const AdditionalGoogleLayers = {
-  TRAFFIC: "TrafficLayer",
-  TRANSIT: "TransitLayer",
-  BICYCLING: "BicyclingLayer"
-};
 var MapContainer_vue_vue_type_style_index_0_lang = /* @__PURE__ */ (() => ".map-container{height:250px}.map-container_map{height:100%}\n")();
 const _hoisted_1$2 = { class: "map-container" };
 const _sfc_main$b = {
@@ -9175,17 +9188,35 @@ function getProviderUrl(provider, mapType) {
   switch (provider) {
     case Providers.IGN:
       switch (mapType) {
+        case MapTypes.ROADMAP:
+          return "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
         case MapTypes.SATELLITE:
           return "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/jpeg";
         case MapTypes.CADASTRAL:
           return "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
         default:
-          return "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&STYLE=normal&FORMAT=image/png";
+          throw new Error("Map type " + mapType + " not supported for IGN");
       }
     case Providers.MAPBOX:
-      return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}";
+      switch (mapType) {
+        case MapTypes.ROADMAP:
+          return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={apiKey}";
+        case MapTypes.SATELLITE:
+          return "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={apiKey}";
+        case MapTypes.HYBRID:
+          return "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/{z}/{x}/{y}?access_token={apiKey}";
+        default:
+          throw new Error("Map type " + mapType + " not supported for Mapbox");
+      }
     case Providers.OPEN_STREET_MAP:
-      return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+      switch (mapType) {
+        case MapTypes.ROADMAP:
+          return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+        default:
+          throw new Error("Map type " + mapType + " not supported for OpenStreetMap");
+      }
+    default:
+      throw new Error("Provider " + provider + " not supported");
   }
 }
 const ZOOM_LEVELS = [12, 13, 14, 15, 16, 17, 18, 19];
@@ -9449,8 +9480,8 @@ const _sfc_main$a = {
     },
     type: {
       type: String,
-      default: "roadmap",
-      validator: (type) => ["roadmap"].includes(type)
+      default: MapTypes.ROADMAP,
+      validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type)
     }
   },
   setup(__props) {
@@ -9474,12 +9505,12 @@ const _sfc_main$9 = {
   props: {
     attribution: {
       type: String,
-      default: '&copy <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
+      default: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> - <a href="https://www.mapbox.com/map-feedback/">Improve this map</a>'
     },
     type: {
       type: String,
-      default: "roadmap",
-      validator: (type) => ["roadmap"].includes(type)
+      default: MapTypes.ROADMAP,
+      validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type)
     }
   },
   async setup(__props) {
@@ -9487,14 +9518,27 @@ const _sfc_main$9 = {
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
     const $layerGroup = inject(LayerGroups.TILE);
-    const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
-      attribution: props.attribution
-    });
-    provide("layer", ref(layer));
-    whenever($layerGroup, (layerGroup) => {
-      toRaw(layerGroup).clearLayers();
-      toRaw(layerGroup).addLayer(layer);
-    }, { immediate: true });
+    const layers = ref(getLayers(props.type));
+    provide("layers", layers);
+    watch(props, (props2) => {
+      var _a;
+      set(layers, getLayers(props2.type));
+      (_a = toRaw(get($layerGroup))) == null ? void 0 : _a.clearLayers();
+      layers.value.forEach((layer) => {
+        var _a2;
+        return (_a2 = toRaw(get($layerGroup))) == null ? void 0 : _a2.addLayer(layer);
+      });
+    }, { deep: true, immediate: true });
+    function getLayers(type) {
+      switch (type) {
+        default:
+          return [
+            new TileLayerOffline(Providers.MAPBOX, type, {
+              attribution: props.attribution
+            })
+          ];
+      }
+    }
     return (_ctx, _cache) => {
       return renderSlot(_ctx.$slots, "default");
     };
@@ -9510,7 +9554,7 @@ const _sfc_main$8 = {
     type: {
       type: String,
       default: MapTypes.ROADMAP,
-      validator: (type) => [MapTypes.SATELLITE, MapTypes.ROADMAP, MapTypes.CADASTRAL].includes(type)
+      validator: (type) => ProvidersMapTypes[Providers.IGN].includes(type)
     }
   },
   setup(__props) {
@@ -10469,4 +10513,4 @@ const getProviderOptions = getProviderOptions$1;
 function index(options) {
   setProviderOptions(options);
 }
-export { AdditionalGoogleLayers, _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };
+export { AdditionalGoogleLayers, _sfc_main$2 as Circle, _sfc_main$6 as Cluster, DefaultOptions, DrawControl, FullScreenControl, _sfc_main$7 as GoogleMaps, _sfc_main$8 as IGN, LayerGroups, LocateControl, _sfc_main$b as MapContainer, MapTypes, _sfc_main$9 as Mapbox, _sfc_main$5 as Marker, Offline, OfflineControl$1 as OfflineControl, _sfc_main$a as OpenStreetMap, PegmanControl, _sfc_main as Polygon, _sfc_main$1 as Polyline, _sfc_main$3 as Popup, Providers, ProvidersMapTypes, ProvidersNames, ScaleControl, Tooltip, ZoomControl, index as default, getProviderOptions, getProviderUrl, importGoogleMapsApi, importLeaflet, importLeafletArrowHeads, importLeafletFullScreen, importLeafletGeoman, importLeafletGeometryUtil, importLeafletGoogleMutant, importLeafletLocateControl, importLeafletMarkerCluster, importLeafletPegman, importLeafletSmoothMarkerBouncing, Bounceable as vBounce };

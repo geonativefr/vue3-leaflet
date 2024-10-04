@@ -3,8 +3,8 @@
 </template>
 
 <script setup>
-	import { get, set, whenever } from '@vueuse/core';
-	import { inject, provide, reactive, ref, toRaw, watch } from 'vue';
+	import { whenever } from '@vueuse/core';
+	import { inject, provide, ref, toRaw } from 'vue';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
@@ -21,37 +21,17 @@
 	});
 
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layers = ref(getLayers(props.type));
-	provide('layers', layers);
+	const layer = new TileLayerOffline(Providers.OPEN_STREET_MAP, props.type, {
+		attribution: props.attribution,
+	});
 
-	watch(
-		props,
-		(props) => {
-			set(layers, getLayers(props.type));
-			toRaw(get($layerGroup))?.clearLayers();
-			layers.value.forEach((layer) => toRaw(get($layerGroup))?.addLayer(layer));
+	provide('layer', ref(layer));
+	whenever(
+		$layerGroup,
+		(layerGroup) => {
+			toRaw(layerGroup).clearLayers();
+			toRaw(layerGroup).addLayer(layer);
 		},
-		{ deep: true, immediate: true }
+		{ immediate: true }
 	);
-
-	function getLayers(type) {
-		switch (type) {
-			case MapTypes.HYBRID:
-				return [
-					new TileLayerOffline(Providers.OPEN_STREET_MAP, MapTypes.SATELLITE, {
-						attribution: props.attribution,
-					}),
-					new TileLayerOffline(Providers.OPEN_STREET_MAP, MapTypes.ROADMAP, {
-						attribution: props.attribution,
-						opacity: 0.5,
-					}),
-				];
-			default:
-				return [
-					new TileLayerOffline(Providers.OPEN_STREET_MAP, type, {
-						attribution: props.attribution,
-					}),
-				];
-		}
-	}
 </script>
