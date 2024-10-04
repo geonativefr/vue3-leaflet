@@ -9513,7 +9513,7 @@ const _sfc_main$9 = {
     const props = __props;
     const $layerGroup = inject(LayerGroups.TILE);
     const layer = ref(getLayer(props.type));
-    provide("layer", ref(layer));
+    provide("layer", layer);
     watch(props, (props2) => {
       var _a, _b;
       set(layer, getLayer(props2.type));
