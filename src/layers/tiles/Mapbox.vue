@@ -18,7 +18,7 @@
 		type: {
 			type: String,
 			default: MapTypes.ROADMAP,
-			validator: (type) => ProvidersMapTypes[Providers.OPEN_STREET_MAP].includes(type),
+			validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type),
 		},
 	});
 

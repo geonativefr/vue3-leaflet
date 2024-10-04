@@ -1,6 +1,5 @@
 export const DefaultOptions = {
 	MAX_ZOOM: 19,
-	OPACITY: 1,
 };
 
 export const Providers = {
