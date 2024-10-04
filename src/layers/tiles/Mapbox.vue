@@ -3,9 +3,8 @@
 </template>
 
 <script setup>
-	import { whenever } from '@vueuse/core';
-	import { inject, provide, ref, toRaw } from 'vue';
-	import { importLeaflet } from '../../utils/leaflet-loader.js';
+	import { get, set } from '@vueuse/core';
+	import { inject, provide, ref, toRaw, watch } from 'vue';
 	import TileLayerOffline from '../Offline';
 	import { LayerGroups, MapTypes, Providers, ProvidersMapTypes } from '../../constants';
 
@@ -21,20 +20,23 @@
 			validator: (type) => ProvidersMapTypes[Providers.MAPBOX].includes(type),
 		},
 	});
-
-	await importLeaflet(inject('leaflet.version'));
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = new TileLayerOffline(Providers.MAPBOX, props.type, {
-		attribution: props.attribution,
-	});
+	const layer = ref(getLayer(props.type))
 
 	provide('layer', ref(layer));
-	whenever(
-		$layerGroup,
-		(layerGroup) => {
-			toRaw(layerGroup).clearLayers();
-			toRaw(layerGroup).addLayer(layer);
+	watch(
+		props,
+		(props) => {
+			set(layer, getLayer(props.type));
+			toRaw(get($layerGroup))?.clearLayers();
+			toRaw(get($layerGroup))?.addLayer(get(layer));
 		},
-		{ immediate: true }
+		{ deep: true, immediate: true }
 	);
+
+	function getLayer(type) {
+		return new TileLayerOffline(Providers.MAPBOX, type, {
+			attribution: props.attribution,
+		});
+	}
 </script>
