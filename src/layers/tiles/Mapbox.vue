@@ -21,9 +21,9 @@
 		},
 	});
 	const $layerGroup = inject(LayerGroups.TILE);
-	const layer = ref(getLayer(props.type))
+	const layer = ref(getLayer(props.type));
 
-	provide('layer', ref(layer));
+	provide('layer', layer);
 	watch(
 		props,
 		(props) => {
