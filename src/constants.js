@@ -40,4 +40,4 @@ export const AdditionalGoogleLayers = {
 	TRAFFIC: 'TrafficLayer',
 	TRANSIT: 'TransitLayer',
 	BICYCLING: 'BicyclingLayer',
-}
+};
