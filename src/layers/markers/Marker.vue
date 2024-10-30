@@ -8,6 +8,7 @@
 	import { get, set, whenever } from '@vueuse/core';
 	import { computed, inject, onUnmounted, provide, reactive, ref, toRaw, toRefs } from 'vue';
 	import { importLeaflet } from '../../utils/leaflet-loader.js';
+	import { importLeafletMarkerSlideTo } from '../../utils/leaflet-marker-slide-to';
 	import { MUTE_ERRORS, silently } from '../../utils/silently.js';
 	import { clean } from '../../utils/utils.js';
 	import { LayerGroups } from '../../constants';
@@ -38,10 +39,14 @@
 			type: [String, Node],
 			default: undefined,
 		},
+		slideEffect: {
+			type: Boolean,
+			default: true,
+		},
 	});
 
 	await importLeaflet(inject('leaflet.version'));
-
+	await importLeafletMarkerSlideTo();
 	// @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
 	L.Marker.prototype._animateZoom = function (opt) {
 		if (!this._map) {
@@ -97,7 +102,15 @@
 	set($marker, marker);
 	emit('load', get($marker));
 
-	whenever(position, (position) => get($marker).setLatLng(position));
+	whenever(position, (position) => {
+		if (props.slideEffect) {
+			return get($marker).slideTo(position, {
+				duration: 250,
+				keepAtCenter: false,
+			});
+		}
+		return get($marker).setLatLng(position);
+	});
 	whenever(icon, (icon) => silently(() => toRaw(get($marker)).setIcon(icon), MUTE_ERRORS), { immediate: true });
 	whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
 	whenever(tooltip, (tooltip) => get(marker).bindTooltip(tooltip), { deep: true, immediate: true });
