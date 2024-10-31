@@ -202,6 +202,6 @@ Then, inside your project:
 
 ```bash
 yarn link vue3-leaflet # Will override your node_modules dependency to use your local copy
-yarn dev # Will watch for changes in your project + in vue3-leaflet
+yarn dev --force # Will watch for changes in your project + in vue3-leaflet
 yarn unlink vue3-leaflet # Once you're done
 ```
