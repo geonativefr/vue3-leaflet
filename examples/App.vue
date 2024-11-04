@@ -14,6 +14,7 @@
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
+			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect"></Marker>
 			<Polygon v-for="(zone, name) of zones" :positions="zone" color="#3388ff" fillColor="#3388ff"></Polygon>
 		</MapContainer>
 		<div class="selector">
@@ -35,6 +36,19 @@
 			</label>
 		</div>
 
+		<div class="move-position">
+			<h2>Slide to</h2>
+			<label>
+				<input type="radio" :value="true" v-model="slideEffect" />
+				Enabled
+			</label>
+			<label>
+				<input type="radio" :value="false" v-model="slideEffect" />
+				Disabled
+			</label>
+			<button @click="movePosition">Move</button>
+		</div>
+
 		<div class="app_saved-maps">
 			<h2 class="app_saved-maps_title">Saved maps</h2>
 			<div class="app_saved-maps_list">
@@ -51,7 +65,7 @@
 </template>
 
 <script setup>
-	import { ref, watch } from 'vue';
+	import { ref, toRaw, watch } from 'vue';
 	import Vue3Leaflet, {
 		GoogleMaps,
 		Mapbox,
@@ -93,6 +107,19 @@
 
 	const center = ref([50.60097732180697, 3.065646079092121]);
 
+	const slideEffect = ref(false);
+	const movingMarkerPositions = [
+		[50.5996830, 3.0622892],
+		[50.6028546, 3.0595997],
+	];
+	const movingMarkerPosition = ref(movingMarkerPositions[0]);
+
+	function movePosition() {
+		movingMarkerPosition.value = toRaw(movingMarkerPosition.value) === movingMarkerPositions[0]
+				? movingMarkerPositions[1]
+				: movingMarkerPositions[0];
+	}
+
 	window.bounceFast = {
 		bounceHeight: 12,
 		bounceSpeed: 85,
@@ -128,6 +155,11 @@
 		}
 		.map-container {
 			height: 600px;
+		}
+		.move-position {
+			button {
+				margin-left: 1rem;
+			}
 		}
 
 		&_saved-maps {
