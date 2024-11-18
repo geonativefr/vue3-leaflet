@@ -22,7 +22,7 @@
 			default: () => [],
 			validator(value) {
 				return value.every((layer) => Object.values(AdditionalGoogleLayers).includes(layer));
-			}
+			},
 		},
 		version: {
 			type: String,

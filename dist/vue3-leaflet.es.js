@@ -764,6 +764,7 @@ const LEAFLET_GEOMETRYUTIL_VERSION = "0.10.2";
 const LEAFLET_GEOMAN_VERSION = "2.14.2";
 const LEAFLET_MARKERCLUSTER_VERSION = "1.5.3";
 const LEAFLET_FULLSCREEN_VERSION = "1.0.5";
+const LEAFLET_MARKER_SLIDE_TO = "0.2.0";
 function renderless(component) {
   return Object.assign(component, { render: () => void 0 });
 }
@@ -9665,6 +9666,9 @@ const _sfc_main$6 = {
     };
   }
 };
+async function importLeafletMarkerSlideTo(version = LEAFLET_MARKER_SLIDE_TO) {
+  return loadJSFromCDN(`https://unpkg.com/leaflet.marker.slideto@${version}/Leaflet.Marker.SlideTo.js`);
+}
 const MUTE_ERRORS = () => ({});
 const LOG_ERRORS = (e) => console.debug(e);
 async function silently(callback, onFailure = LOG_ERRORS) {
@@ -9701,6 +9705,10 @@ const _sfc_main$5 = {
     tooltip: {
       type: [String, Node],
       default: void 0
+    },
+    slideEffect: {
+      type: Boolean,
+      default: true
     }
   },
   emits: ["click", "load"],
@@ -9708,6 +9716,7 @@ const _sfc_main$5 = {
     let __temp, __restore;
     const props = __props;
     [__temp, __restore] = withAsyncContext(() => importLeaflet(inject("leaflet.version"))), await __temp, __restore();
+    [__temp, __restore] = withAsyncContext(() => importLeafletMarkerSlideTo()), await __temp, __restore();
     L.Marker.prototype._animateZoom = function(opt) {
       if (!this._map) {
         return;
@@ -9755,7 +9764,15 @@ const _sfc_main$5 = {
     layerGroup.addLayer(marker);
     set($marker, marker);
     emit("load", get($marker));
-    whenever(position, (position2) => get($marker).setLatLng(position2));
+    whenever(position, (position2) => {
+      if (props.slideEffect) {
+        return get($marker).slideTo(position2, {
+          duration: 250,
+          keepAtCenter: false
+        });
+      }
+      return get($marker).setLatLng(position2);
+    });
     whenever(icon, (icon2) => silently(() => toRaw(get($marker)).setIcon(icon2), MUTE_ERRORS), { immediate: true });
     whenever(options, () => updateOptions(get($marker)), { deep: true, immediate: true });
     whenever(tooltip, (tooltip2) => get(marker).bindTooltip(tooltip2), { deep: true, immediate: true });
