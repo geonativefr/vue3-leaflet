@@ -1,4 +1,4 @@
-import { LEAFLET_ARROWHEADS_VERSION } from '../vars.js';
+import { LEAFLET_ARROWHEADS_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { importLeafletGeometryUtil } from './leaflet-geometryutil-loader.js';
 import { loadJSFromCDN } from './utils.js';
 

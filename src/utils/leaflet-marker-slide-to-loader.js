@@ -1,4 +1,4 @@
-import { LEAFLET_MARKER_SLIDE_TO_VERSION } from '../vars.js';
+import { LEAFLET_MARKER_SLIDE_TO_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadJSFromCDN } from './utils.js';
 
 export async function importLeafletMarkerSlideTo(version = LEAFLET_MARKER_SLIDE_TO_VERSION) {

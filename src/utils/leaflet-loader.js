@@ -1,4 +1,4 @@
-import { LEAFLET_VERSION } from '../vars.js';
+import { LEAFLET_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadCSSFromCDN, loadJSFromCDN } from './utils.js';
 
 export async function importLeaflet(version = LEAFLET_VERSION) {

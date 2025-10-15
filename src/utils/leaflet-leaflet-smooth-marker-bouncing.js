@@ -1,4 +1,4 @@
-import { LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION } from '../vars.js';
+import { LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadJSFromCDN } from './utils.js';
 
 export async function importLeafletSmoothMarkerBouncing(version = LEAFLET_SMOOTH_MARKER_BOUNCING_VERSION) {

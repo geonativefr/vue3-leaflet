@@ -1,4 +1,4 @@
-import { LEAFLET_MARKERCLUSTER_VERSION } from '../vars.js';
+import { LEAFLET_MARKERCLUSTER_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadCSSFromCDN, loadJSFromCDN } from './utils.js';
 
 export async function importLeafletMarkerCluster(version = LEAFLET_MARKERCLUSTER_VERSION) {

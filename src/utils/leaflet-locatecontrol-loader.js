@@ -1,4 +1,4 @@
-import { LEAFLET_LOCATE_CONTROL_VERSION } from '../vars.js';
+import { LEAFLET_LOCATE_CONTROL_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadCSSFromCDN, loadJSFromCDN } from './utils.js';
 
 export async function importLeafletLocateControl(version = LEAFLET_LOCATE_CONTROL_VERSION) {

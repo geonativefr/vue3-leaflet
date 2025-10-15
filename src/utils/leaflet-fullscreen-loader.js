@@ -1,4 +1,4 @@
-import { LEAFLET_FULLSCREEN_VERSION } from '../vars.js';
+import { LEAFLET_FULLSCREEN_VERSION, UNPKG_CDN_URL } from '../vars.js';
 import { loadCSSFromCDN, loadJSFromCDN } from './utils.js';
 
 export async function importLeafletFullScreen(version = LEAFLET_FULLSCREEN_VERSION) {
