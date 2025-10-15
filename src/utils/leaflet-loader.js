@@ -6,4 +6,11 @@ export async function importLeaflet() {
 		loadJSFromCDN(`${UNPKG_CDN_URL}/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`),
 		loadCSSFromCDN(`${UNPKG_CDN_URL}/leaflet@${LEAFLET_VERSION}/dist/leaflet.css`),
 	]);
+	// If CDN fails, Load Leaflet from local copy
+	if (typeof L === 'undefined') {
+		await Promise.all([
+			loadJSFromCDN(`/leaflet/leaflet-${LEAFLET_VERSION}/leaflet.js`),
+			loadCSSFromCDN(`/leaflet/leaflet-${LEAFLET_VERSION}/leaflet.css`),
+		]);
+	}
 }
