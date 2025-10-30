@@ -23,6 +23,7 @@
     "@geoman-io/leaflet-geoman-free": "2.14.2",
     "@runette/leaflet-fullscreen": "1.0.5",
     "@vueuse/core": "^9.6.0",
+    "interactjs": "1.10.27",
     "leaflet-arrowheads": "1.4.0",
     "leaflet-geometryutil": "0.10.2",
     "leaflet-pegman": "0.1.6",
