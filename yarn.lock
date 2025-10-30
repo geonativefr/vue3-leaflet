@@ -622,6 +622,11 @@ leaflet.marker.slideto@0.3.0:
   resolved "https://registry.yarnpkg.com/leaflet.marker.slideto/-/leaflet.marker.slideto-0.3.0.tgz#01c3d84bb111b75339aa6cb99fb1b2f0a8f72ee1"
   integrity sha512-BQwOy5CuDBuEXIbeJ1mjO9SqlY3au65LhWJ1hjkwQYy/XhOhaF7kIF3+0DRasONIvbFYL+QwQ2/QjEjDUZgn4A==
 
+leaflet.markercluster@1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/leaflet.markercluster/-/leaflet.markercluster-1.5.3.tgz#9cdb52a4eab92671832e1ef9899669e80efc4056"
+  integrity sha512-vPTw/Bndq7eQHjLBVlWpnGeLa3t+3zGiuM7fJwCkiMFq+nmRuG3RI3f7f4N4TDX7T4NpbAXpR2+NTRSEGfCSeA==
+
 leaflet@1.9.4, leaflet@^1.6.0, leaflet@^1.7.1:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"

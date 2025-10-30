@@ -26,6 +26,7 @@
     "leaflet-geometryutil": "0.10.2",
     "leaflet.gridlayer.googlemutant": "0.14.1",
     "leaflet.marker.slideto": "0.3.0",
+    "leaflet.markercluster": "1.5.3",
     "lodash.merge": "^4.6.2",
     "vue": "^3.2.25"
   },
