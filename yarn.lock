@@ -622,6 +622,11 @@ leaflet.gridlayer.googlemutant@0.14.1:
   resolved "https://registry.yarnpkg.com/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.14.1.tgz#c282209aa1a39eb2f87d8aaa4e9894181c9e20a0"
   integrity sha512-/OYxEjmgxO1U1KOhTzg+m8c0b95J0943LU8DXQmdJu/x2f+1Ur78rvEPO2QCS0cmwZ3m6FvE5I3zXnBzJNWRCA==
 
+leaflet.locatecontrol@0.79.0:
+  version "0.79.0"
+  resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.79.0.tgz#0236b87c699a49f9ddb2f289941fbc0d3c3f8b62"
+  integrity sha512-h64QIHFkypYdr90lkSfjKvPvvk8/b8UnP3m9WuoWdp5p2AaCWC0T1NVwyuj4rd5U4fBW3tQt4ppmZ2LceHMIDg==
+
 leaflet.marker.slideto@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/leaflet.marker.slideto/-/leaflet.marker.slideto-0.3.0.tgz#01c3d84bb111b75339aa6cb99fb1b2f0a8f72ee1"
