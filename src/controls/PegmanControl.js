@@ -1,7 +1,8 @@
 import { whenever } from '@vueuse/core';
 import { inject } from 'vue';
-import { importLeaflet } from '../utils/leaflet-loader.js';
-import { importLeafletPegman } from '../utils/leaflet-pegman-loader.js';
+import L from 'leaflet';
+import 'leaflet-pegman';
+import 'leaflet-pegman/leaflet-pegman.css';
 import { loadGmapsApi, renderless } from '../utils/utils.js';
 
 export default renderless({
@@ -30,9 +31,6 @@ export default renderless({
 		if (props.apiKey) {
 			await loadGmapsApi(props.apiKey);
 		}
-
-		await importLeaflet();
-		await importLeafletPegman(props.version);
 
 		const mount = async (map) => {
 			const control = new L.Control.Pegman({

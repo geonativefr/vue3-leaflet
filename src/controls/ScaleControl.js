@@ -1,6 +1,6 @@
 import { whenever } from '@vueuse/core';
 import { inject } from 'vue';
-import { importLeaflet } from '../utils/leaflet-loader.js';
+import L from 'leaflet';
 import { clean, renderless } from '../utils/utils.js';
 
 export default renderless({
@@ -24,7 +24,6 @@ export default renderless({
 	},
 	async setup(props) {
 		const map = inject('map');
-		await importLeaflet(inject('leaflet.version'));
 		const control = L.control.scale(clean({ ...props }));
 
 		whenever(map, (map) => map.addControl(control), { immediate: true });

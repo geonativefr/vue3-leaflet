@@ -1,5 +1,7 @@
 import { get } from '@vueuse/core';
 import { toRaw } from 'vue';
+import L from 'leaflet';
+import 'leaflet.smooth_marker_bouncing';
 
 function setBouncingState(marker, value) {
 	if (value) {

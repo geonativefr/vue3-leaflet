@@ -5,8 +5,8 @@
 <script setup>
 	import { set, whenever } from '@vueuse/core';
 	import { inject, reactive, ref, toRefs, unref, toRaw, watch } from 'vue';
-	import { importLeaflet } from '../../utils/leaflet-loader.js';
-	import { importLeafletGoogleMutant } from '../../utils/leaflet-google-mutant-loader.js';
+	import L from 'leaflet';
+	import 'leaflet.gridlayer.googlemutant';
 	import { importGoogleMapsApi } from '../../utils/gmaps-api-loader.js';
 	import { AdditionalGoogleLayers, MapTypes, ProvidersMapTypes, LayerGroups, Providers } from '../../constants';
 	import { getProviderOptions } from '../../utils/options';
@@ -29,9 +29,6 @@
 			default: undefined,
 		},
 	});
-
-	await importLeaflet(inject('leaflet.version'));
-	await importLeafletGoogleMutant(props.version);
 
 	const { type, additionalLayers } = toRefs(props);
 	const defaultOptions = reactive({ type });

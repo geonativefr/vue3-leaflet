@@ -1,7 +1,8 @@
 import { whenever } from '@vueuse/core';
 import { inject, reactive } from 'vue';
-import { importLeafletFullScreen } from '../utils/leaflet-fullscreen-loader.js';
-import { importLeaflet } from '../utils/leaflet-loader.js';
+import L from 'leaflet';
+import '@runette/leaflet-fullscreen';
+import '@runette/leaflet-fullscreen/dist/leaflet.fullscreen.css';
 import { clean, renderless } from '../utils/utils.js';
 
 export default renderless({
@@ -26,8 +27,6 @@ export default renderless({
 	async setup(props) {
 		const map = inject('map');
 
-		await importLeaflet(inject('leaflet.version'));
-		await importLeafletFullScreen(props.version);
 		const options = reactive({
 			position: props.position,
 			title: {

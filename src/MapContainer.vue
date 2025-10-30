@@ -36,6 +36,10 @@
 			type: Array,
 			default: undefined,
 		},
+		version: {
+			type: String,
+			default: undefined,
+		},
 	});
 
 	const { center, zoom, zoomControl, bounds, scrollWheelZoom } = toRefs(props);
@@ -56,9 +60,10 @@
 	provide('map', $map);
 	provide(LayerGroups.TILE, $tileLayerGroup);
 	provide(LayerGroups.PIN, $pinLayerGroup);
+	provide('leaflet.version', props.version);
 
 	onMounted(async () => {
-		await importLeaflet();
+		await importLeaflet(props.version);
 
 		const map = L.map(get(container), options);
 		map.setView(props.center, props.zoom);

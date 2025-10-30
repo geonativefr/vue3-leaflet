@@ -1,5 +1,8 @@
 import { whenever } from '@vueuse/core';
 import { inject, nextTick } from 'vue';
+import L from 'leaflet';
+import '@geoman-io/leaflet-geoman-free';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import { renderless } from '../utils/utils.js';
 
 export default renderless({

@@ -7,8 +7,8 @@
 <script setup>
 	import { get, set, whenever } from '@vueuse/core';
 	import { computed, inject, onUnmounted, provide, reactive, ref, toRaw, toRefs } from 'vue';
-	import { importLeaflet } from '../../utils/leaflet-loader.js';
-	import { importLeafletMarkerSlideTo } from '../../utils/leaflet-marker-slide-to-loader';
+	import L from 'leaflet';
+	import 'leaflet.marker.slideto';
 	import { MUTE_ERRORS, silently } from '../../utils/silently.js';
 	import { clean } from '../../utils/utils.js';
 	import { LayerGroups } from '../../constants';
@@ -45,8 +45,6 @@
 		},
 	});
 
-	await importLeaflet(inject('leaflet.version'));
-	await importLeafletMarkerSlideTo();
 	// @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
 	L.Marker.prototype._animateZoom = function (opt) {
 		if (!this._map) {
