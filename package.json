@@ -30,6 +30,7 @@
     "leaflet.locatecontrol": "0.79.0",
     "leaflet.marker.slideto": "0.3.0",
     "leaflet.markercluster": "1.5.3",
+    "leaflet.smooth_marker_bouncing": "2.0.1",
     "lodash.merge": "^4.6.2",
     "vue": "^3.2.25"
   },
