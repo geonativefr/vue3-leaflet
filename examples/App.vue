@@ -1,6 +1,6 @@
 <template>
 	<div class="app">
-		<MapContainer :zoom-control="false" :center="center" :zoom="16" version="1.8.0">
+		<MapContainer :zoom-control="false" :center="center" :zoom="16">
 			<GoogleMaps
 				v-if="provider === Providers.GOOGLE_MAPS"
 				:type="mapType"
