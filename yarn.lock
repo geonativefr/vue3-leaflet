@@ -372,7 +372,22 @@ is-number@^7.0.0:
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
 
-leaflet@1.9.4:
+leaflet-arrowheads@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/leaflet-arrowheads/-/leaflet-arrowheads-1.4.0.tgz#2a92711c4ca89e6a63014f552cc0d6c67653a773"
+  integrity sha512-aIjsmoWe1VJXaGOpKpS6E8EzN2vpx3GGCNP/FxQteLVzAg5xMID7elf9hj/1CWLJo8FuGRjSvKkUQDj7mocrYA==
+  dependencies:
+    leaflet "^1.7.1"
+    leaflet-geometryutil "^0.10.0"
+
+leaflet-geometryutil@^0.10.0:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/leaflet-geometryutil/-/leaflet-geometryutil-0.10.3.tgz#dda78546abc58723a46b47fd6ffb081f5b63cec4"
+  integrity sha512-Qeas+KsnenE0Km/ydt8km3AqFe7kJhVwuLdbCYM2xe2epsxv5UFEaVJiagvP9fnxS8QvBNbm7DJlDA0tkKo9VA==
+  dependencies:
+    leaflet "^1.6.0"
+
+leaflet@1.9.4, leaflet@^1.6.0, leaflet@^1.7.1:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
   integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
