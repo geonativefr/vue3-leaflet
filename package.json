@@ -20,6 +20,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "2.14.2",
     "@runette/leaflet-fullscreen": "1.0.5",
     "@vueuse/core": "^9.6.0",
     "leaflet-arrowheads": "1.4.0",
