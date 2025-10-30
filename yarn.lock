@@ -612,6 +612,11 @@ leaflet-geometryutil@^0.10.0:
   dependencies:
     leaflet "^1.6.0"
 
+leaflet.gridlayer.googlemutant@0.14.1:
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.14.1.tgz#c282209aa1a39eb2f87d8aaa4e9894181c9e20a0"
+  integrity sha512-/OYxEjmgxO1U1KOhTzg+m8c0b95J0943LU8DXQmdJu/x2f+1Ur78rvEPO2QCS0cmwZ3m6FvE5I3zXnBzJNWRCA==
+
 leaflet@1.9.4, leaflet@^1.6.0, leaflet@^1.7.1:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
