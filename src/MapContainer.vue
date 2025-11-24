@@ -11,7 +11,8 @@
 <script setup>
 	import { get, set, templateRef, whenever } from '@vueuse/core';
 	import { onMounted, provide, reactive, ref, toRefs, watch } from 'vue';
-	import { importLeaflet } from './utils/leaflet-loader.js';
+	import L from 'leaflet';
+	import 'leaflet/dist/leaflet.css';
 	import { LayerGroups } from './constants';
 
 	const emit = defineEmits(['ready', 'move', 'zoomend']);
@@ -63,8 +64,6 @@
 	provide('leaflet.version', props.version);
 
 	onMounted(async () => {
-		await importLeaflet(props.version);
-
 		const map = L.map(get(container), options);
 		map.setView(props.center, props.zoom);
 		map.on('move', (event) => emit('move', { event, center: map.getCenter(), map }));
