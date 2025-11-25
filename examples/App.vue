@@ -16,6 +16,7 @@
 			<Marker v-for="position of positions" :position="position"></Marker>
 			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect"></Marker>
 			<Polygon v-for="(zone, name) of zones" :positions="zone" color="#3388ff" fillColor="#3388ff"></Polygon>
+			<Polyline :positions="movingMarkerPositions" color="#3388ff" :arrows="{ size: '10px', yawn: 30, frequency: 'allvertices' }"></Polyline>
 		</MapContainer>
 		<div class="selector">
 			<label v-for="providerKey in Object.keys(ProvidersNames)" :key="providerKey">
@@ -84,6 +85,7 @@
 		Providers,
 		AdditionalGoogleLayers,
 		Polygon,
+		Polyline,
 	} from '../src';
 	import positions from './positions.json';
 	import zones from './zones.json';
