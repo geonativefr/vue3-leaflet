@@ -14,7 +14,7 @@
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
-			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect"></Marker>
+			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect" v-bounce="true"></Marker>
 			<Polygon v-for="(zone, name) of zones" :positions="zone" color="#3388ff" fillColor="#3388ff"></Polygon>
 			<Polyline :positions="movingMarkerPositions" color="#3388ff" :arrows="{ size: '10px', yawn: 30, frequency: 'allvertices' }"></Polyline>
 		</MapContainer>
@@ -86,6 +86,7 @@
 		AdditionalGoogleLayers,
 		Polygon,
 		Polyline,
+		vBounce,
 	} from '../src';
 	import positions from './positions.json';
 	import zones from './zones.json';
