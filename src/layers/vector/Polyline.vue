@@ -6,7 +6,6 @@
 	import { whenever } from '@vueuse/core';
 	import { computed, inject, onUnmounted, provide, reactive, toRefs } from 'vue';
 	import L from 'leaflet';
-	import 'leaflet-geometryutil';
 	import 'leaflet-arrowheads';
 	import { clean } from '../../utils/utils.js';
 	import PathProps from '../PathProps.js';
