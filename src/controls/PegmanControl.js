@@ -1,6 +1,8 @@
 import { whenever } from '@vueuse/core';
 import { inject } from 'vue';
+import interact from 'interactjs';
 import L from 'leaflet';
+window.interact = interact;
 import 'leaflet-pegman';
 import 'leaflet-pegman/leaflet-pegman.css';
 import { loadGmapsApi, renderless } from '../utils/utils.js';
