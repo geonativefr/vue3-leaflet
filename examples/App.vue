@@ -9,6 +9,7 @@
 			<IGN v-if="provider === Providers.IGN" :type="mapType" />
 			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
 			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
+			<FullScreenControl position="bottomright" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
@@ -73,6 +74,7 @@
 		IGN,
 		OpenStreetMap,
 		MapContainer,
+		FullScreenControl,
 		ZoomControl,
 		ScaleControl,
 		LocateControl,
