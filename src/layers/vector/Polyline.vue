@@ -5,7 +5,8 @@
 <script setup>
 	import { whenever } from '@vueuse/core';
 	import { computed, inject, onUnmounted, provide, reactive, toRefs } from 'vue';
-	import { importLeafletArrowHeads } from '../../utils/leaflet-leaflet-arrowheads.js';
+	import L from 'leaflet';
+	import 'leaflet-arrowheads';
 	import { clean } from '../../utils/utils.js';
 	import PathProps from '../PathProps.js';
 	import { LayerGroups } from '../../constants';
@@ -42,7 +43,6 @@
 	onUnmounted(() => polyline.remove());
 
 	if (props.arrows) {
-		await importLeafletArrowHeads();
 		polyline.arrowheads(props.arrows);
 	}
 

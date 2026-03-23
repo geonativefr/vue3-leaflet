@@ -9,7 +9,7 @@
 <script setup>
 	import { get, set, templateRef, useMounted, useMutationObserver, whenever } from '@vueuse/core';
 	import { inject, provide, ref, toRefs, watch } from 'vue';
-	import { importLeaflet } from '../utils/leaflet-loader.js';
+	import L from 'leaflet';
 	import Void from '../Void.vue';
 
 	const props = defineProps({
@@ -18,8 +18,6 @@
 			default: undefined,
 		},
 	});
-
-	await importLeaflet(inject('leaflet.version'));
 
 	// @link https://github.com/Leaflet/Leaflet/issues/4453#issuecomment-1151893365
 	L.Popup.prototype._animateZoom = function (e) {

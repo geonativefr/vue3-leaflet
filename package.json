@@ -20,13 +20,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "2.14.2",
+    "@runette/leaflet-fullscreen": "1.0.5",
     "@vueuse/core": "^9.6.0",
+    "interactjs": "^1.10.27",
+    "leaflet": "1.9.4",
+    "leaflet-arrowheads": "1.4.0",
+    "leaflet-geometryutil": "0.10.2",
+    "leaflet-pegman": "0.1.6",
+    "leaflet.gridlayer.googlemutant": "0.14.1",
+    "leaflet.locatecontrol": "0.79.0",
+    "leaflet.marker.slideto": "0.3.0",
+    "leaflet.markercluster": "1.5.3",
+    "leaflet.smooth_marker_bouncing": "2.0.1",
     "lodash.merge": "^4.6.2",
     "vue": "^3.2.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
-    "leaflet": "^1.9.4",
     "path": "^0.12.7",
     "prettier": "^3.0.1",
     "sass": "^1.66.0",

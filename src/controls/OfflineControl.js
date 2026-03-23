@@ -1,7 +1,6 @@
 import { inject } from 'vue';
-import { Control, DomUtil } from 'leaflet';
+import L, { Control, DomUtil } from 'leaflet';
 import { renderless } from '../utils/utils.js';
-import { importLeaflet } from '../utils/leaflet-loader.js';
 import TileLayerOffline from '../layers/Offline.js';
 import { whenever } from '@vueuse/core';
 import DownloadIcon from '../assets/download.svg';
@@ -90,8 +89,6 @@ export default renderless({
 
 	async setup(props, context) {
 		const $map = inject('map');
-
-		await importLeaflet(inject('leaflet.version'));
 
 		const map = await new Promise((resolve) => {
 			whenever($map, (map) => resolve(map), { immediate: true });
