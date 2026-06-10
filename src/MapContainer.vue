@@ -13,7 +13,13 @@
 	import { onMounted, provide, reactive, ref, toRefs, watch } from 'vue';
 	import L from 'leaflet';
 	import 'leaflet/dist/leaflet.css';
+	import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+	import iconUrl from 'leaflet/dist/images/marker-icon.png';
+	import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 	import { LayerGroups } from './constants';
+
+	L.Icon.Default.imagePath = '';
+	L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });
 
 	const emit = defineEmits(['ready', 'move', 'zoomend']);
 	const props = defineProps({
