@@ -10,12 +10,13 @@
 			<Mapbox v-if="provider === Providers.MAPBOX" :type="mapType" />
 			<OpenStreetMap v-if="provider === Providers.OPEN_STREET_MAP" :type="mapType" />
 			<DrawControl draw-circle draw-polygon draw-rectangle only-one-shape />
+			<FullScreenControl position="bottomright" />
 			<ZoomControl position="bottomright" />
 			<ScaleControl />
 			<LocateControl position="bottomright" />
 			<OfflineControl @progress="downloadProgress" @maxSize="onMaxSize" />
 			<Marker v-for="position of positions" :position="position"></Marker>
-			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect"></Marker>
+			<Marker :position="movingMarkerPosition" :slide-effect="slideEffect" v-bounce="true"></Marker>
 			<Polygon v-for="(zone, name) of zones" :positions="zone" color="#3388ff" fillColor="#3388ff"></Polygon>
 			<Polyline :positions="movingMarkerPositions" color="#3388ff" :arrows="{ size: '10px', yawn: 30, frequency: 'allvertices' }"></Polyline>
 		</MapContainer>
@@ -75,6 +76,7 @@
 		OpenStreetMap,
 		MapContainer,
 		DrawControl,
+		FullScreenControl,
 		ZoomControl,
 		ScaleControl,
 		LocateControl,
@@ -88,6 +90,7 @@
 		AdditionalGoogleLayers,
 		Polygon,
 		Polyline,
+		vBounce,
 	} from '../src';
 	import positions from './positions.json';
 	import zones from './zones.json';
