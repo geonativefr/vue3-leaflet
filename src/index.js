@@ -27,5 +27,5 @@ export * from './utils/urls.js';
 export const getProviderOptions = Options.getProviderOptions;
 
 export default function (options) {
-	Options.setProviderOptions(options);
+  Options.setProviderOptions(options);
 }
